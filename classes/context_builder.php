@@ -146,6 +146,9 @@ class context_builder {
         // Append AI literacy instructions.
         $prompt .= self::get_ai_literacy_instructions();
 
+        // Append next-steps suggestion instructions.
+        $prompt .= self::get_next_steps_instructions();
+
         // Append multilingual instructions (with explicit language if set).
         $prompt .= self::get_multilingual_instructions($lang);
 
@@ -457,6 +460,23 @@ class context_builder {
             . "When appropriate, share tips like: 'A good practice when using any AI tool is to...', "
             . "or 'This is an example of where AI can help you get started, but you should verify...'.\n"
             . "The goal is to prepare students to be effective, critical AI users beyond this tutoring context.";
+    }
+
+    /**
+     * Get instructions for appending SOLA_NEXT suggestion markers.
+     *
+     * @return string
+     */
+    private static function get_next_steps_instructions(): string {
+        return "\n\n## Suggested Follow-up Actions\n"
+            . "After EVERY response, append exactly this marker on its own line at the very end:\n"
+            . "[SOLA_NEXT]suggestion 1||suggestion 2||suggestion 3||suggestion 4[/SOLA_NEXT]\n\n"
+            . "Each suggestion should be a short (3–8 word) actionable prompt that naturally continues "
+            . "the conversation. Examples: \"Quiz me on this\", \"Give me an example\", "
+            . "\"Explain it more simply\", \"What should I study next?\". "
+            . "Vary suggestions based on context. Always include exactly 4, separated by ||. "
+            . "The [SOLA_NEXT]...[/SOLA_NEXT] block is hidden from the student and must appear "
+            . "at the very end of your response with no text after it.";
     }
 
     /**

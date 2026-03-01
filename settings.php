@@ -106,7 +106,7 @@ if ($hassiteconfig) {
     $avatarchoices = [
         'avatar_01' => get_string('settings:avatar_saylor', 'local_ai_course_assistant'),
     ];
-    for ($i = 2; $i <= 11; $i++) {
+    for ($i = 2; $i <= 17; $i++) {
         $num = str_pad($i, 2, '0', STR_PAD_LEFT);
         $avatarchoices["avatar_{$num}"] = "Avatar {$i}";
     }
@@ -376,6 +376,46 @@ if ($hassiteconfig) {
         html_writer::link($ragadminurl,
             get_string('ragadmin:view_status', 'local_ai_course_assistant'),
             ['class' => 'btn btn-secondary btn-sm'])
+    ));
+
+    // --- Voice Mode (OpenAI Realtime) Settings ---
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/realtime_heading',
+        get_string('settings:realtime_heading', 'local_ai_course_assistant'),
+        ''
+    ));
+
+    // Realtime enable.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/realtime_enabled',
+        get_string('settings:realtime_enabled', 'local_ai_course_assistant'),
+        get_string('settings:realtime_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+
+    // Realtime API key (separate from main key).
+    $settings->add(new admin_setting_configpasswordunmask(
+        'local_ai_course_assistant/realtime_apikey',
+        get_string('settings:realtime_apikey', 'local_ai_course_assistant'),
+        get_string('settings:realtime_apikey_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
+    // Realtime voice.
+    $realtimevoices = [
+        'shimmer' => 'Shimmer',
+        'alloy'   => 'Alloy',
+        'echo'    => 'Echo',
+        'fable'   => 'Fable',
+        'onyx'    => 'Onyx',
+        'nova'    => 'Nova',
+    ];
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/realtime_voice',
+        get_string('settings:realtime_voice', 'local_ai_course_assistant'),
+        get_string('settings:realtime_voice_desc', 'local_ai_course_assistant'),
+        'shimmer',
+        $realtimevoices
     ));
 
     $ADMIN->add('localplugins', $settings);

@@ -95,4 +95,18 @@ $functions = [
         'ajax'         => true,
         'capabilities' => 'local/ai_course_assistant:use',
     ],
+    'local_ai_course_assistant_save_avatar_preference' => [
+        'classname'    => \local_ai_course_assistant\external\save_avatar_preference::class,
+        'description'  => 'Save the user\'s preferred avatar.',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
+    'local_ai_course_assistant_get_realtime_token' => [
+        'classname'    => \local_ai_course_assistant\external\get_realtime_token::class,
+        'description'  => 'Get an ephemeral token for OpenAI Realtime voice mode.',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
 ];

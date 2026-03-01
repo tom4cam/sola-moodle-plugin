@@ -151,6 +151,19 @@ define(['core/ajax'], function(Ajax) {
     };
 
     /**
+     * Save the user's preferred avatar.
+     *
+     * @param {string} avatar Avatar identifier (e.g. 'avatar_03')
+     * @returns {Promise}
+     */
+    const saveAvatarPreference = function(avatar) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_save_avatar_preference',
+            args: {avatar: avatar},
+        }])[0];
+    };
+
+    /**
      * Dismiss the intro modal.
      *
      * @returns {Promise}
@@ -183,6 +196,19 @@ define(['core/ajax'], function(Ajax) {
         }])[0];
     };
 
+    /**
+     * Get an ephemeral token for OpenAI Realtime voice mode.
+     *
+     * @param {number} courseid
+     * @returns {Promise}
+     */
+    const getRealtimeToken = function(courseid) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_get_realtime_token',
+            args: {courseid: courseid},
+        }])[0];
+    };
+
     return {
         sendMessage: sendMessage,
         getHistory: getHistory,
@@ -194,5 +220,7 @@ define(['core/ajax'], function(Ajax) {
         getReminderPreferences: getReminderPreferences,
         dismissIntro: dismissIntro,
         generateQuiz: generateQuiz,
+        saveAvatarPreference: saveAvatarPreference,
+        getRealtimeToken: getRealtimeToken,
     };
 });

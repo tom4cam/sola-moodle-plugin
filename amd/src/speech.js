@@ -87,6 +87,8 @@ define([], function() {
     let recognition = null;
     /** @type {boolean} */
     let isListening = false;
+    /** @type {number} Incremented on every cancel to abort pending speak() calls */
+    let speakCancelToken = 0;
 
     // -----------------------------------------------------------------------
     // Language helpers
@@ -326,23 +328,14 @@ define([], function() {
     };
 
     /**
-     * Speak a text string.
-     * Cancels any currently playing speech first.
-     * Automatically selects the best available voice for the current locale.
+     * Strip markdown-style symbols that don't read well aloud.
+     * Returns cleaned plain text suitable for TTS.
      *
-     * @param {string}   text  The text to read aloud.
-     * @param {Function} onEnd Optional callback when speech finishes.
+     * @param {string} text
+     * @returns {string}
      */
-    const speak = function(text, onEnd) {
-        if (!isTTSSupported()) {
-            return;
-        }
-
-        // Cancel any ongoing speech.
-        speechSynthesis.cancel();
-
-        // Strip markdown-style symbols that don't read well aloud.
-        const clean = text
+    const cleanTextForSpeech = function(text) {
+        return text
             .replace(/```[\s\S]*?```/g, 'code block.')
             .replace(/`[^`]+`/g, '')
             .replace(/#{1,6}\s/g, '')
@@ -352,10 +345,35 @@ define([], function() {
             .replace(/\n{2,}/g, '. ')
             .replace(/\n/g, ' ')
             .trim();
+    };
 
+    /**
+     * Speak a text string.
+     * Cancels any currently playing speech first.
+     * Automatically selects the best available voice for the current locale.
+     *
+     * @param {string}        text       The text to read aloud.
+     * @param {Function|null} onEnd      Called when speech finishes or is canceled.
+     * @param {Function|null} onBoundary Called with (charIndex) at each word boundary.
+     */
+    const speak = function(text, onEnd, onBoundary) {
+        if (!isTTSSupported()) {
+            return;
+        }
+
+        // Cancel any ongoing speech and invalidate any pending speak() calls.
+        speechSynthesis.cancel();
+        const myToken = ++speakCancelToken;
+
+        const clean = cleanTextForSpeech(text);
         const locale = getLocale();
 
         const doSpeak = function() {
+            // Abort if a newer speak() or stopSpeaking() has been called.
+            if (myToken !== speakCancelToken) {
+                return;
+            }
+
             const utterance = new SpeechSynthesisUtterance(clean);
             utterance.lang  = locale;
             utterance.rate  = 1.0;
@@ -370,16 +388,26 @@ define([], function() {
             utterance.onend   = onEnd || function() {};
             utterance.onerror = onEnd || function() {};
 
+            if (onBoundary) {
+                utterance.onboundary = function(event) {
+                    if (event.name === 'word') {
+                        onBoundary(event.charIndex);
+                    }
+                };
+            }
+
             speechSynthesis.speak(utterance);
         };
 
         // Chrome loads voices asynchronously — getVoices() can return [] on first call.
+        // Also use a short delay to work around a Chrome bug where cancel()+speak()
+        // in the same tick can silently fail.
         if (speechSynthesis.getVoices().length) {
-            doSpeak();
+            setTimeout(doSpeak, 100);
         } else {
             speechSynthesis.onvoiceschanged = function() {
                 speechSynthesis.onvoiceschanged = null;
-                doSpeak();
+                setTimeout(doSpeak, 100);
             };
         }
     };
@@ -389,6 +417,7 @@ define([], function() {
      */
     const stopSpeaking = function() {
         if (isTTSSupported()) {
+            ++speakCancelToken; // Abort any pending speak() setTimeout
             speechSynthesis.cancel();
         }
     };
@@ -403,25 +432,93 @@ define([], function() {
     };
 
     // -----------------------------------------------------------------------
+    // Conversation starter label translations (43 languages)
+    // Keys: helpLesson (reused for 'explain'), quiz, studyPlan, helpMe, keyConcepts, ellPractice
+    // -----------------------------------------------------------------------
+
+    /** @type {Object} Starter label translations keyed by ISO 639-1 code */
+    const STARTER_LABELS = {
+        'ar': {helpLesson: 'اشرح هذا',              quiz: 'اختبر معلوماتي',          studyPlan: 'خطة الدراسة',        helpMe: 'مساعدة AI',        keyConcepts: 'المفاهيم الرئيسية',    ellPractice: 'تدريب على الكلام'},
+        'zh': {helpLesson: '解释这个',                quiz: '测验我',                   studyPlan: '学习计划',            helpMe: 'AI 帮助',          keyConcepts: '关键概念',              ellPractice: '口语练习'},
+        'cs': {helpLesson: 'Vysvětlit',              quiz: 'Otestuj mě',              studyPlan: 'Studijní plán',      helpMe: 'Pomoc AI',         keyConcepts: 'Klíčové pojmy',         ellPractice: 'Cvičení mluvení'},
+        'da': {helpLesson: 'Forklar dette',          quiz: 'Test mig',                studyPlan: 'Studieplan',         helpMe: 'AI-hjælp',         keyConcepts: 'Nøglebegreber',         ellPractice: 'Øv at tale'},
+        'nl': {helpLesson: 'Leg dit uit',            quiz: 'Test me',                 studyPlan: 'Studieplan',         helpMe: 'AI-hulp',          keyConcepts: 'Kernbegrippen',         ellPractice: 'Spreektraining'},
+        'fi': {helpLesson: 'Selitä tämä',            quiz: 'Testaa minut',            studyPlan: 'Opiskelusuunnitelma',helpMe: 'AI-apu',           keyConcepts: 'Avainkäsitteet',        ellPractice: 'Puheen harjoittelu'},
+        'fr': {helpLesson: 'Expliquer',              quiz: 'Testez-moi',              studyPlan: "Plan d'étude",       helpMe: 'Aide IA',          keyConcepts: 'Concepts clés',         ellPractice: "Pratiquer l'oral"},
+        'de': {helpLesson: 'Erkläre das',            quiz: 'Teste mich',              studyPlan: 'Lernplan',           helpMe: 'KI-Hilfe',         keyConcepts: 'Schlüsselbegriffe',     ellPractice: 'Sprechen üben'},
+        'el': {helpLesson: 'Εξήγησε αυτό',          quiz: 'Δοκίμασέ με',             studyPlan: 'Σχέδιο μελέτης',    helpMe: 'Βοήθεια AI',       keyConcepts: 'Βασικές Έννοιες',       ellPractice: 'Εξάσκηση ομιλίας'},
+        'hi': {helpLesson: 'यह समझाएं',              quiz: 'मुझे टेस्ट करो',          studyPlan: 'अध्ययन योजना',      helpMe: 'AI सहायता',        keyConcepts: 'मुख्य अवधारणाएं',       ellPractice: 'बोलने का अभ्यास'},
+        'hu': {helpLesson: 'Magyarázd el',           quiz: 'Tesztelj engem',          studyPlan: 'Tanulmányi terv',   helpMe: 'AI segítség',      keyConcepts: 'Főfogalmak',            ellPractice: 'Beszéd gyakorlása'},
+        'id': {helpLesson: 'Jelaskan ini',           quiz: 'Uji saya',                studyPlan: 'Rencana belajar',   helpMe: 'Bantuan AI',       keyConcepts: 'Konsep Utama',          ellPractice: 'Latihan berbicara'},
+        'it': {helpLesson: 'Spiega questo',          quiz: 'Mettimi alla prova',      studyPlan: 'Piano di studio',   helpMe: 'Aiuto AI',         keyConcepts: 'Concetti chiave',       ellPractice: 'Pratica del parlato'},
+        'ja': {helpLesson: 'これを説明して',           quiz: 'テストして',               studyPlan: '学習計画',            helpMe: 'AIサポート',        keyConcepts: '重要概念',               ellPractice: '会話練習'},
+        'ko': {helpLesson: '이것을 설명해주세요',      quiz: '테스트해 주세요',           studyPlan: '학습 계획',          helpMe: 'AI 도움',          keyConcepts: '핵심 개념',              ellPractice: '말하기 연습'},
+        'nb': {helpLesson: 'Forklar dette',          quiz: 'Test meg',                studyPlan: 'Studieplan',         helpMe: 'AI-hjelp',         keyConcepts: 'Nøkkelbegreper',        ellPractice: 'Øv å snakke'},
+        'pl': {helpLesson: 'Wyjaśnij to',            quiz: 'Przetestuj mnie',         studyPlan: 'Plan nauki',         helpMe: 'Pomoc AI',         keyConcepts: 'Kluczowe pojęcia',      ellPractice: 'Ćwiczenie mówienia'},
+        'pt': {helpLesson: 'Explique isso',          quiz: 'Me teste',                studyPlan: 'Plano de estudo',   helpMe: 'Ajuda de IA',      keyConcepts: 'Conceitos-chave',       ellPractice: 'Praticar a fala'},
+        'ro': {helpLesson: 'Explică asta',           quiz: 'Testează-mă',             studyPlan: 'Plan de studiu',    helpMe: 'Ajutor AI',        keyConcepts: 'Concepte cheie',        ellPractice: 'Practică vorbirea'},
+        'ru': {helpLesson: 'Объясни это',            quiz: 'Проверь меня',            studyPlan: 'План учёбы',         helpMe: 'Помощь ИИ',        keyConcepts: 'Ключевые понятия',      ellPractice: 'Практика речи'},
+        'sk': {helpLesson: 'Vysvetli to',            quiz: 'Otestuj ma',              studyPlan: 'Študijný plán',     helpMe: 'Pomoc AI',         keyConcepts: 'Kľúčové pojmy',         ellPractice: 'Cvičenie reči'},
+        'es': {helpLesson: 'Explicar esto',          quiz: 'Ponme a prueba',          studyPlan: 'Plan de estudio',   helpMe: 'Ayuda de IA',      keyConcepts: 'Conceptos clave',       ellPractice: 'Practicar el habla'},
+        'sv': {helpLesson: 'Förklara detta',         quiz: 'Testa mig',               studyPlan: 'Studieplan',         helpMe: 'AI-hjälp',         keyConcepts: 'Nyckelbegrepp',         ellPractice: 'Övning i tal'},
+        'ta': {helpLesson: 'இதை விளக்கு',           quiz: 'என்னை சோதி',              studyPlan: 'படிப்பு திட்டம்',   helpMe: 'AI உதவி',          keyConcepts: 'முக்கிய கருத்துகள்',    ellPractice: 'பேசும் பயிற்சி'},
+        'th': {helpLesson: 'อธิบายสิ่งนี้',         quiz: 'ทดสอบฉัน',               studyPlan: 'แผนการเรียน',        helpMe: 'ความช่วยเหลือ AI', keyConcepts: 'แนวคิดหลัก',           ellPractice: 'ฝึกพูด'},
+        'tr': {helpLesson: 'Bunu açıkla',            quiz: 'Beni sına',               studyPlan: 'Çalışma planı',     helpMe: 'Yapay zeka yardımı',keyConcepts: 'Temel Kavramlar',       ellPractice: 'Konuşma pratiği'},
+        'uk': {helpLesson: 'Поясни це',              quiz: 'Перевір мене',            studyPlan: 'Навчальний план',    helpMe: 'Допомога ШІ',      keyConcepts: 'Ключові поняття',       ellPractice: 'Практика мовлення'},
+        'vi': {helpLesson: 'Giải thích điều này',    quiz: 'Kiểm tra tôi',           studyPlan: 'Kế hoạch học tập',  helpMe: 'Hỗ trợ AI',        keyConcepts: 'Khái niệm chính',       ellPractice: 'Luyện nói'},
+        'bn': {helpLesson: 'এটি ব্যাখ্যা করুন',     quiz: 'আমাকে পরীক্ষা করুন',    studyPlan: 'অধ্যয়ন পরিকল্পনা',helpMe: 'AI সহায়তা',       keyConcepts: 'মূল ধারণা',            ellPractice: 'কথা বলার অনুশীলন'},
+        'tl': {helpLesson: 'Ipaliwanag ito',         quiz: 'Subukin ako',             studyPlan: 'Plano sa pag-aaral',helpMe: 'AI tulong',        keyConcepts: 'Pangunahing Konsepto',  ellPractice: 'Pagsasanay sa pagsasalita'},
+        'ms': {helpLesson: 'Terangkan ini',          quiz: 'Uji saya',                studyPlan: 'Rancangan belajar', helpMe: 'Bantuan AI',       keyConcepts: 'Konsep Utama',          ellPractice: 'Latihan bercakap'},
+        'pa': {helpLesson: 'ਇਹ ਸਮਝਾਓ',              quiz: 'ਮੈਨੂੰ ਟੈਸਟ ਕਰੋ',         studyPlan: 'ਅਧਿਐਨ ਯੋਜਨਾ',       helpMe: 'AI ਸਹਾਇਤਾ',       keyConcepts: 'ਮੁੱਖ ਧਾਰਣਾਵਾਂ',        ellPractice: 'ਬੋਲਣ ਦੀ ਪ੍ਰੈਕਟਿਸ'},
+        'am': {helpLesson: 'ይህን አብራራ',              quiz: 'ፈትነኝ',                   studyPlan: 'የጥናት እቅድ',          helpMe: 'የAI እርዳታ',        keyConcepts: 'ዋና ፅንሰ-ሀሳቦች',         ellPractice: 'የንግግር ልምምድ'},
+        'ne': {helpLesson: 'यो व्याख्या गर्नुहोस्',  quiz: 'मलाई परीक्षण गर्नुहोस्', studyPlan: 'अध्ययन योजना',      helpMe: 'AI सहायता',        keyConcepts: 'मुख्य अवधारणाहरू',      ellPractice: 'बोल्ने अभ्यास'},
+        'sw': {helpLesson: 'Eleza hili',             quiz: 'Nijaribu',                studyPlan: 'Mpango wa masomo',  helpMe: 'Msaada wa AI',     keyConcepts: 'Dhana Kuu',             ellPractice: 'Mazoezi ya kusema'},
+        'zu': {helpLesson: 'Chaza lokhu',            quiz: 'Nglinge',                 studyPlan: 'Uhlelo lwezifundo', helpMe: 'Usizo lwe-AI',     keyConcepts: 'Imiqondo Esemqoka',     ellPractice: 'Ukulolonga ukukhuluma'},
+        'bm': {helpLesson: 'A fɔ cogo min na',      quiz: 'N sɛgɛsɛgɛ',             studyPlan: 'Kalanso jɛtigi',    helpMe: 'AI dɛmɛ',          keyConcepts: 'Kunnafoni Hakɛw',       ellPractice: 'Kumakan lasɛli'},
+        'ha': {helpLesson: 'Bayyana wannan',         quiz: 'Jarrabeni',               studyPlan: 'Shirin karatu',     helpMe: 'Taimako na AI',    keyConcepts: "Muhimman Ra'ayoyi",     ellPractice: 'Yi magana'},
+        'ig': {helpLesson: 'Kọọ ihe a',             quiz: 'Nwale m',                 studyPlan: 'Atụmatụ mmụta',     helpMe: 'Nkwado AI',        keyConcepts: 'Echiche Ndị Bụ Isi',    ellPractice: 'Ịmụta ikwu okwu'},
+        'om': {helpLesson: 'Kana ibsi',             quiz: 'Na qori',                 studyPlan: 'Karoora barumsaa',  helpMe: 'Gargaarsa AI',     keyConcepts: 'Yaadota Ijoo',          ellPractice: 'Dubbachuu shaakala'},
+        'so': {helpLesson: 'Sharax kan',            quiz: 'I tijaabi',               studyPlan: 'Qorshe waxbarashada',helpMe: 'Caawimada AI',    keyConcepts: 'Fikradaha Muhiimka ah', ellPractice: 'Celinta hadlida'},
+        'wo': {helpLesson: 'Xamal li',              quiz: 'Seetlu ma',               studyPlan: 'Xëy ci jàng',       helpMe: 'Ndimbal AI',       keyConcepts: 'Xam-xam bu Dëkk',      ellPractice: 'Taxawaay ci wax-waxu'},
+        'yo': {helpLesson: 'Ṣe àlàyé èyí',         quiz: 'Dánwò mi',                studyPlan: 'Ètò Ẹkọ',           helpMe: 'Ìrànlọ́wọ́ AI',  keyConcepts: 'Àwọn Èrò Pàtàkì',     ellPractice: 'Ìdánwò Ọ̀rọ̀'},
+    };
+
+    /**
+     * Get starter label translations for a given language code.
+     * Returns null for English (default), meaning callers should use the original server-rendered text.
+     *
+     * @param {string|null} code ISO 639-1 code, or null for English
+     * @returns {{helpLesson, quiz, studyPlan, helpMe, keyConcepts, ellPractice}|null}
+     */
+    const getStarterLabels = function(code) {
+        if (!code) {
+            return null;
+        }
+        return STARTER_LABELS[code] || null;
+    };
+
+    // -----------------------------------------------------------------------
     // Public API
     // -----------------------------------------------------------------------
 
     return {
-        SUPPORTED_LANGS:  SUPPORTED_LANGS,
-        LANG_KEY:         LANG_KEY,
-        getLang:          getLang,
-        setLang:          setLang,
-        clearLang:        clearLang,
-        getLocale:        getLocale,
-        getLangInfo:      getLangInfo,
+        SUPPORTED_LANGS:   SUPPORTED_LANGS,
+        LANG_KEY:          LANG_KEY,
+        getLang:           getLang,
+        setLang:           setLang,
+        clearLang:         clearLang,
+        getLocale:         getLocale,
+        getLangInfo:       getLangInfo,
         detectBrowserLang: detectBrowserLang,
-        isSTTSupported:   isSTTSupported,
-        isTTSSupported:   isTTSSupported,
-        startListening:   startListening,
-        stopListening:    stopListening,
-        isRecording:      isRecording,
-        speak:            speak,
-        stopSpeaking:     stopSpeaking,
-        isSpeaking:       isSpeaking,
+        isSTTSupported:    isSTTSupported,
+        isTTSSupported:    isTTSSupported,
+        startListening:    startListening,
+        stopListening:     stopListening,
+        isRecording:       isRecording,
+        cleanTextForSpeech: cleanTextForSpeech,
+        speak:             speak,
+        stopSpeaking:      stopSpeaking,
+        isSpeaking:        isSpeaking,
+        getStarterLabels:  getStarterLabels,
     };
 });

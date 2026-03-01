@@ -72,11 +72,24 @@ class hook_callbacks {
         }
 
         // Get config values.
-        $avatar = get_config('local_ai_course_assistant', 'avatar') ?: 'avatar_01';
         $position = get_config('local_ai_course_assistant', 'position') ?: 'bottom-right';
+
+        // User's personally chosen avatar (falls back to site default).
+        $useravatar = \get_user_preferences('local_ai_course_assistant_avatar', null);
+        $avatar = $useravatar ?: (get_config('local_ai_course_assistant', 'avatar') ?: 'avatar_01');
 
         // Build avatar URL.
         $avatarurl = $OUTPUT->image_url("avatars/{$avatar}", 'local_ai_course_assistant')->out(false);
+
+        // Build list of all available avatars as JSON for the picker.
+        $availableavatars = [];
+        for ($i = 1; $i <= 11; $i++) {
+            $id = 'avatar_' . str_pad((string)$i, 2, '0', STR_PAD_LEFT);
+            $availableavatars[] = [
+                'id'  => $id,
+                'url' => $OUTPUT->image_url("avatars/{$id}", 'local_ai_course_assistant')->out(false),
+            ];
+        }
 
         // Build SSE URL.
         $sseurl = new \moodle_url('/local/ai_course_assistant/sse.php');
@@ -131,11 +144,24 @@ class hook_callbacks {
         $offsetx = (int)(get_config('local_ai_course_assistant', 'position_offset_x') ?: 95);
         $offsety = (int)(get_config('local_ai_course_assistant', 'position_offset_y') ?: 20);
 
+        // Voice mode availability.
+        $realtimeenabled = (bool)get_config('local_ai_course_assistant', 'realtime_enabled');
+
+        // TTS proxy URL: available when an OpenAI key is present (realtime or main provider).
+        $realtimeapikey = get_config('local_ai_course_assistant', 'realtime_apikey');
+        $provider       = get_config('local_ai_course_assistant', 'provider');
+        $mainapikey     = get_config('local_ai_course_assistant', 'apikey');
+        $hasttskey = !empty($realtimeapikey) || ($provider === 'openai' && !empty($mainapikey));
+        $ttsurl = $hasttskey
+            ? (new \moodle_url('/local/ai_course_assistant/tts.php'))->out(false)
+            : '';
+
         // Render template.
         $templatedata = [
             'courseid'           => $courseid,
             'sesskey'            => sesskey(),
             'avatarurl'          => $avatarurl,
+            'availableavatars'   => json_encode($availableavatars),
             'positionclass'      => $position,
             'userrole'           => $userrole,
             'sseurl'             => $sseurl->out(false),
@@ -151,6 +177,8 @@ class hook_callbacks {
             'firstname'          => $USER->firstname,
             'currentpageid'      => $currentpageid,
             'currentpagetitle'   => $currentpagetitle,
+            'realtimeenabled'    => $realtimeenabled,
+            'ttsurl'             => $ttsurl,
         ];
 
         $html = $OUTPUT->render_from_template('local_ai_course_assistant/chat_widget', $templatedata);
