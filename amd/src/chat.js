@@ -1042,10 +1042,28 @@ define([
         historyLoaded = true;
         Repo.getHistory(courseId).then(function(result) {
             if (result.messages && result.messages.length > 0) {
+                const NEXT_RE = /\n*\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/;
+                let lastSuggestions = [];
                 result.messages.forEach(function(msg) {
-                    UI.addMessage(msg.role, msg.message);
+                    let text = msg.message;
+                    if (msg.role === 'assistant') {
+                        const match = text.match(NEXT_RE);
+                        if (match) {
+                            lastSuggestions = match[1].split('||')
+                                .map(function(s) { return s.trim(); })
+                                .filter(Boolean).slice(0, 4);
+                            text = text.replace(NEXT_RE, '').trimEnd();
+                        } else {
+                            lastSuggestions = [];
+                        }
+                    }
+                    UI.addMessage(msg.role, text);
                 });
                 UI.scrollToBottom(true);
+                // Re-show chips from the last assistant message that had them.
+                if (lastSuggestions.length) {
+                    UI.showSuggestions(lastSuggestions, handleSuggestionClick);
+                }
             } else {
                 // Show greeting.
                 Str.get_string('chat:greeting', 'local_ai_course_assistant').then(function(greeting) {
