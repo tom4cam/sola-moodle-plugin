@@ -426,6 +426,11 @@ define([
         micBtn = root.querySelector('.local-ai-course-assistant__btn-mic');
         langBtn = root.querySelector('.local-ai-course-assistant__btn-lang');
         langBanner = root.querySelector('.local-ai-course-assistant__lang-banner');
+        // Apply admin-configured avatar accent color as a CSS variable.
+        const avatarColor = root.dataset.avatarColor;
+        if (avatarColor) {
+            root.style.setProperty('--aica-avatar-color', avatarColor);
+        }
         restoreExpandState();
         applyPositionOffset();
         initDrag();

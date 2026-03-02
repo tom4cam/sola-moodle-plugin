@@ -32,11 +32,11 @@
     width: 62px;
     height: 62px;
     border-radius: 50%;
-    border: none;
-    background: #4a6cf7;
+    border: 3px solid var(--aica-avatar-color, #4a6cf7);
+    background: #ffffff;
     cursor: pointer;
     padding: 0;
-    box-shadow: 0 2px 10px rgba(74, 108, 247, 0.35);
+    box-shadow: 0 2px 10px rgba(74, 108, 247, 0.25);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     align-items: center;
@@ -53,7 +53,7 @@
 }
 
 .local-ai-course-assistant__toggle:focus-visible {
-    outline: 3px solid #4a6cf7;
+    outline: 3px solid var(--aica-avatar-color, #4a6cf7);
     outline-offset: 3px;
 }
 

@@ -118,6 +118,14 @@ if ($hassiteconfig) {
         $avatarchoices
     ));
 
+    // Avatar button accent color.
+    $settings->add(new admin_setting_configcolourpicker(
+        'local_ai_course_assistant/avatar_color',
+        get_string('settings:avatar_color', 'local_ai_course_assistant'),
+        get_string('settings:avatar_color_desc', 'local_ai_course_assistant'),
+        '#4a6cf7'
+    ));
+
     // Position.
     $positions = [
         'bottom-right' => get_string('settings:position_br', 'local_ai_course_assistant'),
