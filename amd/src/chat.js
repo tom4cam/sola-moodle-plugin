@@ -258,11 +258,6 @@ define([
             resetBtn.addEventListener('click', handleReset);
         }
 
-        // Avatar picker button.
-        const avatarBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-avatar') : null;
-        if (avatarBtn) {
-            avatarBtn.addEventListener('click', handleAvatarPicker);
-        }
 
         // Conversation starters.
         if (els.root) {
@@ -463,13 +458,6 @@ define([
         }
 
         UI.showStarters();
-    };
-
-    /**
-     * Handle avatar picker button click in the header title — open SVG avatar picker.
-     */
-    const handleAvatarPicker = function() {
-        UI.showSVGAvatarPicker();
     };
 
     /**

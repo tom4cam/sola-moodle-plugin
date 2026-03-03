@@ -1619,7 +1619,8 @@
     background: none;
     border: none;
     padding: 0;
-    cursor: pointer;
+    cursor: default;
+    pointer-events: none;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -2181,7 +2182,26 @@
    - Generated SVG avatars: mouth moves (driven by Web Audio; CSS fallback below)
    ========================================================= */
 
-/* Bounce — for preset (non-generated) avatars */
+/* Idle: gentle bob (vertical float) on the toggle button */
+@keyframes aica-avatar-bob {
+    0%   { transform: translateY(0);    }
+    50%  { transform: translateY(-5px); }
+    100% { transform: translateY(0);    }
+}
+
+/* Idle: soft pulse ring on the toggle button */
+@keyframes aica-avatar-pulse {
+    0%   { box-shadow: 0 0 0 0   rgba(74, 108, 247, 0.35); }
+    70%  { box-shadow: 0 0 0 8px rgba(74, 108, 247, 0);    }
+    100% { box-shadow: 0 0 0 0   rgba(74, 108, 247, 0);    }
+}
+
+.local-ai-course-assistant__toggle {
+    animation: aica-avatar-bob 3s ease-in-out infinite,
+               aica-avatar-pulse 2.5s ease-out infinite;
+}
+
+/* Bounce — for preset (non-generated) avatars while speaking */
 @keyframes aica-avatar-bounce {
     0%   { transform: translateY(0); }
     35%  { transform: translateY(-8px) scale(1.04); }
