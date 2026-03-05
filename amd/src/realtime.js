@@ -376,7 +376,7 @@ define([], function() {
                 setState('idle');
                 break;
 
-            case 'response.audio.delta':
+            case 'response.output_audio.delta':
                 if (msg.delta) {
                     audioChunks.push(msg.delta);
                 }
@@ -385,13 +385,13 @@ define([], function() {
                 }
                 break;
 
-            case 'response.audio_transcript.delta':
+            case 'response.output_audio_transcript.delta':
                 if (msg.delta && onTranscriptCb) {
                     onTranscriptCb('assistant', msg.delta);
                 }
                 break;
 
-            case 'response.audio.done':
+            case 'response.output_audio.done':
                 playAudioChunks();
                 break;
 
@@ -457,20 +457,27 @@ define([], function() {
             masterGain.gain.value = 1;
             masterGain.connect(audioCtx.destination);
 
-            // Configure session: voice, instructions, audio formats, VAD off.
-            // Do NOT include 'type' inside the session object — it is only required
-            // by the HTTP /v1/realtime/client_secrets body, not the WebSocket event.
+            // Configure session using the GA Realtime API structure.
+            // GA endpoint uses nested audio.input / audio.output objects —
+            // the old flat fields (voice, modalities, input_audio_format, etc.)
+            // are beta-only and rejected by the GA WebSocket.
             ws.send(JSON.stringify({
                 type: 'session.update',
                 session: {
-                    voice: voice || 'shimmer',
+                    type: 'realtime',
                     instructions: instructions || '',
-                    modalities: ['audio', 'text'],
-                    input_audio_format: 'pcm16',
-                    output_audio_format: 'pcm16',
-                    input_audio_transcription: {model: 'whisper-1'},
-                    turn_detection: null,  // client-side VAD — only transmit when speaking
-                    temperature: 0.8,
+                    output_modalities: ['audio'],
+                    audio: {
+                        input: {
+                            format: {type: 'audio/pcm', rate: 24000},
+                            transcription: {model: 'whisper-1'},
+                            turn_detection: null,  // client-side VAD — only transmit when speaking
+                        },
+                        output: {
+                            format: {type: 'audio/pcm', rate: 24000},
+                            voice: voice || 'shimmer',
+                        },
+                    },
                 },
             }));
 
