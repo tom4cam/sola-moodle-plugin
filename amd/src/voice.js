@@ -78,6 +78,26 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
     var restartTimer = null;
     /** @type {string} Derived TTS proxy URL */
     var ttsUrl = '';
+    /** @type {string} Derived transcription proxy URL (MediaRecorder mode) */
+    var transcribeUrl = '';
+    /** @type {boolean} True when SpeechRecognition unavailable; use MediaRecorder + Whisper instead */
+    var useMediaRecorder = false;
+    /** @type {MediaStream|null} Mic stream (MediaRecorder mode) */
+    var mediaStream = null;
+    /** @type {MediaRecorder|null} */
+    var mediaRecorder = null;
+    /** @type {Blob[]} Recorded audio chunks */
+    var recordingChunks = [];
+    /** @type {boolean} True once speech-level audio is detected in current recording */
+    var speechDetected = false;
+    /** @type {number|null} Silence timer handle (VAD) */
+    var silenceTimer = null;
+    /** @type {AnalyserNode|null} VAD analyser (mic input) */
+    var vadAnalyser = null;
+    /** @type {MediaStreamAudioSourceNode|null} */
+    var vadSource = null;
+    /** @type {number|null} rAF handle for VAD loop */
+    var vadFrame = null;
 
     // ── Callbacks / session config ────────────────────────────────────────────
 
@@ -177,10 +197,11 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
 
     // ── TTS queue ─────────────────────────────────────────────────────────────
 
-    // Forward declaration — processTtsQueue and scheduleRecognitionRestart
-    // call each other; both are assigned before connect() is callable.
+    // Forward declaration — processTtsQueue, scheduleRecognitionRestart, and
+    // startMediaRecording call each other; all are assigned before connect() is callable.
     var processTtsQueue;
     var scheduleRecognitionRestart;
+    var startMediaRecording;
 
     /**
      * Stop current TTS playback and clear the queue.
@@ -212,7 +233,10 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         }
         restartTimer = setTimeout(function() {
             restartTimer = null;
-            if (connected && recognition) {
+            if (!connected) { return; }
+            if (useMediaRecorder) {
+                startMediaRecording();
+            } else if (recognition) {
                 try { recognition.start(); } catch (e) { /**/ }
             }
         }, 300);
@@ -413,6 +437,165 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         });
     };
 
+    // ── MediaRecorder (mobile fallback) ──────────────────────────────────────
+
+    /**
+     * Return a short file extension for a MIME type string.
+     * @param {string} mime
+     * @returns {string}
+     */
+    var getExtFromMime = function(mime) {
+        if (mime.indexOf('webm') !== -1) { return 'webm'; }
+        if (mime.indexOf('mp4')  !== -1) { return 'mp4'; }
+        if (mime.indexOf('ogg')  !== -1) { return 'ogg'; }
+        if (mime.indexOf('wav')  !== -1) { return 'wav'; }
+        return 'webm';
+    };
+
+    /**
+     * Stop the VAD loop and release its nodes.
+     */
+    var stopVAD = function() {
+        if (vadFrame) {
+            cancelAnimationFrame(vadFrame);
+            vadFrame = null;
+        }
+        if (silenceTimer) {
+            clearTimeout(silenceTimer);
+            silenceTimer = null;
+        }
+        if (vadSource) {
+            try { vadSource.disconnect(); } catch (e) { /**/ }
+            vadSource = null;
+        }
+        vadAnalyser = null;
+        speechDetected = false;
+    };
+
+    /**
+     * Start a VAD rAF loop that detects speech onset and trailing silence.
+     * When silence follows speech for 1.5 s, stops the MediaRecorder.
+     */
+    var startVAD = function() {
+        if (!audioCtx || !mediaStream) { return; }
+        try {
+            vadSource  = audioCtx.createMediaStreamSource(mediaStream);
+            vadAnalyser = audioCtx.createAnalyser();
+            vadAnalyser.fftSize = 256;
+            vadSource.connect(vadAnalyser);
+        } catch (e) { return; }
+
+        var checkLevel = function() {
+            if (!mediaRecorder || mediaRecorder.state !== 'recording') { return; }
+            var data = new Uint8Array(vadAnalyser.frequencyBinCount);
+            vadAnalyser.getByteFrequencyData(data);
+            var sum = 0;
+            for (var i = 0; i < data.length; i++) { sum += data[i]; }
+            var level = sum / data.length;
+
+            if (level > 15) {                 // ~6 % of max — speech onset threshold
+                speechDetected = true;
+                if (silenceTimer) {
+                    clearTimeout(silenceTimer);
+                    silenceTimer = null;
+                }
+            } else if (speechDetected && !silenceTimer) {
+                // Silence started after speech — begin countdown.
+                silenceTimer = setTimeout(function() {
+                    silenceTimer = null;
+                    if (mediaRecorder && mediaRecorder.state === 'recording') {
+                        mediaRecorder.stop();
+                    }
+                }, 1500);
+            }
+            vadFrame = requestAnimationFrame(checkLevel);
+        };
+        vadFrame = requestAnimationFrame(checkLevel);
+    };
+
+    /**
+     * Record one utterance via MediaRecorder, transcribe via Whisper, and
+     * feed the result into processUtterance(). Called instead of startRecognition()
+     * on browsers where SpeechRecognition is unavailable (e.g. iOS Chrome).
+     */
+    startMediaRecording = function() {
+        if (!connected || !mediaStream) { return; }
+
+        // Prefer webm; fall back to mp4 (iOS Safari), then let browser choose.
+        var mimeType = '';
+        if (window.MediaRecorder) {
+            if (MediaRecorder.isTypeSupported('audio/webm')) {
+                mimeType = 'audio/webm';
+            } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                mimeType = 'audio/mp4';
+            }
+        }
+
+        recordingChunks = [];
+        speechDetected  = false;
+
+        try {
+            mediaRecorder = mimeType
+                ? new MediaRecorder(mediaStream, {mimeType: mimeType})
+                : new MediaRecorder(mediaStream);
+        } catch (e) {
+            if (onErrorCb) { onErrorCb('Audio recording is not supported in this browser.'); }
+            return;
+        }
+
+        mediaRecorder.ondataavailable = function(e) {
+            if (e.data && e.data.size > 0) {
+                recordingChunks.push(e.data);
+            }
+        };
+
+        mediaRecorder.onstop = function() {
+            stopVAD();
+            if (!connected) { return; }
+            if (!speechDetected || !recordingChunks.length) {
+                // Nothing spoken — wait then restart listening.
+                scheduleRecognitionRestart();
+                return;
+            }
+
+            var blobMime = (mediaRecorder && mediaRecorder.mimeType) || 'audio/webm';
+            var blob = new Blob(recordingChunks, {type: blobMime});
+            recordingChunks = [];
+
+            var formData = new FormData();
+            formData.append('audio',    blob, 'audio.' + getExtFromMime(blobMime));
+            formData.append('sesskey',  cfg.sessKey  || '');
+            formData.append('courseid', cfg.courseId || 0);
+            if (cfg.lang) {
+                // Send ISO 639-1 code ('en', not 'en-US').
+                formData.append('lang', cfg.lang.split('-')[0]);
+            }
+
+            setState('connecting'); // "thinking" spinner
+
+            fetch(transcribeUrl, {method: 'POST', body: formData})
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!connected) { return; }
+                    if (data.error || !data.text || !data.text.trim()) {
+                        setState('idle');
+                        scheduleRecognitionRestart();
+                        return;
+                    }
+                    processUtterance(data.text.trim());
+                })
+                .catch(function() {
+                    if (!connected) { return; }
+                    setState('idle');
+                    scheduleRecognitionRestart();
+                });
+        };
+
+        mediaRecorder.start(250); // collect chunks every 250 ms
+        setState('listening');
+        startVAD();
+    };
+
     // ── Speech recognition ────────────────────────────────────────────────────
 
     /**
@@ -524,19 +707,59 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
             return;
         }
 
-        // Check Speech Recognition support before marking connected.
-        if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+        // Determine STT method: Web Speech API preferred; MediaRecorder + Whisper fallback
+        // for browsers where SpeechRecognition is unavailable (e.g. iOS Chrome/WKWebView).
+        var hasSR = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+        var hasMR = !!(window.MediaRecorder && navigator.mediaDevices &&
+                       navigator.mediaDevices.getUserMedia);
+
+        if (!hasSR && !hasMR) {
             audioCtx.close().catch(function() {/**/});
             audioCtx = null;
             if (onErrorCb) {
-                onErrorCb('Speech recognition is not supported in this browser. Please try Chrome or Edge.');
+                onErrorCb('Speech input is not supported in this browser.');
             }
             return;
         }
 
+        useMediaRecorder = !hasSR;
         connected = true;
         setState('connecting');
-        startRecognition();
+        transcribeUrl = cfg.sseUrl.replace(/\/sse\.php(\?.*)?$/, '/transcribe.php');
+
+        if (useMediaRecorder) {
+            // getUserMedia must be initiated within the user-gesture call stack (iOS requirement).
+            navigator.mediaDevices.getUserMedia({audio: true})
+                .then(function(stream) {
+                    if (!connected) {
+                        stream.getTracks().forEach(function(t) { t.stop(); });
+                        return;
+                    }
+                    mediaStream = stream;
+                    if (config.greeting) {
+                        if (onTranscriptCb) { onTranscriptCb('assistant', config.greeting); }
+                        ttsQueue.push(config.greeting);
+                        processTtsQueue();
+                    } else {
+                        startMediaRecording();
+                    }
+                })
+                .catch(function() {
+                    disconnect();
+                    if (onErrorCb) {
+                        onErrorCb('Microphone access denied. Please allow microphone access to use voice chat.');
+                    }
+                });
+        } else {
+            // Web Speech API path (existing behaviour).
+            if (config.greeting) {
+                if (onTranscriptCb) { onTranscriptCb('assistant', config.greeting); }
+                ttsQueue.push(config.greeting);
+                processTtsQueue();
+            } else {
+                startRecognition();
+            }
+        }
     };
 
     /**
@@ -550,6 +773,19 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
             try { recognition.abort(); } catch (e) { /**/ }
             recognition = null;
         }
+
+        // Stop MediaRecorder and mic stream (MediaRecorder mode).
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            try { mediaRecorder.stop(); } catch (e) { /**/ }
+        }
+        mediaRecorder  = null;
+        recordingChunks = [];
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(function(t) { t.stop(); });
+            mediaStream = null;
+        }
+        stopVAD();
+        useMediaRecorder = false;
 
         // Clear restart timer.
         if (restartTimer) {

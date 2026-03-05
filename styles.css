@@ -1106,29 +1106,29 @@
 
 /* =========================================================
    Scroll-to-bottom arrow button
-   Sticky at the bottom of the messages area; appears when scrolled up
+   Absolutely positioned at the bottom-centre of the drawer; floats above content.
    ========================================================= */
 
 .local-ai-course-assistant__scroll-down {
-    position: sticky;
-    bottom: 8px;
+    position: absolute;
+    bottom: 64px; /* sit above the input area */
     left: 50%;
     transform: translateX(-50%);
     display: none;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background: #fff;
-    border: 1px solid #d1d5db;
-    color: #6b7280;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    color: #374151;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-    transition: opacity 0.2s, color 0.15s;
-    z-index: 10;
-    /* keep it from being part of the message flow */
-    margin-top: -40px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    transition: opacity 0.18s, box-shadow 0.15s;
+    z-index: 20;
     pointer-events: none;
     opacity: 0;
 }
@@ -1141,8 +1141,8 @@
 
 @media (hover: hover) {
     .local-ai-course-assistant__scroll-down:hover {
-        color: #4a6cf7;
-        border-color: #c7d2fe;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.06);
+        color: #111827;
     }
 }
 

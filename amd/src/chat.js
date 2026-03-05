@@ -575,6 +575,7 @@ define([
                 sessKey:  sessKey,
                 sseUrl:   sseUrl,
                 lang:     Speech.getLang(),
+                greeting: "What would you like to talk about today? You can begin speaking.",
             }
         );
     };
@@ -605,6 +606,13 @@ define([
             }
         }
 
+        // Pre-request microphone access within the user-gesture call stack.
+        // iOS/WKWebView requires getUserMedia to be initiated synchronously during a user
+        // gesture; the WebSocket 'session.created' callback fires too late.
+        const micPromise = (navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
+            ? navigator.mediaDevices.getUserMedia({audio: true}).catch(function() { return null; })
+            : Promise.resolve(null);
+
         const endSession = function() {
             Realtime.disconnect();
             UI.hideVoiceOverlay();
@@ -613,7 +621,11 @@ define([
         const overlay = UI.showVoiceOverlay(avatarUrl, endSession);
         UI.setVoiceState('connecting');
 
-        Repo.getRealtimeToken(courseId).then(function(result) {
+        // Fetch token and mic stream in parallel — both initiated within the user gesture.
+        Promise.all([Repo.getRealtimeToken(courseId), micPromise]).then(function(results) {
+            const result    = results[0];
+            const micStream = results[1]; // null if getUserMedia failed or unsupported
+
             const token = result.token;
             const voice = localStorage.getItem('aica_tts_voice') || result.voice;
 
@@ -638,7 +650,8 @@ define([
                     },
                 },
                 overlay,
-                audioCtx
+                audioCtx,
+                micStream
             );
             return;
         }).catch(function(err) {

@@ -28,10 +28,13 @@ define([], function() {
      * @type {string}
      */
     var ELL_INSTRUCTIONS = 'You are SOLA in a real-time voice conversation. Keep responses brief (2–3 sentences). ' +
-        '[ELL Coaching Mode] You are an English conversation and pronunciation coach. While having natural ' +
-        'conversation: gently correct grammar errors by modeling the correct form ("You might say: \'...\'"), ' +
-        'offer pronunciation tips when speech sounds unclear. For pronunciation practice, speak a target ' +
-        'phrase clearly, then listen to the learner repeat it and give specific encouraging feedback.';
+        '[ELL Coaching Mode] You are an English conversation and pronunciation coach. ' +
+        'Begin the session by saying: "I can help you with your pronunciation. ' +
+        'Speak a word or sentence and I\'ll help!" ' +
+        'While having natural conversation: gently correct grammar errors by modeling the correct form ' +
+        '("You might say: \'...\'"), offer pronunciation tips when speech sounds unclear. ' +
+        'For pronunciation practice, speak a target phrase clearly, then listen to the learner repeat it ' +
+        'and give specific encouraging feedback.';
 
     /** @type {WebSocket|null} */
     var ws = null;
@@ -65,6 +68,8 @@ define([], function() {
     var sessionWarnTimer = null;
     /** @type {number|null} Session cap disconnect timer */
     var sessionCapTimer = null;
+    /** @type {MediaStream|null} Pre-acquired mic stream passed in from connect() (iOS user-gesture) */
+    var micStreamIn = null;
     /** Session length cap in ms (15 minutes) */
     var SESSION_CAP_MS = 15 * 60 * 1000;
     /** Warning fires 1 minute before cap */
@@ -259,7 +264,18 @@ define([], function() {
      *     the very start of each utterance
      */
     var startMicCapture = function() {
-        navigator.mediaDevices.getUserMedia({audio: true}).then(function(stream) {
+        // Use a pre-acquired stream (passed from the user-gesture context) when available.
+        // This is required on iOS/WKWebView where getUserMedia must be initiated
+        // synchronously within a user gesture; the WebSocket 'session.created' callback
+        // fires asynchronously and the gesture context has already expired.
+        var getStream = micStreamIn
+            ? Promise.resolve(micStreamIn)
+            : (navigator.mediaDevices && navigator.mediaDevices.getUserMedia
+                ? navigator.mediaDevices.getUserMedia({audio: true})
+                : Promise.reject(new Error('getUserMedia not supported')));
+        micStreamIn = null; // consume it so a reconnect does a fresh getUserMedia
+
+        getStream.then(function(stream) {
             micStream = stream;
             // audioCtx may have been closed by a prior disconnect() — bail out cleanly.
             if (!audioCtx) {
@@ -374,6 +390,12 @@ define([], function() {
 
             case 'session.updated':
                 setState('idle');
+                // Trigger an initial spoken greeting — SOLA will use the instruction
+                // "Begin the session by saying: ..." to generate the first audio response.
+                // This fires once on session.updated (after session.create).
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({type: 'response.create'}));
+                }
                 break;
 
             case 'response.output_audio.delta':
@@ -430,11 +452,12 @@ define([], function() {
      * @param {AudioContext|null} audioCtxIn Pre-created AudioContext (required for iOS/WKWebView
      *                                       where AudioContext must be created in a user gesture)
      */
-    var connect = function(token, instructions, voice, callbacks, overlayEl, audioCtxIn) {
+    var connect = function(token, instructions, voice, callbacks, overlayEl, audioCtxIn, micStreamParam) {
         onTranscriptCb  = callbacks.onTranscript  || null;
         onStateChangeCb = callbacks.onStateChange || null;
         onErrorCb       = callbacks.onError       || null;
         overlayRoot     = overlayEl               || null;
+        micStreamIn     = micStreamParam          || null;
 
         setState('connecting');
 
@@ -523,6 +546,11 @@ define([], function() {
      * Disconnect from the Realtime API and clean up all resources.
      */
     var disconnect = function() {
+        // Null the error callback first so the WebSocket close event that fires
+        // asynchronously after ws.close() never surfaces a spurious error message
+        // (e.g. code 1005 / 1000) for intentional disconnects.
+        onErrorCb = null;
+
         // Stop any playing audio — silence master gain first.
         if (masterGain && audioCtx) {
             masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
@@ -538,6 +566,12 @@ define([], function() {
         }
         analyser = null;
         masterGain = null;
+
+        // Clear any unconsumed pre-acquired stream.
+        if (micStreamIn) {
+            micStreamIn.getTracks().forEach(function(t) { t.stop(); });
+            micStreamIn = null;
+        }
 
         // Stop microphone.
         if (scriptProcessor) {
@@ -557,9 +591,10 @@ define([], function() {
         if (sessionWarnTimer) { clearTimeout(sessionWarnTimer); sessionWarnTimer = null; }
         if (sessionCapTimer)  { clearTimeout(sessionCapTimer);  sessionCapTimer  = null; }
 
-        // Close WebSocket.
+        // Close WebSocket with normal closure code so the close handler
+        // does not treat it as an error (1005 = no status, triggers false error message).
         if (ws) {
-            ws.close();
+            ws.close(1000, 'Session ended');
             ws = null;
         }
 

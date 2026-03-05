@@ -63,6 +63,10 @@ define([
     let lastUserMsgEl = null;
     /** Scroll-to-bottom arrow button element */
     let scrollDownBtn = null;
+    /** Whether the user has clicked "scroll down" during streaming (follow mode) */
+    let scrollFollowMode = false;
+    /** Last known scrollTop — used to detect upward scroll (which exits follow mode) */
+    let lastScrollTop = 0;
     /** Minimum pixel movement to count as a drag (suppresses subsequent click) */
     const DRAG_THRESHOLD = 8;
 
@@ -427,24 +431,37 @@ define([
         messagesContainer = root.querySelector('.local-ai-course-assistant__messages');
 
         // Scroll-to-bottom arrow — appears when the user has scrolled up.
+        // Positioned outside the messages container so it doesn't affect scroll height.
         scrollDownBtn = document.createElement('button');
         scrollDownBtn.className = 'local-ai-course-assistant__scroll-down';
         scrollDownBtn.setAttribute('aria-label', 'Scroll to bottom');
         scrollDownBtn.innerHTML =
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"' +
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"' +
             ' fill="currentColor" aria-hidden="true">' +
             '<path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>' +
             '</svg>';
         scrollDownBtn.addEventListener('click', function() {
-            messagesContainer.scrollTo({top: messagesContainer.scrollHeight, behavior: 'smooth'});
+            if (streamingEl) {
+                // Streaming in progress — enter follow mode and snap immediately.
+                scrollFollowMode = true;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            } else {
+                // No streaming — smooth jump to bottom.
+                messagesContainer.scrollTo({top: messagesContainer.scrollHeight, behavior: 'smooth'});
+            }
         });
-        messagesContainer.appendChild(scrollDownBtn);
+        // Place outside messages container so it doesn't add to scroll height.
+        drawer.appendChild(scrollDownBtn);
 
         const updateScrollBtn = function() {
             if (!scrollDownBtn || !messagesContainer) { return; }
-            const gap = messagesContainer.scrollHeight
-                - messagesContainer.scrollTop
-                - messagesContainer.clientHeight;
+            const current = messagesContainer.scrollTop;
+            // Detect upward scroll → exit follow mode.
+            if (current < lastScrollTop) {
+                scrollFollowMode = false;
+            }
+            lastScrollTop = current;
+            const gap = messagesContainer.scrollHeight - current - messagesContainer.clientHeight;
             scrollDownBtn.classList.toggle('local-ai-course-assistant__scroll-down--visible', gap > 80);
         };
         messagesContainer.addEventListener('scroll', updateScrollBtn, {passive: true});
@@ -593,13 +610,19 @@ define([
                     }));
                 } catch (e) { /**/ }
             } else {
-                // No movement — this was a plain click, not a drag.
-                // Restore CSS-based positioning so the widget stays at bottom/right
-                // and adapts correctly when the viewport resizes (e.g. iOS address bar).
-                root.style.bottom = '';
-                root.style.right  = '';
-                root.style.top    = '';
-                root.style.left   = '';
+                // No movement — plain click, not a drag.
+                // Only reset to CSS bottom/right positioning when there is no saved
+                // drag position; if the user has previously dragged the widget, leave
+                // the inline styles in place (they already reflect the correct position
+                // from onDragStart) so the widget doesn't snap back on every click.
+                let hasSavedPos = false;
+                try { hasSavedPos = !!localStorage.getItem(DRAG_KEY); } catch (e) { /**/ }
+                if (!hasSavedPos) {
+                    root.style.bottom = '';
+                    root.style.right  = '';
+                    root.style.top    = '';
+                    root.style.left   = '';
+                }
             }
         };
 
@@ -751,9 +774,17 @@ define([
         }
 
         // ── Tap outside drawer to close (desktop + mobile) ───────────────────────
+        // Use composedPath() so elements removed from the DOM during event
+        // propagation (e.g. suggestion chips cleared by clearSuggestions()) still
+        // resolve correctly. Also exclude the toggle button itself — clicking it
+        // calls toggleDrawer() which opens the drawer; without this exclusion the
+        // root handler immediately closes it again.
         if (root) {
             root.addEventListener('click', function(e) {
-                if (isOpen() && drawer && !drawer.contains(e.target)) {
+                const path = e.composedPath ? e.composedPath() : [e.target];
+                const insideDrawer = path.some(function(el) { return el === drawer; });
+                const onToggle = toggle && path.some(function(el) { return el === toggle; });
+                if (isOpen() && drawer && !insideDrawer && !onToggle) {
                     closeDrawer();
                 }
             });
@@ -1136,9 +1167,11 @@ define([
         }
         const content = streamingEl.querySelector('.local-ai-course-assistant__message-content');
         content.innerHTML = Markdown.render(fullText);
-        // Do not auto-scroll here — the top of the streaming message was already
-        // brought into view when streaming started. The scroll-down arrow lets the
-        // user jump to the bottom if they want to follow along.
+        // In follow mode (user clicked the scroll-down arrow during streaming),
+        // keep the bottom of new content visible. Otherwise stay at message top.
+        if (scrollFollowMode) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
     };
 
     /**
@@ -1174,9 +1207,14 @@ define([
             }
 
             streamingEl = null;
-            // After the final markdown render, snap back to the top of the completed
-            // message so students read from the beginning (not stranded mid-response).
-            scrollToMessageTop(completedEl);
+            if (scrollFollowMode) {
+                // User was following — land at the bottom of the completed message.
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                scrollFollowMode = false;
+            } else {
+                // Default: snap back to the top so students read from the beginning.
+                scrollToMessageTop(completedEl);
+            }
         }
     };
 
