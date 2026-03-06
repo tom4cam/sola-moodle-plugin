@@ -638,6 +638,7 @@ define([
                 return;
             }
             e.preventDefault();
+            try { e.currentTarget.setPointerCapture(e.pointerId); } catch (ex) { /**/ }
             onDragStart(e.clientX, e.clientY, false);
         });
         document.addEventListener('pointermove', function(e) {
@@ -646,9 +647,14 @@ define([
         document.addEventListener('pointerup', onDragEnd);
         document.addEventListener('pointercancel', onDragEnd);
 
-        // Toggle button drag — desktop only (same mobile guard).
-        if (toggle && window.innerWidth > 600) {
+        // Toggle button drag — all screen sizes.
+        // On mobile the drawer is fullscreen-fixed so only the floating button moves,
+        // which is exactly what the user wants when repositioning the widget.
+        // setPointerCapture routes subsequent pointermove/pointerup to this element
+        // reliably on iOS Chrome (where touch-dragging without capture can drop events).
+        if (toggle) {
             toggle.addEventListener('pointerdown', function(e) {
+                try { e.currentTarget.setPointerCapture(e.pointerId); } catch (ex) { /**/ }
                 onDragStart(e.clientX, e.clientY, true);
             });
         }
