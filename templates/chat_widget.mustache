@@ -74,6 +74,9 @@
          aria-label="{{#str}}chat:title, local_ai_course_assistant{{/str}}"
          aria-hidden="true">
 
+        {{! Swipe handle — mobile only; drag down to close }}
+        <div class="aica-swipe-handle" aria-hidden="true"></div>
+
         {{! Header }}
         <div class="local-ai-course-assistant__header">
             <div class="local-ai-course-assistant__header-title">
@@ -259,6 +262,13 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7H4a7 7 0 0 1 7-7h1V5.73A2 2 0 0 1 10 4a2 2 0 0 1 2-2M4 15h16v1a7 7 0 0 1-7 7H11a7 7 0 0 1-7-7v-1m3 2v1a4 4 0 0 0 4 4h2a4 4 0 0 0 4-4v-1H7z"/></svg>
                 </span>
                 <span>{{#str}}chat:starter_ai_coach, local_ai_course_assistant{{/str}}</span>
+            </button>
+            <button class="local-ai-course-assistant__starter" data-starter="quick-study">
+                <span class="aica-starter-icon" aria-hidden="true">
+                    {{! Timer icon — Quick Study }}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61 1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42A7.73 7.73 0 0 0 12 4a8 8 0 1 0 8 8c0-2.21-.9-4.21-2.03-5.39zm-1.97 9.61A6 6 0 1 1 12 6a6 6 0 0 1 5.06 9.61z"/></svg>
+                </span>
+                <span>{{#str}}chat:starter_quick_study, local_ai_course_assistant{{/str}}</span>
             </button>
         </div>
 

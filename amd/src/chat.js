@@ -60,8 +60,10 @@ define([
     let currentPageTitle = '';
     /** @type {boolean} Whether SOLA is locked due to a Moodle quiz attempt/view page */
     let quizLocked = false;
-    /** @type {HTMLAudioElement|null} Currently playing OpenAI TTS audio */
+    /** @type {HTMLAudioElement|{pause:Function}|null} Currently playing OpenAI TTS audio (or AudioContext proxy) */
     let currentAudio = null;
+    /** @type {AudioContext|null} Shared AudioContext unlocked by user gesture (iOS TTS fix) */
+    let sharedAudioCtx = null;
 
     /**
      * Initialize the chat module.
@@ -389,6 +391,11 @@ define([
 
         if (starterKey === 'quiz') {
             handleQuiz();
+            return;
+        }
+
+        if (starterKey === 'quick-study') {
+            handleQuickStudy();
             return;
         }
 
@@ -822,6 +829,30 @@ define([
     };
 
     /**
+     * Get (or create) the shared AudioContext, resuming it if suspended.
+     * Must be called synchronously inside a user gesture to unlock iOS audio.
+     *
+     * @returns {AudioContext|null}
+     */
+    const getOrCreateAudioCtx = function() {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) {
+            return null;
+        }
+        if (!sharedAudioCtx) {
+            try {
+                sharedAudioCtx = new AudioCtx();
+            } catch (e) {
+                return null;
+            }
+        }
+        if (sharedAudioCtx.state === 'suspended') {
+            sharedAudioCtx.resume().catch(function() { /**/ });
+        }
+        return sharedAudioCtx;
+    };
+
+    /**
      * Return the OpenAI TTS URL if available, or empty string.
      *
      * @returns {string}
@@ -877,17 +908,80 @@ define([
                 for (var i = 0; i < byteChars.length; i++) {
                     byteArr[i] = byteChars.charCodeAt(i);
                 }
+
+                // ── AudioContext path (iOS-compatible) ────────────────────────────
+                // sharedAudioCtx was unlocked synchronously in handleSpeak() within
+                // the user gesture; decoding + playing here (in a Promise chain) is
+                // safe because the context is already running.
+                const ctx = sharedAudioCtx;
+                if (ctx && ctx.decodeAudioData) {
+                    ctx.decodeAudioData(byteArr.buffer, function(audioBuffer) {
+                        const source = ctx.createBufferSource();
+                        source.buffer = audioBuffer;
+
+                        // Route through analyser for SVG mouth sync.
+                        const analyser = ctx.createAnalyser();
+                        source.connect(analyser);
+                        analyser.connect(ctx.destination);
+
+                        // Duck-typed proxy so stopAllTts() can call .pause().
+                        var startedAt = ctx.currentTime;
+                        currentAudio = {
+                            pause: function() {
+                                try { source.stop(); } catch (e) { /**/ }
+                            },
+                            _duration: audioBuffer.duration,
+                            _startedAt: startedAt
+                        };
+
+                        UI.startMouthSyncFromAnalyser(analyser);
+
+                        if (wordSpans && cleanText) {
+                            var rafId;
+                            var onFrame = function() {
+                                if (!currentAudio) { return; }
+                                var elapsed = ctx.currentTime - startedAt;
+                                var charIndex = Math.floor(
+                                    (elapsed / audioBuffer.duration) * cleanText.length
+                                );
+                                UI.highlightWordAt(wordSpans, charIndex);
+                                rafId = requestAnimationFrame(onFrame);
+                            };
+                            rafId = requestAnimationFrame(onFrame);
+                            source.onended = function() {
+                                cancelAnimationFrame(rafId);
+                                currentAudio = null;
+                                UI.stopMouthSync();
+                                if (callback) { callback(); }
+                            };
+                        } else {
+                            source.onended = function() {
+                                currentAudio = null;
+                                UI.stopMouthSync();
+                                if (callback) { callback(); }
+                            };
+                        }
+                        source.start(0);
+                    }, function() {
+                        // decodeAudioData failed — fall back to browser TTS.
+                        currentAudio = null;
+                        Speech.speak(text, callback);
+                    });
+                    return;
+                }
+
+                // ── HTMLAudioElement fallback (non-iOS / no AudioContext) ──────────
                 const blob = new Blob([byteArr], {type: data.type || 'audio/mpeg'});
                 const objUrl = URL.createObjectURL(blob);
                 const audio = new Audio(objUrl);
                 currentAudio = audio;
-                // Start Web Audio mouth sync (drives SVG avatar lip movement).
                 UI.startMouthSync(audio);
-                // Proportional word highlighting: estimate char position from playback progress.
                 if (wordSpans && cleanText) {
                     audio.addEventListener('timeupdate', function() {
                         if (!audio.duration) { return; }
-                        const charIndex = Math.floor((audio.currentTime / audio.duration) * cleanText.length);
+                        const charIndex = Math.floor(
+                            (audio.currentTime / audio.duration) * cleanText.length
+                        );
                         UI.highlightWordAt(wordSpans, charIndex);
                     });
                 }
@@ -937,6 +1031,12 @@ define([
         stopAllTts();
 
         UI.setSpeakingState(msgEl, true);
+
+        // Unlock AudioContext synchronously within the user gesture (required for iOS Chrome).
+        // This must happen before any async operation; decoding/playing in the
+        // fetch callback is then safe because the context is already running.
+        getOrCreateAudioCtx();
+
         const ttsUrl = getTtsUrl();
         if (ttsUrl) {
             const cleanText = Speech.cleanTextForSpeech(text);
@@ -1125,6 +1225,227 @@ define([
     };
 
     /**
+     * Save the current page/topic as the most recent study session topic.
+     * Called after the user sends a message.
+     */
+    const updateLastSession = function() {
+        try {
+            const topic = currentPageTitle || (quizTopics && quizTopics[0] ? quizTopics[0].name : '');
+            if (!topic) {
+                return;
+            }
+            const key = 'aica_last_session_' + courseId;
+            localStorage.setItem(key, JSON.stringify({topic: topic, ts: Date.now()}));
+        } catch (e) { /**/ }
+    };
+
+    /**
+     * Show a "welcome back" suggestion chip if there is a recent session to continue.
+     * Called on widget open (after history loads).
+     */
+    const checkWelcomeBack = function() {
+        try {
+            const key = 'aica_last_session_' + courseId;
+            const stored = JSON.parse(localStorage.getItem(key) || 'null');
+            if (!stored || !stored.topic) {
+                return;
+            }
+            const daysSince = (Date.now() - stored.ts) / 86400000;
+            if (daysSince > 7) {
+                return; // Too long ago — don't bother
+            }
+            const topic = stored.topic;
+
+            // Also surface the last quiz score for the same topic if available.
+            let quizNote = '';
+            try {
+                const hist = JSON.parse(localStorage.getItem('aica_quiz_history_' + courseId) || '[]');
+                // Find most recent quiz result for the same or similar topic.
+                for (var i = hist.length - 1; i >= 0; i--) {
+                    if (hist[i].topic && hist[i].topic.toLowerCase().indexOf(topic.toLowerCase().slice(0, 8)) >= 0) {
+                        const pct = Math.round((hist[i].score / hist[i].total) * 100);
+                        quizNote = ' (last quiz: ' + pct + '%)';
+                        break;
+                    }
+                }
+            } catch (e) { /**/ }
+
+            const chip = 'Continue: ' + topic + quizNote;
+            // Show after a brief delay so history messages render first.
+            setTimeout(function() {
+                UI.showSuggestions([chip, 'Start fresh'], handleSuggestionClick);
+            }, 600);
+        } catch (e) { /**/ }
+    };
+
+    /**
+     * Handle the Quick Study chip.
+     * Shows a time picker + topic selector, then sends a focused study prompt.
+     */
+    const handleQuickStudy = function() {
+        const root = document.getElementById('local-ai-course-assistant');
+        const drawer = root ? root.querySelector('.local-ai-course-assistant__drawer') : null;
+        if (!drawer) {
+            return;
+        }
+
+        // Remove any existing panel.
+        const existing = drawer.querySelector('.aica-study-setup');
+        if (existing) {
+            existing.remove();
+            UI.showStarters();
+            return;
+        }
+
+        // Hide messages/starters while panel is showing.
+        drawer.classList.add('local-ai-course-assistant__drawer--quiz-setup');
+
+        const panel = document.createElement('div');
+        panel.className = 'aica-study-setup aica-quiz-setup';
+
+        // Title.
+        const title = document.createElement('h3');
+        title.className = 'aica-quiz-setup__title';
+        title.textContent = 'Quick Study';
+        panel.appendChild(title);
+
+        // Time label.
+        const timeLabel = document.createElement('p');
+        timeLabel.className = 'aica-quiz-setup__label';
+        timeLabel.textContent = 'How much time do you have?';
+        panel.appendChild(timeLabel);
+
+        // Time buttons.
+        const timeRow = document.createElement('div');
+        timeRow.className = 'aica-quiz-setup__count-row';
+        const times = [5, 10, 15, 30];
+        let selectedMinutes = 10;
+        times.forEach(function(n) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'aica-quiz-setup__count-btn' +
+                (n === selectedMinutes ? ' aica-quiz-setup__count-btn--selected' : '');
+            btn.textContent = n + ' min';
+            btn.dataset.mins = n;
+            btn.addEventListener('click', function() {
+                selectedMinutes = n;
+                timeRow.querySelectorAll('.aica-quiz-setup__count-btn').forEach(function(b) {
+                    b.classList.toggle('aica-quiz-setup__count-btn--selected',
+                        parseInt(b.dataset.mins) === selectedMinutes);
+                });
+            });
+            timeRow.appendChild(btn);
+        });
+        panel.appendChild(timeRow);
+
+        // Topic label.
+        const topicLabel = document.createElement('p');
+        topicLabel.className = 'aica-quiz-setup__label';
+        topicLabel.textContent = 'What would you like to study?';
+        panel.appendChild(topicLabel);
+
+        // Topic select.
+        const select = document.createElement('select');
+        select.className = 'aica-quiz-setup__topic-select';
+
+        const addOption = function(value, text) {
+            const opt = document.createElement('option');
+            opt.value = value;
+            opt.textContent = text;
+            select.appendChild(opt);
+        };
+
+        addOption('__guided__', 'AI-guided (based on your progress)');
+        if (currentPageTitle) {
+            addOption('', currentPageTitle + ' (current page)');
+        }
+        if (Array.isArray(quizTopics)) {
+            quizTopics.forEach(function(t) {
+                addOption(t.name, t.name);
+            });
+        }
+        addOption('__custom__', 'Custom topic...');
+        panel.appendChild(select);
+
+        // Custom input.
+        const customInput = document.createElement('input');
+        customInput.type = 'text';
+        customInput.className = 'aica-quiz-setup__custom-input';
+        customInput.placeholder = 'Enter a topic...';
+        customInput.style.display = 'none';
+        panel.appendChild(customInput);
+
+        select.addEventListener('change', function() {
+            customInput.style.display = select.value === '__custom__' ? '' : 'none';
+            if (select.value === '__custom__') { customInput.focus(); }
+        });
+
+        // Start button.
+        const startBtn = document.createElement('button');
+        startBtn.type = 'button';
+        startBtn.className = 'aica-quiz-setup__start';
+        startBtn.textContent = 'Start';
+        startBtn.addEventListener('click', function() {
+            let topic;
+            if (select.value === '__custom__') {
+                topic = customInput.value.trim() || 'this topic';
+            } else if (select.value === '__guided__') {
+                topic = null;
+            } else {
+                topic = select.value || currentPageTitle;
+            }
+
+            // Remove panel and restore drawer.
+            panel.remove();
+            drawer.classList.remove('local-ai-course-assistant__drawer--quiz-setup');
+
+            // Build the study prompt.
+            let prompt;
+            if (topic) {
+                prompt = 'I have ' + selectedMinutes + ' minutes. Please give me a focused ' +
+                    selectedMinutes + '-minute study session on "' + topic +
+                    '". Start with the most important concept, keep responses concise, ' +
+                    'and guide me step by step.';
+            } else {
+                prompt = 'I have ' + selectedMinutes + ' minutes to study. Based on my recent ' +
+                    'activity and this course, what should I focus on? Give me a focused ' +
+                    selectedMinutes + '-minute study session — start immediately with the most ' +
+                    'important topic and keep responses concise.';
+            }
+
+            // Track study session.
+            try {
+                const sessionKey = 'aica_study_sessions_' + courseId;
+                const sessions = JSON.parse(localStorage.getItem(sessionKey) || '[]');
+                sessions.push({topic: topic || 'AI-guided', minutes: selectedMinutes, ts: Date.now()});
+                if (sessions.length > 20) { sessions.splice(0, sessions.length - 20); }
+                localStorage.setItem(sessionKey, JSON.stringify(sessions));
+            } catch (e) { /**/ }
+
+            const els = UI.getElements();
+            els.input.value = prompt;
+            UI.autoResizeInput();
+            UI.updateSendButton();
+            handleSend();
+        });
+        panel.appendChild(startBtn);
+
+        // Cancel button.
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.className = 'aica-quiz-setup__cancel';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.addEventListener('click', function() {
+            panel.remove();
+            drawer.classList.remove('local-ai-course-assistant__drawer--quiz-setup');
+            UI.showStarters();
+        });
+        panel.appendChild(cancelBtn);
+
+        drawer.appendChild(panel);
+    };
+
+    /**
      * Handle toggle button click.
      * Suppressed if the toggle was just used to drag-reposition the widget.
      */
@@ -1151,6 +1472,7 @@ define([
             loadHistory();
             checkAndShowIntro();
             updateStreak();
+            checkWelcomeBack();
         }
     };
 
@@ -1354,6 +1676,9 @@ define([
         UI.hideStarters();
         UI.setInputEnabled(false);
         UI.clearInput();
+
+        // Track last session topic for personalized welcome-back.
+        updateLastSession();
 
         // Add user message.
         UI.addMessage('user', text, null);

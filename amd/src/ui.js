@@ -409,6 +409,14 @@ define([
 
     /** @type {HTMLElement|null} Current streaming message element */
     let streamingEl = null;
+    /** Typewriter: full text received from SSE (may be ahead of visual display) */
+    let typewriterFull = '';
+    /** Typewriter: number of characters currently displayed */
+    let typewriterPos = 0;
+    /** Typewriter: setInterval handle */
+    let typewriterTimer = null;
+    /** Characters revealed per 20ms tick (~200 chars/sec) */
+    const TYPEWRITER_SPEED = 5;
 
     /** @type {HTMLElement|null} Currently playing TTS message element */
     let speakingEl = null;
@@ -765,20 +773,23 @@ define([
      * Safe to call on desktop too — touch events simply never fire there.
      */
     const initMobileGestures = function() {
-        // ── Mobile: swipe-down on header to close ────────────────────────────────
+        // ── Mobile: swipe-down on swipe handle to close ──────────────────────────
+        // Restricted to the dedicated .aica-swipe-handle bar to avoid accidental
+        // dismissal when scrolling through messages or swiping on content.
         var swipeTouchStartY = 0;
         var swipeTouchStartX = 0;
-        if (drawer) {
-            drawer.addEventListener('touchstart', function(e) {
+        var swipeHandle = drawer ? drawer.querySelector('.aica-swipe-handle') : null;
+        if (swipeHandle) {
+            swipeHandle.addEventListener('touchstart', function(e) {
                 swipeTouchStartY = e.touches[0].clientY;
                 swipeTouchStartX = e.touches[0].clientX;
             }, {passive: true});
 
-            drawer.addEventListener('touchend', function(e) {
+            swipeHandle.addEventListener('touchend', function(e) {
                 var dy = e.changedTouches[0].clientY - swipeTouchStartY;
                 var dx = Math.abs(e.changedTouches[0].clientX - swipeTouchStartX);
-                // Swipe down ≥ 80px, more vertical than horizontal → close drawer.
-                if (dy > 80 && dx < dy * 0.8) {
+                // Swipe down ≥ 60px, more vertical than horizontal → close drawer.
+                if (dy > 60 && dx < dy * 0.8) {
                     closeDrawer();
                 }
             }, {passive: true});
@@ -1152,6 +1163,10 @@ define([
                 av.classList.toggle('aica-avatar-svg--speaking', !!on);
             });
         }
+        // Pulse-glow the toggle button itself (drives the CSS @keyframes aica-speaking-glow).
+        if (toggle) {
+            toggle.classList.toggle('aica-speaking', !!on);
+        }
     };
 
     /**
@@ -1166,8 +1181,64 @@ define([
     };
 
     /**
-     * Append a chunk to the current streaming message.
-     * Re-renders all accumulated text through markdown on each chunk.
+     * Scroll just enough to keep the bottom of the streaming content visible.
+     * Unlike scrollToBottom, this doesn't snap to the very end of the messages container.
+     */
+    const scrollToKeepStreamingVisible = function() {
+        if (!messagesContainer || !streamingEl) {
+            return;
+        }
+        const content = streamingEl.querySelector('.local-ai-course-assistant__message-content');
+        if (!content) {
+            return;
+        }
+        const cRect = messagesContainer.getBoundingClientRect();
+        const eRect = content.getBoundingClientRect();
+        if (eRect.bottom > cRect.bottom - 4) {
+            messagesContainer.scrollTop += (eRect.bottom - cRect.bottom) + 6;
+        }
+    };
+
+    /**
+     * Internal: advance the typewriter by TYPEWRITER_SPEED characters and re-render.
+     */
+    const tickTypewriter = function() {
+        if (!streamingEl) {
+            clearTypewriterTimer();
+            return;
+        }
+        const target = typewriterFull.length;
+        if (typewriterPos >= target) {
+            return; // Caught up — more tokens may still arrive
+        }
+        typewriterPos = Math.min(typewriterPos + TYPEWRITER_SPEED, target);
+        const partial = typewriterFull.substring(0, typewriterPos);
+        const content = streamingEl.querySelector('.local-ai-course-assistant__message-content');
+        if (content) {
+            content.innerHTML = Markdown.render(partial);
+            if (scrollFollowMode) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            } else {
+                scrollToKeepStreamingVisible();
+            }
+        }
+    };
+
+    /**
+     * Clear the typewriter timer and reset state.
+     */
+    const clearTypewriterTimer = function() {
+        if (typewriterTimer) {
+            clearInterval(typewriterTimer);
+            typewriterTimer = null;
+        }
+        typewriterFull = '';
+        typewriterPos = 0;
+    };
+
+    /**
+     * Append a chunk to the current streaming message using typewriter animation.
+     * Queues the new text; a timer reveals it character-by-character.
      *
      * @param {string} fullText The full accumulated text so far
      */
@@ -1175,12 +1246,9 @@ define([
         if (!streamingEl) {
             return;
         }
-        const content = streamingEl.querySelector('.local-ai-course-assistant__message-content');
-        content.innerHTML = Markdown.render(fullText);
-        // In follow mode (user clicked the scroll-down arrow during streaming),
-        // keep the bottom of new content visible. Otherwise stay at message top.
-        if (scrollFollowMode) {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        typewriterFull = fullText;
+        if (!typewriterTimer) {
+            typewriterTimer = setInterval(tickTypewriter, 20);
         }
     };
 
@@ -1191,6 +1259,8 @@ define([
      * @param {Function|null} onSpeak   Optional TTS callback; if provided, adds speak button
      */
     const finishStreaming = function(fullText, onSpeak) {
+        // Stop typewriter animation — final render below replaces it.
+        clearTypewriterTimer();
         if (streamingEl) {
             const completedEl = streamingEl;
             const content = streamingEl.querySelector('.local-ai-course-assistant__message-content');
@@ -2591,6 +2661,59 @@ define([
     };
 
     /**
+     * Start mouth sync from an already-created AnalyserNode (AudioContext TTS path).
+     * Used when the audio is played through a shared AudioContext (e.g. iOS TTS fix).
+     *
+     * @param {AnalyserNode} analyser  Pre-configured analyser connected to audio source
+     */
+    const startMouthSyncFromAnalyser = function(analyser) {
+        stopMouthSync();
+        if (!root || !analyser) {
+            return;
+        }
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.55;
+        var data = new Uint8Array(analyser.frequencyBinCount);
+        var rafId = null;
+        var alive = true;
+
+        var resetMouth = function() {
+            if (!root) { return; }
+            root.querySelectorAll('.aica-mouth-open').forEach(function(el) {
+                el.style.transform = 'scaleY(0)';
+                el.style.opacity = '0';
+            });
+            root.querySelectorAll('.aica-mouth-smile').forEach(function(el) {
+                el.style.opacity = '';
+            });
+        };
+
+        mouthSyncCleanup = function() {
+            alive = false;
+            if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+            mouthSyncCleanup = null;
+            resetMouth();
+        };
+
+        var update = function() {
+            if (!alive) { return; }
+            analyser.getByteFrequencyData(data);
+            var sum = 0;
+            for (var i = 2; i <= 20; i++) { sum += data[i]; }
+            var amp = Math.min(1, (sum / 19 / 90));
+            root.querySelectorAll('.aica-mouth-open').forEach(function(el) {
+                el.style.transform = 'scaleY(' + amp + ')';
+                el.style.opacity = amp > 0.08 ? '1' : '0';
+            });
+            root.querySelectorAll('.aica-mouth-smile').forEach(function(el) {
+                el.style.opacity = String(Math.max(0.05, 1 - amp * 1.3));
+            });
+            rafId = requestAnimationFrame(update);
+        };
+        update();
+    };
+
+    /**
      * Stop Web Audio mouth sync and reset mouth to resting state.
      */
     const stopMouthSync = function() {
@@ -2665,6 +2788,7 @@ define([
         highlightWordAt: highlightWordAt,
         stopWordHighlight: stopWordHighlight,
         startMouthSync: startMouthSync,
+        startMouthSyncFromAnalyser: startMouthSyncFromAnalyser,
         stopMouthSync: stopMouthSync,
         isStartersVisible: isStartersVisible,
     };

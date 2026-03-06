@@ -570,8 +570,32 @@
     }
 }
 
+/* Swipe handle bar — appears above header on mobile, used to drag-to-dismiss */
+.aica-swipe-handle {
+    display: none; /* hidden on desktop */
+    flex-shrink: 0;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+}
+.aica-swipe-handle::after {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.18);
+}
+
 /* Mobile (< 600px) */
 @media (max-width: 600px) {
+    .aica-swipe-handle {
+        display: flex;
+    }
+
     .local-ai-course-assistant__drawer {
         position: fixed;
         left: 8px;
@@ -2477,18 +2501,15 @@
                aica-avatar-pulse 2.5s ease-out infinite;
 }
 
-/* Bounce — for preset (non-generated) avatars while speaking */
-@keyframes aica-avatar-bounce {
-    0%   { transform: translateY(0); }
-    35%  { transform: translateY(-8px) scale(1.04); }
-    55%  { transform: translateY(-3px) scale(1.01); }
-    70%  { transform: translateY(-6px) scale(1.03); }
-    100% { transform: translateY(0); }
+/* Glow pulse on the toggle button while TTS is active */
+@keyframes aica-speaking-glow {
+    0%   { box-shadow: 0 0 0 0px  rgba(74, 108, 247, 0.7); }
+    50%  { box-shadow: 0 0 0 12px rgba(74, 108, 247, 0.15); }
+    100% { box-shadow: 0 0 0 0px  rgba(74, 108, 247, 0.7); }
 }
 
-/* PNG/SVG-file avatars: bounce */
-.aica-avatar-svg--speaking:not(.aica-avatar-svg--has-svg) {
-    animation: aica-avatar-bounce 0.65s ease-in-out infinite;
+.local-ai-course-assistant__toggle.aica-speaking {
+    animation: aica-speaking-glow 0.7s ease-in-out infinite !important;
 }
 
 /* CSS fallback mouth for generated SVG avatars when Web Audio is unavailable */

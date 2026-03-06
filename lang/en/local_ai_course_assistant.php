@@ -408,6 +408,7 @@ $string['chat:starter_help_me']             = 'AI Help';
 $string['chat:starter_ell_practice']        = 'Practice Speaking';
 $string['chat:starter_ell_pronunciation']   = 'ELL Pronunciation';
 $string['chat:starter_ai_coach']            = 'AI Coach';
+$string['chat:starter_quick_study']         = 'Quick Study';
 $string['chat:starter_speak']               = 'Speak a starter';
 // Legacy keys kept for backwards compatibility.
 $string['chat:starter_help_lesson']         = 'Explain This';
