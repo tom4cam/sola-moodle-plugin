@@ -158,15 +158,29 @@ define([], function() {
                 continue;
             }
 
-            // Close list if we hit a non-list line.
+            // Empty line — peek ahead so blank lines between list items don't break the list.
+            // AI models frequently emit blank lines between numbered items, which would otherwise
+            // cause each item to start a new <ol> and reset the counter to 1.
+            if (line.trim() === '') {
+                if (inList) {
+                    let j = i + 1;
+                    while (j < lines.length && lines[j].trim() === '') { j++; }
+                    const peek = j < lines.length ? lines[j] : '';
+                    const nextIsOl = !!peek.match(/^[\s]*\d+\.\s+/);
+                    const nextIsUl = !!peek.match(/^[\s]*[-*+]\s+/);
+                    if ((listType === 'ol' && nextIsOl) || (listType === 'ul' && nextIsUl)) {
+                        continue; // Blank line inside a list — stay in list
+                    }
+                    output.push(listType === 'ul' ? '</ul>' : '</ol>');
+                    inList = false;
+                }
+                continue;
+            }
+
+            // Close list if we hit a non-list, non-empty line.
             if (inList) {
                 output.push(listType === 'ul' ? '</ul>' : '</ol>');
                 inList = false;
-            }
-
-            // Empty line.
-            if (line.trim() === '') {
-                continue;
             }
 
             // Regular paragraph.

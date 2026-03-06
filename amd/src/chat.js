@@ -623,7 +623,8 @@ define([
             UI.hideVoiceOverlay();
         };
 
-        UI.showVoiceOverlay(avatarUrl, endSession);
+        UI.showVoiceOverlay(avatarUrl, endSession,
+            'Start speaking \u2014 SOLA will listen and respond.');
         UI.setVoiceState('connecting');
 
         Voice.connect(
@@ -706,7 +707,8 @@ define([
             UI.hideVoiceOverlay();
         };
 
-        const overlay = UI.showVoiceOverlay(avatarUrl, endSession);
+        const overlay = UI.showVoiceOverlay(avatarUrl, endSession,
+            'Speak a word or sentence to practice your pronunciation. SOLA will give you feedback.');
         UI.setVoiceState('connecting');
 
         // Fetch token and mic stream in parallel — both initiated within the user gesture.

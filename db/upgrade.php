@@ -209,5 +209,12 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026030801, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026030802) {
+        // v1.0.19: Fix numbered list rendering (blank lines between items reset counter);
+        // add written instruction prompt to ELL/Practice Speaking voice overlay.
+        // No schema changes needed.
+        upgrade_plugin_savepoint(true, 2026030802, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

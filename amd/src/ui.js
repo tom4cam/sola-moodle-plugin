@@ -1931,7 +1931,7 @@ define([
      * @param {Function} onEnd      Called when the user clicks the end-session button
      * @returns {HTMLElement} The bar element (passed to Realtime as overlayRoot for --aica-voice-level)
      */
-    const showVoiceOverlay = function(avatarUrl, onEnd) {
+    const showVoiceOverlay = function(avatarUrl, onEnd, instruction) {
         if (!drawer) { return null; }
 
         // Remove any existing bar.
@@ -1950,11 +1950,22 @@ define([
         }
         bar.appendChild(wave);
 
-        // Status text.
+        // Middle column: status text + optional instruction.
+        const middle = document.createElement('div');
+        middle.className = 'aica-voice-bar__middle';
+
         const status = document.createElement('span');
         status.className = 'aica-voice-status';
         status.textContent = 'Connecting…';
-        bar.appendChild(status);
+        middle.appendChild(status);
+
+        if (instruction) {
+            const hint = document.createElement('p');
+            hint.className = 'aica-voice-instruction';
+            hint.textContent = instruction;
+            middle.appendChild(hint);
+        }
+        bar.appendChild(middle);
 
         // End button.
         const endBtn = document.createElement('button');
