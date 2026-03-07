@@ -1019,6 +1019,8 @@ define([
         if (opening) {
             drawer.classList.add('local-ai-course-assistant__drawer--open');
             if (root) { root.classList.add('local-ai-course-assistant--open'); }
+            // Show conversation starters when reopening.
+            showStarters();
         } else {
             drawer.classList.remove('local-ai-course-assistant__drawer--open');
             if (root) { root.classList.remove('local-ai-course-assistant--open'); }

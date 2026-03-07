@@ -93,17 +93,6 @@
                 <span>{{#str}}chat:title, local_ai_course_assistant{{/str}}</span>
             </div>
             <div class="local-ai-course-assistant__header-actions">
-                {{#ttsurl}}
-                <button class="local-ai-course-assistant__btn-voice"
-                        title="{{#str}}chat:voice_mode, local_ai_course_assistant{{/str}}"
-                        aria-label="{{#str}}chat:voice_mode, local_ai_course_assistant{{/str}}"
-                        type="button">
-                    {{! Headphone icon — voice conversation mode }}
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
-                        <path d="M12 1a9 9 0 0 0-9 9v4a3 3 0 0 0 3 3h1a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1H6v-1a6 6 0 0 1 12 0v1h-1a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h1a3 3 0 0 0 3-3v-4a9 9 0 0 0-9-9z"/>
-                    </svg>
-                </button>
-                {{/ttsurl}}
                 {{#canviewanalytics}}
                 <a href="{{analyticsurl}}"
                    class="local-ai-course-assistant__btn-analytics"
