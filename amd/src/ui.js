@@ -682,10 +682,25 @@ define([
         // setPointerCapture routes subsequent pointermove/pointerup to this element
         // reliably on iOS Chrome (where touch-dragging without capture can drop events).
         if (toggle) {
+            var togglePending = null;
             toggle.addEventListener('pointerdown', function(e) {
                 try { e.currentTarget.setPointerCapture(e.pointerId); } catch (ex) { /**/ }
-                onDragStart(e.clientX, e.clientY, true);
+                // Don't start drag immediately — wait for actual movement to avoid
+                // a position jump on plain tap/click.
+                togglePending = {x: e.clientX, y: e.clientY};
             });
+            toggle.addEventListener('pointermove', function(e) {
+                if (!togglePending) { return; }
+                var dx = Math.abs(e.clientX - togglePending.x);
+                var dy = Math.abs(e.clientY - togglePending.y);
+                if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) {
+                    onDragStart(togglePending.x, togglePending.y, true);
+                    onDragMove(e.clientX, e.clientY);
+                    togglePending = null;
+                }
+            });
+            toggle.addEventListener('pointerup', function() { togglePending = null; });
+            toggle.addEventListener('pointercancel', function() { togglePending = null; });
         }
 
         // Drawer body drag — allows dragging from non-interactive areas outside the header
@@ -836,6 +851,31 @@ define([
                         localStorage.setItem(SIZE_KEY, JSON.stringify(size));
                     } catch (ex) { /**/ }
                 }
+            }, {passive: true});
+        }
+
+        // ── Swipe down on header to close ────────────────────────────────────────
+        var headerEl = drawer ? drawer.querySelector('.local-ai-course-assistant__header') : null;
+        if (headerEl) {
+            var hdrStartY = 0;
+            var hdrMoved = false;
+            headerEl.addEventListener('touchstart', function(e) {
+                // Only start if touch is not on a button/link (let those handle normally).
+                if (e.target.closest('button, a')) { return; }
+                hdrStartY = e.touches[0].clientY;
+                hdrMoved = false;
+            }, {passive: true});
+            headerEl.addEventListener('touchmove', function(e) {
+                if (e.target.closest('button, a')) { return; }
+                var dy = e.touches[0].clientY - hdrStartY;
+                if (dy > 40) { hdrMoved = true; }
+            }, {passive: true});
+            headerEl.addEventListener('touchend', function() {
+                if (hdrMoved) {
+                    closeDrawer();
+                    if (drawer) { drawer.style.height = ''; }
+                }
+                hdrMoved = false;
             }, {passive: true});
         }
 
