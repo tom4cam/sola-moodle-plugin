@@ -111,6 +111,8 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
 
     /** @type {Function|null} */
     var onTranscriptCb = null;
+    /** @type {Function|null} Suggestions callback — receives array of chip strings */
+    var onSuggestionsCb = null;
     /** @type {Function|null} */
     var onStateChangeCb = null;
     /** @type {Function|null} */
@@ -478,6 +480,17 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
                 if (!connected) {
                     return;
                 }
+                // Extract SOLA_NEXT suggestions before stripping.
+                if (onSuggestionsCb) {
+                    var nextMatch = displayBuffer.match(/\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/);
+                    if (nextMatch) {
+                        var chips = nextMatch[1].split('||').map(function(s) { return s.trim(); })
+                            .filter(function(s) { return s.length > 0; });
+                        if (chips.length) {
+                            onSuggestionsCb(chips);
+                        }
+                    }
+                }
                 // Flush remaining buffer as final sentence.
                 var remaining = stripSolaTags(sentenceBuffer).trim();
                 sentenceBuffer = '';
@@ -739,9 +752,10 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
             disconnect();
         }
 
-        onTranscriptCb  = callbacks.onTranscript  || null;
+        onTranscriptCb  = callbacks.onTranscript   || null;
         onStateChangeCb = callbacks.onStateChange  || null;
         onErrorCb       = callbacks.onError        || null;
+        onSuggestionsCb = callbacks.onSuggestions  || null;
 
         cfg = {
             courseId: config.courseId || 0,

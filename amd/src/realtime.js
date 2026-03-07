@@ -33,7 +33,11 @@ define([], function() {
         'While having natural conversation: gently correct grammar errors by modeling the correct form ' +
         '("You might say: \'...\'"), offer pronunciation tips when speech sounds unclear. ' +
         'For pronunciation practice, speak a target phrase clearly, then listen to the learner repeat it ' +
-        'and give specific encouraging feedback.';
+        'and give specific encouraging feedback. ' +
+        'After each response, append exactly one line: [SOLA_NEXT]chip1||chip2||chip3[/SOLA_NEXT] ' +
+        'where each chip is a short suggestion the learner might say or practice next ' +
+        '(e.g. a word to pronounce, a conversation topic, or a follow-up question). ' +
+        'Never read the [SOLA_NEXT] tag aloud.';
 
     /** @type {WebSocket|null} */
     var ws = null;
@@ -53,6 +57,12 @@ define([], function() {
     var onTranscriptCb = null;
     /** @type {Function|null} Error callback */
     var onErrorCb = null;
+    /** @type {Function|null} Suggestions callback — receives array of chip strings */
+    var onSuggestionsCb = null;
+    /** @type {string} Accumulated assistant transcript for SOLA_NEXT parsing */
+    var assistantTranscript = '';
+    /** @type {number} How many chars of assistantTranscript have been emitted to display */
+    var transcriptEmitted = 0;
     /** @type {HTMLElement|null} Overlay root for CSS custom property */
     var overlayRoot = null;
     /** @type {number|null} Animation frame ID */
@@ -407,8 +417,15 @@ define([], function() {
                 break;
 
             case 'response.output_audio_transcript.delta':
-                if (msg.delta && onTranscriptCb) {
-                    onTranscriptCb('assistant', msg.delta);
+                if (msg.delta) {
+                    assistantTranscript += msg.delta;
+                    // Strip [SOLA_NEXT] tags from displayed transcript.
+                    var solaIdx = assistantTranscript.indexOf('[SOLA_NEXT]');
+                    var visibleEnd = solaIdx !== -1 ? solaIdx : assistantTranscript.length;
+                    if (visibleEnd > transcriptEmitted && onTranscriptCb) {
+                        onTranscriptCb('assistant', assistantTranscript.slice(transcriptEmitted, visibleEnd));
+                    }
+                    transcriptEmitted = visibleEnd;
                 }
                 break;
 
@@ -423,7 +440,19 @@ define([], function() {
                 break;
 
             case 'response.done':
-                // Audio playback onended handles state change.
+                // Parse SOLA_NEXT suggestions from accumulated transcript.
+                if (onSuggestionsCb && assistantTranscript) {
+                    var nextMatch = assistantTranscript.match(/\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/);
+                    if (nextMatch) {
+                        var chips = nextMatch[1].split('||').map(function(s) { return s.trim(); })
+                            .filter(function(s) { return s.length > 0; });
+                        if (chips.length) {
+                            onSuggestionsCb(chips);
+                        }
+                    }
+                }
+                assistantTranscript = '';
+                transcriptEmitted = 0;
                 break;
 
             case 'error':
@@ -452,9 +481,12 @@ define([], function() {
      *                                       where AudioContext must be created in a user gesture)
      */
     var connect = function(token, instructions, voice, callbacks, overlayEl, audioCtxIn, micStreamParam) {
-        onTranscriptCb  = callbacks.onTranscript  || null;
-        onStateChangeCb = callbacks.onStateChange || null;
-        onErrorCb       = callbacks.onError       || null;
+        onTranscriptCb  = callbacks.onTranscript   || null;
+        onStateChangeCb = callbacks.onStateChange  || null;
+        onErrorCb       = callbacks.onError        || null;
+        onSuggestionsCb = callbacks.onSuggestions  || null;
+        assistantTranscript = '';
+        transcriptEmitted = 0;
         overlayRoot     = overlayEl               || null;
         micStreamIn     = micStreamParam          || null;
 

@@ -646,6 +646,12 @@ define([
                     UI.hideVoiceOverlay();
                     addAssistantMsg(msg || 'Voice mode failed.');
                 },
+                onSuggestions: function(chips) {
+                    UI.showSuggestions(chips, function(text) {
+                        UI.clearSuggestions();
+                        Voice.sendText(text);
+                    });
+                },
             },
             {
                 courseId: courseId,
@@ -719,9 +725,19 @@ define([
             const token = result.token;
             const voice = localStorage.getItem('aica_tts_voice') || result.voice;
 
+            // Enrich ELL instructions with course page context for relevant suggestions.
+            let ellInstructions = Realtime.ELL_INSTRUCTIONS;
+            if (currentPageTitle) {
+                ellInstructions += ' The learner is currently studying: "' + currentPageTitle + '".';
+            }
+            if (moduleTitles.length) {
+                ellInstructions += ' Course topics include: ' + moduleTitles.slice(0, 8).join(', ') + '.';
+            }
+            ellInstructions += ' Base your SOLA_NEXT suggestions on the course content when possible.';
+
             Realtime.connect(
                 token,
-                Realtime.ELL_INSTRUCTIONS,
+                ellInstructions,
                 voice,
                 {
                     onTranscript: function(role, text) {
@@ -737,6 +753,12 @@ define([
                         UI.setVoiceState('disconnected');
                         UI.hideVoiceOverlay();
                         addAssistantMsg(msg || 'Voice connection failed.');
+                    },
+                    onSuggestions: function(chips) {
+                        UI.showSuggestions(chips, function(text) {
+                            UI.clearSuggestions();
+                            Realtime.sendText(text);
+                        });
                     },
                 },
                 overlay,
