@@ -80,9 +80,8 @@ $templatedata = [
     'url_7' => (new moodle_url('/local/ai_course_assistant/analytics.php', ['courseid' => $courseid, 'range' => 7]))->out(false),
     'url_30' => (new moodle_url('/local/ai_course_assistant/analytics.php', ['courseid' => $courseid, 'range' => 30]))->out(false),
     'url_all' => (new moodle_url('/local/ai_course_assistant/analytics.php', ['courseid' => $courseid, 'range' => 0]))->out(false),
-    'token_analytics_url' => has_capability('moodle/site:config', context_system::instance())
-        ? (new moodle_url('/local/ai_course_assistant/token_analytics.php'))->out(false)
-        : null,
+    'token_analytics_url' => (new moodle_url('/local/ai_course_assistant/token_analytics.php',
+        ['courseid' => $courseid, 'range' => $range]))->out(false),
 ];
 
 echo $OUTPUT->header();

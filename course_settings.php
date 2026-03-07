@@ -84,6 +84,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     course_config_manager::save($courseid, $data);
 
+    // RAG toggle — stored separately as plugin config keyed by course.
+    $ragcourse = optional_param('rag_course_enabled', 0, PARAM_INT);
+    set_config('rag_enabled_course_' . $courseid, $ragcourse, 'local_ai_course_assistant');
+
     // ELL Pronunciation toggle — stored separately as plugin config keyed by course.
     $ellpronunciation = optional_param('ell_pronunciation_enabled', 0, PARAM_INT);
     set_config('ell_pronunciation_course_' . $courseid, $ellpronunciation, 'local_ai_course_assistant');
@@ -102,6 +106,11 @@ $current = course_config_manager::get($courseid);
 // ELL Pronunciation setting (stored via plugin config, not in course_cfg table).
 $ellpronunciationenabled = (bool)get_config('local_ai_course_assistant', 'ell_pronunciation_course_' . $courseid);
 $realtimeenabled = (bool)get_config('local_ai_course_assistant', 'realtime_enabled');
+
+// RAG setting — defaults to enabled if global RAG is on and not explicitly disabled.
+$ragenabled = (bool)get_config('local_ai_course_assistant', 'rag_enabled');
+$ragcourseraw = get_config('local_ai_course_assistant', 'rag_enabled_course_' . $courseid);
+$ragcourseenabled = ($ragcourseraw === false) || (bool)$ragcourseraw;
 
 // Speaking Practice setting.
 $speakingpracticeraw = get_config('local_ai_course_assistant', 'speaking_practice_course_' . $courseid);
@@ -264,6 +273,32 @@ echo html_writer::div(
             </div>
         </div>
     </div>
+
+    <?php if ($ragenabled) { ?>
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="mb-0"><?php echo get_string('coursesettings:rag', 'local_ai_course_assistant'); ?></h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted"><?php echo get_string('coursesettings:rag_desc', 'local_ai_course_assistant'); ?></p>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label" for="rag_course_enabled">
+                    <?php echo get_string('coursesettings:rag', 'local_ai_course_assistant'); ?>
+                </label>
+                <div class="col-sm-9">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="rag_course_enabled"
+                               name="rag_course_enabled" value="1"
+                               <?php if ($ragcourseenabled) { echo 'checked'; } ?>>
+                        <label class="custom-control-label" for="rag_course_enabled">
+                            <?php echo get_string('coursesettings:rag_enable', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php } ?>
 
     <?php if ($hasttskey) { ?>
     <div class="card mb-3">

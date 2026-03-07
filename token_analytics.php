@@ -26,19 +26,34 @@ require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\token_cost_manager;
 
-$syscontext = context_system::instance();
 require_login();
-require_capability('moodle/site:config', $syscontext);
 
 $range    = optional_param('range',    30, PARAM_INT);  // Days: 7, 30, 90, 0 = all.
 $courseid = optional_param('courseid',  0, PARAM_INT);  // 0 = all courses.
 
+$syscontext = context_system::instance();
+$hassiteconfig = has_capability('moodle/site:config', $syscontext);
+
+if ($hassiteconfig) {
+    // Site admins can see all courses.
+    $pagecontext = $syscontext;
+} elseif ($courseid > 0) {
+    // Course-level: require viewanalytics on that course; lock to that course only.
+    $coursecontext = context_course::instance($courseid);
+    require_capability('local/ai_course_assistant:viewanalytics', $coursecontext);
+    $pagecontext = $coursecontext;
+} else {
+    // No courseid and not a site admin — deny.
+    require_capability('moodle/site:config', $syscontext);
+    $pagecontext = $syscontext; // unreachable, satisfies static analysis.
+}
+
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/token_analytics.php',
     ['range' => $range, 'courseid' => $courseid]));
-$PAGE->set_context($syscontext);
+$PAGE->set_context($pagecontext);
 $PAGE->set_title('SOLA — Token Usage & Cost');
 $PAGE->set_heading('SOLA — Token Usage & Cost');
-$PAGE->set_pagelayout('admin');
+$PAGE->set_pagelayout($hassiteconfig ? 'admin' : 'report');
 
 // ── Query helpers ──────────────────────────────────────────────────────────────
 

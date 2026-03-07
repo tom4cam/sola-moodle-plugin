@@ -158,6 +158,95 @@ if ($hassiteconfig) {
         $positions
     ));
 
+    // --- RAG / Semantic Search Settings ---
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/rag_heading',
+        get_string('settings:rag_heading', 'local_ai_course_assistant'),
+        get_string('settings:rag_heading_desc', 'local_ai_course_assistant')
+    ));
+
+    // RAG master toggle.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/rag_enabled',
+        get_string('settings:rag_enabled', 'local_ai_course_assistant'),
+        get_string('settings:rag_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+
+    // Embedding provider.
+    $embeddingproviders = [
+        'openai' => get_string('settings:embed_provider_openai', 'local_ai_course_assistant'),
+        'ollama' => get_string('settings:embed_provider_ollama', 'local_ai_course_assistant'),
+    ];
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/embed_provider',
+        get_string('settings:embed_provider', 'local_ai_course_assistant'),
+        get_string('settings:embed_provider_desc', 'local_ai_course_assistant'),
+        'openai',
+        $embeddingproviders
+    ));
+
+    // Embedding API key (separate from chat API key).
+    $settings->add(new admin_setting_configpasswordunmask(
+        'local_ai_course_assistant/embed_apikey',
+        get_string('settings:embed_apikey', 'local_ai_course_assistant'),
+        get_string('settings:embed_apikey_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
+    // Embedding model name.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/embed_model',
+        get_string('settings:embed_model', 'local_ai_course_assistant'),
+        get_string('settings:embed_model_desc', 'local_ai_course_assistant'),
+        'text-embedding-3-small'
+    ));
+
+    // Embedding API base URL (for Ollama or custom endpoints).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/embed_apibaseurl',
+        get_string('settings:embed_apibaseurl', 'local_ai_course_assistant'),
+        get_string('settings:embed_apibaseurl_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
+    // Embedding dimensions.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/embed_dimensions',
+        get_string('settings:embed_dimensions', 'local_ai_course_assistant'),
+        get_string('settings:embed_dimensions_desc', 'local_ai_course_assistant'),
+        '1536',
+        PARAM_INT
+    ));
+
+    // Top-k chunks retrieved per query.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rag_topk',
+        get_string('settings:rag_topk', 'local_ai_course_assistant'),
+        get_string('settings:rag_topk_desc', 'local_ai_course_assistant'),
+        '5',
+        PARAM_INT
+    ));
+
+    // Chunk size (target words per chunk).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rag_chunksize',
+        get_string('settings:rag_chunksize', 'local_ai_course_assistant'),
+        get_string('settings:rag_chunksize_desc', 'local_ai_course_assistant'),
+        '400',
+        PARAM_INT
+    ));
+
+    // Link to RAG index status / reindex admin page.
+    $ragadminurl = new moodle_url('/local/ai_course_assistant/rag_admin.php');
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/rag_admin_link',
+        get_string('ragadmin:title', 'local_ai_course_assistant'),
+        html_writer::link($ragadminurl,
+            get_string('ragadmin:view_status', 'local_ai_course_assistant'),
+            ['class' => 'btn btn-secondary btn-sm'])
+    ));
+
     // --- FAQ & Support Settings ---
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/faq_heading',
@@ -312,95 +401,6 @@ if ($hassiteconfig) {
         get_string('settings:whatsapp_blocked_countries', 'local_ai_course_assistant'),
         get_string('settings:whatsapp_blocked_countries_desc', 'local_ai_course_assistant'),
         ''
-    ));
-
-    // --- RAG / Semantic Search Settings ---
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/rag_heading',
-        get_string('settings:rag_heading', 'local_ai_course_assistant'),
-        get_string('settings:rag_heading_desc', 'local_ai_course_assistant')
-    ));
-
-    // RAG master toggle.
-    $settings->add(new admin_setting_configcheckbox(
-        'local_ai_course_assistant/rag_enabled',
-        get_string('settings:rag_enabled', 'local_ai_course_assistant'),
-        get_string('settings:rag_enabled_desc', 'local_ai_course_assistant'),
-        0
-    ));
-
-    // Embedding provider.
-    $embeddingproviders = [
-        'openai' => get_string('settings:embed_provider_openai', 'local_ai_course_assistant'),
-        'ollama' => get_string('settings:embed_provider_ollama', 'local_ai_course_assistant'),
-    ];
-    $settings->add(new admin_setting_configselect(
-        'local_ai_course_assistant/embed_provider',
-        get_string('settings:embed_provider', 'local_ai_course_assistant'),
-        get_string('settings:embed_provider_desc', 'local_ai_course_assistant'),
-        'openai',
-        $embeddingproviders
-    ));
-
-    // Embedding API key (separate from chat API key).
-    $settings->add(new admin_setting_configpasswordunmask(
-        'local_ai_course_assistant/embed_apikey',
-        get_string('settings:embed_apikey', 'local_ai_course_assistant'),
-        get_string('settings:embed_apikey_desc', 'local_ai_course_assistant'),
-        ''
-    ));
-
-    // Embedding model name.
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/embed_model',
-        get_string('settings:embed_model', 'local_ai_course_assistant'),
-        get_string('settings:embed_model_desc', 'local_ai_course_assistant'),
-        'text-embedding-3-small'
-    ));
-
-    // Embedding API base URL (for Ollama or custom endpoints).
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/embed_apibaseurl',
-        get_string('settings:embed_apibaseurl', 'local_ai_course_assistant'),
-        get_string('settings:embed_apibaseurl_desc', 'local_ai_course_assistant'),
-        ''
-    ));
-
-    // Embedding dimensions.
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/embed_dimensions',
-        get_string('settings:embed_dimensions', 'local_ai_course_assistant'),
-        get_string('settings:embed_dimensions_desc', 'local_ai_course_assistant'),
-        '1536',
-        PARAM_INT
-    ));
-
-    // Top-k chunks retrieved per query.
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/rag_topk',
-        get_string('settings:rag_topk', 'local_ai_course_assistant'),
-        get_string('settings:rag_topk_desc', 'local_ai_course_assistant'),
-        '5',
-        PARAM_INT
-    ));
-
-    // Chunk size (target words per chunk).
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/rag_chunksize',
-        get_string('settings:rag_chunksize', 'local_ai_course_assistant'),
-        get_string('settings:rag_chunksize_desc', 'local_ai_course_assistant'),
-        '400',
-        PARAM_INT
-    ));
-
-    // Link to RAG index status / reindex admin page.
-    $ragadminurl = new moodle_url('/local/ai_course_assistant/rag_admin.php');
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/rag_admin_link',
-        get_string('ragadmin:title', 'local_ai_course_assistant'),
-        html_writer::link($ragadminurl,
-            get_string('ragadmin:view_status', 'local_ai_course_assistant'),
-            ['class' => 'btn btn-secondary btn-sm'])
     ));
 
     // --- Voice Mode (OpenAI Realtime) Settings ---

@@ -160,7 +160,9 @@ try {
 
     // RAG retrieval: embed user query and fetch relevant chunks.
     $retrievedchunks = [];
-    if (get_config('local_ai_course_assistant', 'rag_enabled')) {
+    $ragcourseraw = get_config('local_ai_course_assistant', 'rag_enabled_course_' . $courseid);
+    $ragcourseenabled = ($ragcourseraw === false) || (bool)$ragcourseraw; // default enabled
+    if (get_config('local_ai_course_assistant', 'rag_enabled') && $ragcourseenabled) {
         try {
             if (!content_indexer::is_course_indexed($courseid)) {
                 content_indexer::index_course($courseid);
