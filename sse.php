@@ -54,6 +54,9 @@ $lang       = optional_param('lang', '', PARAM_ALPHA);      // ISO 639-1 languag
 $pageid     = optional_param('pageid', 0, PARAM_INT);       // Course-module ID of the current page.
 $pagetitle  = optional_param('pagetitle', '', PARAM_TEXT);  // Title of the current resource/activity.
 $coachstyle = optional_param('coachingstyle', '', PARAM_ALPHA); // Coaching style: coach, buddy, tutor.
+$timelimit  = optional_param('timelimit', 0, PARAM_INT);      // Time constraint in minutes (0 = none).
+$firstgen   = optional_param('firstgen', 0, PARAM_BOOL);      // First-generation student mode.
+$completion = optional_param('completion', 0, PARAM_INT);      // Course completion percentage (0-100).
 
 // Validate context and capability.
 $context = context_course::instance($courseid);
@@ -197,6 +200,50 @@ try {
         ];
         if (isset($styles[$coachstyle])) {
             $systemprompt .= "\n\n## Coaching Style\n" . $styles[$coachstyle];
+        }
+    }
+
+    // Append time constraint instruction if the student declared a time limit.
+    if ($timelimit > 0 && $timelimit <= 120) {
+        $systemprompt .= "\n\n## Time Constraint\n"
+            . "The student has indicated they only have {$timelimit} minutes. "
+            . "Keep responses concise and action-oriented. Prioritize the most important concept. "
+            . "Skip lengthy introductions — get straight to the core content. "
+            . "If covering multiple points, use bullet points for quick scanning.";
+    }
+
+    // Append first-generation student support if enabled.
+    if ($firstgen) {
+        $systemprompt .= "\n\n## First-Generation Student Support\n"
+            . "This student has identified as a first-generation college student. "
+            . "Be mindful that they may not have family experience with higher education to draw on. "
+            . "When relevant:\n"
+            . "- Explain academic conventions that others might take for granted "
+            . "(e.g., office hours, syllabi, citation styles, study groups).\n"
+            . "- Normalize asking questions and seeking help — it's a strength, not a weakness.\n"
+            . "- Be extra encouraging about their achievements — they're blazing a trail.\n"
+            . "- If they mention feeling out of place or like an impostor, validate those feelings "
+            . "and remind them they earned their spot.\n"
+            . "- Avoid jargon unless you explain it. Don't assume knowledge of academic systems.\n"
+            . "Do NOT mention 'first-generation' explicitly unless they bring it up — just adapt your tone naturally.";
+    }
+
+    // Append progress awareness if completion data is available.
+    if ($completion > 0) {
+        $systemprompt .= "\n\n## Student Progress\n"
+            . "The student has completed approximately {$completion}% of this course. ";
+        if ($completion < 25) {
+            $systemprompt .= "They are just getting started. Focus on building foundational understanding "
+                . "and confidence. Avoid referencing advanced topics they haven't reached yet.";
+        } else if ($completion < 50) {
+            $systemprompt .= "They are building momentum. Connect new concepts to what they've already learned. "
+                . "Encourage them — they're making real progress.";
+        } else if ($completion < 75) {
+            $systemprompt .= "They are past the halfway mark. Help them see connections between earlier and later topics. "
+                . "Start encouraging synthesis and deeper understanding.";
+        } else {
+            $systemprompt .= "They are nearing completion. Help them consolidate their learning and prepare for "
+                . "any final assessments. Celebrate how far they've come.";
         }
     }
 

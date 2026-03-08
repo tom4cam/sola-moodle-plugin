@@ -625,6 +625,23 @@ define([
             handleSend();
             return;
         }
+        // Special chip: spaced repetition refresher.
+        if (text.startsWith('Quick refresher on ') || text.startsWith('Give me a refresher on ')) {
+            var refreshTopic = text.replace(/^(?:Quick refresher on |Give me a refresher on )/, '');
+            UI.clearSuggestions();
+            var prompt = 'Give me a quick refresher on "' + refreshTopic + '". ' +
+                'Summarize the key points in 3-5 bullets, then check my understanding with a question.';
+            UI.getElements().input.value = prompt;
+            UI.autoResizeInput();
+            UI.updateSendButton();
+            handleSend();
+            return;
+        }
+        // Special chip: dismiss nudge.
+        if (text === 'No thanks') {
+            UI.clearSuggestions();
+            return;
+        }
         // Special chip: open progress panel.
         if (text === 'Show my progress') {
             UI.clearSuggestions();
@@ -1407,20 +1424,39 @@ define([
 
             const daysAgo = Math.max(1, Math.round(daysSince));
             const timeStr = daysAgo === 1 ? 'yesterday' : daysAgo + ' days ago';
-            const msg = 'Welcome back, **' + name + '**! \ud83d\udc4b\n\n' +
-                'Last time you were studying **' + topic + '** (' + timeStr + ').' +
-                studyNote + quizNote +
-                '\n\nWould you like to pick up where you left off?';
+
+            // Extended re-engagement for 5+ day absence.
+            let msg;
+            let chips;
+            if (daysSince >= 5) {
+                msg = 'Welcome back, **' + name + '**! It\'s been a while (' + daysAgo + ' days). \ud83d\udc4b\n\n' +
+                    'No worries — picking back up is what matters most. ' +
+                    'Last time you were working on **' + topic + '**.' +
+                    studyNote + quizNote +
+                    '\n\nWould you like a quick refresher, or would you rather start fresh?';
+                chips = [
+                    'Give me a refresher on ' + topic,
+                    'Continue: ' + topic + chipSuffix,
+                    'What should I focus on?',
+                    'Start fresh'
+                ];
+            } else {
+                msg = 'Welcome back, **' + name + '**! \ud83d\udc4b\n\n' +
+                    'Last time you were studying **' + topic + '** (' + timeStr + ').' +
+                    studyNote + quizNote +
+                    '\n\nWould you like to pick up where you left off?';
+                chips = [
+                    'Continue: ' + topic + chipSuffix,
+                    'Show my progress',
+                    'Start something new'
+                ];
+            }
 
             // Show after a brief delay so history messages render first.
             setTimeout(function() {
                 addAssistantMsg(msg);
                 setTimeout(function() {
-                    UI.showSuggestions([
-                        'Continue: ' + topic + chipSuffix,
-                        'Show my progress',
-                        'Start something new'
-                    ], handleSuggestionClick);
+                    UI.showSuggestions(chips, handleSuggestionClick);
                 }, 150);
             }, 600);
         } catch (e) { /**/ }
@@ -1819,6 +1855,7 @@ define([
             checkAndShowIntro();
             updateStreak();
             checkWelcomeBack();
+            checkSpacedRepetition();
         }
     };
 
@@ -1882,6 +1919,80 @@ define([
         } catch (e) {
             // localStorage disabled — skip silently.
         }
+    };
+
+    /**
+     * Check for topics due for spaced repetition review (studied 3-7 days ago).
+     * Shows a "Want a refresher?" chip if a topic qualifies. Runs once per session.
+     */
+    const checkSpacedRepetition = function() {
+        try {
+            var now = Date.now();
+            var minAge = 3 * 86400000; // 3 days
+            var maxAge = 14 * 86400000; // 14 days
+            var shown = {};
+
+            // Gather topics from study sessions and quiz history.
+            var candidates = [];
+            var sessions = JSON.parse(localStorage.getItem('aica_study_sessions_' + courseId) || '[]');
+            sessions.forEach(function(s) {
+                if (s.topic && !shown[s.topic]) {
+                    var age = now - s.ts;
+                    if (age >= minAge && age <= maxAge) {
+                        candidates.push({topic: s.topic, age: age, type: 'study'});
+                        shown[s.topic] = true;
+                    }
+                }
+            });
+            var quizHist = JSON.parse(localStorage.getItem('aica_quiz_history_' + courseId) || '[]');
+            quizHist.forEach(function(q) {
+                if (q.topic && !shown[q.topic]) {
+                    var age = now - q.date;
+                    if (age >= minAge && age <= maxAge) {
+                        var pct = q.total > 0 ? Math.round((q.score / q.total) * 100) : 0;
+                        candidates.push({topic: q.topic, age: age, type: 'quiz', pct: pct});
+                        shown[q.topic] = true;
+                    }
+                }
+            });
+
+            if (candidates.length === 0) { return; }
+
+            // Pick the best candidate: prioritise low quiz scores, then oldest.
+            candidates.sort(function(a, b) {
+                if (a.type === 'quiz' && b.type !== 'quiz') { return -1; }
+                if (b.type === 'quiz' && a.type !== 'quiz') { return 1; }
+                if (a.type === 'quiz' && b.type === 'quiz') { return a.pct - b.pct; }
+                return b.age - a.age;
+            });
+            var best = candidates[0];
+            var daysAgo = Math.round(best.age / 86400000);
+
+            // Check if we've already shown a spaced rep nudge for this topic recently.
+            var nudgeKey = 'aica_sr_nudge_' + courseId;
+            var lastNudge = JSON.parse(localStorage.getItem(nudgeKey) || 'null');
+            if (lastNudge && lastNudge.topic === best.topic && (now - lastNudge.ts) < 86400000) {
+                return; // Already nudged about this topic today.
+            }
+            localStorage.setItem(nudgeKey, JSON.stringify({topic: best.topic, ts: now}));
+
+            var label = best.type === 'quiz' && best.pct !== undefined
+                ? best.topic + ' (scored ' + best.pct + '%, ' + daysAgo + 'd ago)'
+                : best.topic + ' (' + daysAgo + 'd ago)';
+
+            setTimeout(function() {
+                var msg = 'Research shows that reviewing material a few days later strengthens memory. ' +
+                    'You studied **' + best.topic + '** ' + daysAgo + ' days ago — want a quick refresher?';
+                addAssistantMsg(msg);
+                setTimeout(function() {
+                    UI.showSuggestions([
+                        'Quick refresher on ' + best.topic,
+                        'Quiz me on ' + best.topic,
+                        'No thanks'
+                    ], handleSuggestionClick);
+                }, 150);
+            }, 2000);
+        } catch (e) { /**/ }
     };
 
     /**
@@ -2070,6 +2181,24 @@ define([
             var coachStyle = localStorage.getItem('aica_coaching_style');
             if (coachStyle) { postData.coachingstyle = coachStyle; }
         } catch (e) { /**/ }
+
+        // Detect time constraint in user message (e.g. "I only have 10 minutes").
+        var timeMatch = text.match(/(?:i\s+(?:only\s+)?have|got)\s+(\d+)\s*min/i);
+        if (timeMatch) {
+            postData.timelimit = parseInt(timeMatch[1], 10);
+        }
+
+        // First-generation student support.
+        try {
+            if (localStorage.getItem('aica_firstgen') === '1') { postData.firstgen = 1; }
+        } catch (e) { /**/ }
+
+        // Course completion percentage.
+        var rootEl = document.getElementById('local-ai-course-assistant');
+        var completionPct = rootEl ? (parseInt(rootEl.dataset.completionpct, 10) || 0) : 0;
+        if (completionPct > 0) {
+            postData.completion = completionPct;
+        }
 
         streamController = SSE.startStream(sseUrl, postData, {
             onToken: function(token) {

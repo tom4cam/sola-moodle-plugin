@@ -181,6 +181,23 @@ class hook_callbacks {
             ? (new \moodle_url('/local/ai_course_assistant/tts.php'))->out(false)
             : '';
 
+        // Calculate course completion percentage.
+        $completionpct = 0;
+        $completioninfo = new \completion_info($course);
+        if ($completioninfo->is_enabled()) {
+            $activities = $completioninfo->get_activities();
+            if (!empty($activities)) {
+                $completed = 0;
+                foreach ($activities as $act) {
+                    $data = $completioninfo->get_data($act, $USER->id);
+                    if ($data->completionstate != COMPLETION_INCOMPLETE) {
+                        $completed++;
+                    }
+                }
+                $completionpct = round(($completed / count($activities)) * 100);
+            }
+        }
+
         // Render template.
         $templatedata = [
             'courseid'           => $courseid,
@@ -212,6 +229,7 @@ class hook_callbacks {
             'avatarfill'         => get_config('local_ai_course_assistant', 'avatar_fill') ?: '#ffffff',
             'displaymode'        => $displaymode,
             'emailreminders'     => (bool)get_config('local_ai_course_assistant', 'reminders_email_enabled'),
+            'completionpct'      => $completionpct,
         ];
 
         $html = $OUTPUT->render_from_template('local_ai_course_assistant/chat_widget', $templatedata);

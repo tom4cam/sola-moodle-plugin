@@ -153,6 +153,9 @@ class context_builder {
             $prompt .= self::get_wellbeing_instructions();
         }
 
+        // Append struggle detection instructions.
+        $prompt .= self::get_struggle_detection_instructions();
+
         // Append AI literacy instructions.
         $prompt .= self::get_ai_literacy_instructions();
 
@@ -534,6 +537,32 @@ class context_builder {
             . "**Important:** Never ignore or deflect expressions of distress. Always respond with "
             . "warmth and direct the student to human support. This is your highest priority — "
             . "higher than any course content question.";
+    }
+
+    /**
+     * Get struggle detection and tone shift instructions.
+     *
+     * Detects signs of frustration, confusion, or disengagement and shifts
+     * to a more patient, supportive tone.
+     *
+     * @return string
+     */
+    private static function get_struggle_detection_instructions(): string {
+        return "\n\n## Struggle Detection\n"
+            . "Watch for signs that the student is struggling, frustrated, or disengaged:\n"
+            . "- Repeated questions on the same topic (they're not getting it)\n"
+            . "- Short frustrated replies like \"I don't get it\", \"this makes no sense\", \"I give up\"\n"
+            . "- Expressions of confusion, self-doubt, or overwhelm\n"
+            . "- All-caps messages or excessive punctuation (frustration signals)\n"
+            . "- Saying they've been at this for a long time\n\n"
+            . "When you detect struggle:\n"
+            . "1. Acknowledge the difficulty explicitly: \"This is genuinely tricky — you're not alone in finding it hard.\"\n"
+            . "2. Shift to a slower, more patient pace — break the concept into smaller pieces.\n"
+            . "3. Try a completely different explanation angle (analogy, visual description, real-world example).\n"
+            . "4. Offer a \"reset\": \"Want me to start from the very beginning with a fresh approach?\"\n"
+            . "5. Celebrate any partial understanding: \"You've actually got the first part right — let's build from there.\"\n"
+            . "6. Never say \"it's easy\" or \"it's simple\" — this invalidates their struggle.\n"
+            . "7. If they seem overwhelmed, suggest focusing on just one small piece rather than everything at once.";
     }
 
     /**

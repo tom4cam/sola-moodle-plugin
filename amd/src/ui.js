@@ -2259,6 +2259,22 @@ define([
             pendingCoach = coachSelect.value;
         });
         coachSection.appendChild(coachSelect);
+
+        // First-generation student toggle.
+        var firstgenRow = document.createElement('div');
+        firstgenRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:8px';
+        var firstgenToggle = document.createElement('input');
+        firstgenToggle.type = 'checkbox';
+        firstgenToggle.id = 'aica-firstgen-toggle';
+        try { firstgenToggle.checked = localStorage.getItem('aica_firstgen') === '1'; } catch (e) { /**/ }
+        var firstgenLabel = document.createElement('label');
+        firstgenLabel.htmlFor = 'aica-firstgen-toggle';
+        firstgenLabel.textContent = 'I\'m a first-generation college student';
+        firstgenLabel.style.cssText = 'font-size:12px;cursor:pointer;color:#6c757d';
+        firstgenRow.appendChild(firstgenToggle);
+        firstgenRow.appendChild(firstgenLabel);
+        coachSection.appendChild(firstgenRow);
+
         content.appendChild(coachSection);
 
         // ── Language ──
@@ -2617,6 +2633,17 @@ define([
                     localStorage.setItem('aica_coaching_style', pendingCoach);
                 } else {
                     localStorage.removeItem('aica_coaching_style');
+                }
+            } catch (e) { /**/ }
+            // Save first-gen preference.
+            try {
+                var fgToggle = content.querySelector('#aica-firstgen-toggle');
+                if (fgToggle) {
+                    if (fgToggle.checked) {
+                        localStorage.setItem('aica_firstgen', '1');
+                    } else {
+                        localStorage.removeItem('aica_firstgen');
+                    }
                 }
             } catch (e) { /**/ }
             // Save TTS speed if slider exists.
