@@ -1850,11 +1850,17 @@ define([
         }
         // Remove first-visit pulse on first click and mark course as visited.
         var toggleEl = document.getElementById('local-ai-course-assistant-toggle');
-        if (toggleEl && toggleEl.classList.contains('aica-first-visit')) {
+        var isFirstVisit = toggleEl && toggleEl.classList.contains('aica-first-visit');
+        if (isFirstVisit) {
             toggleEl.classList.remove('aica-first-visit');
             try {
                 localStorage.setItem('ai_course_assistant_visited_' + courseId, '1');
             } catch (e) { /**/ }
+        }
+        // Pre-apply welcome class before opening so the drawer doesn't flash
+        // empty content on mobile before the welcome panel is injected.
+        if (isFirstVisit && !UI.isOpen()) {
+            UI.preWelcome();
         }
         const opened = UI.toggleDrawer();
         if (opened && quizLocked && !historyLoaded) {

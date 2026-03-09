@@ -1722,6 +1722,16 @@ define([
     };
 
     /**
+     * Pre-apply the welcome class to the drawer so it opens with starters/input
+     * hidden, preventing a flash of empty content before the welcome panel loads.
+     */
+    const preWelcome = function() {
+        if (drawer) {
+            drawer.classList.add('local-ai-course-assistant__drawer--welcome');
+        }
+    };
+
+    /**
      * Show welcome screen on first use.
      * Renders as a full overlay inside the drawer.
      */
@@ -3238,6 +3248,7 @@ define([
         getMessages: getMessages,
         showNotification: showNotification,
         showIntroModal: showIntroModal,
+        preWelcome: preWelcome,
         toggleExpand: toggleExpand,
         toggleMinimize: toggleMinimize,
         setMicRecording: setMicRecording,
