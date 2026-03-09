@@ -236,6 +236,9 @@ class hook_callbacks {
             'displaymode'        => $displaymode,
             'displayname'        => get_config('local_ai_course_assistant', 'display_name') ?: 'SOLA',
             'shortname_label'    => get_config('local_ai_course_assistant', 'short_name') ?: 'SOLA',
+            'welcomemessage'     => get_config('local_ai_course_assistant', 'welcome_message') ?: '',
+            'chatgreeting'       => get_config('local_ai_course_assistant', 'chat_greeting') ?: '',
+            'coursename'         => $course->fullname,
             'emailreminders'     => (bool)get_config('local_ai_course_assistant', 'reminders_email_enabled'),
             'completionpct'      => $completionpct,
         ];

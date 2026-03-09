@@ -54,6 +54,10 @@ define([
     let streamController = null;
     /** @type {string} Student's first name for personalized greeting */
     let firstName = '';
+    /** @type {string} Custom chat greeting from admin settings (empty = use default) */
+    let customGreeting = '';
+    /** @type {string} Course full name for variable substitution */
+    let courseName = '';
     /** @type {number} Current module/page ID (0 if not on a resource page) */
     let currentPageId = 0;
     /** @type {string} Title of the current resource page (empty if on course-level page) */
@@ -82,6 +86,8 @@ define([
         sessKey = root.dataset.sesskey;
         sseUrl = root.dataset.sseurl;
         firstName = root.dataset.firstname || '';
+        customGreeting = root.dataset.chatGreeting || '';
+        courseName = root.dataset.coursename || '';
         currentPageId = parseInt(root.dataset.currentPageId, 10) || 0;
         currentPageTitle = root.dataset.currentPageTitle || '';
         quizLocked = root.dataset.quizLocked === '1';
@@ -713,8 +719,9 @@ define([
             speakChips.push('Discuss ' + currentPageTitle);
         }
         for (var i = 0; i < moduleTitles.length && speakChips.length < 4; i++) {
-            if (moduleTitles[i] && moduleTitles[i] !== currentPageTitle) {
-                speakChips.push('Talk about ' + moduleTitles[i]);
+            var title = moduleTitles[i] && moduleTitles[i].name ? moduleTitles[i].name : '';
+            if (title && title !== currentPageTitle) {
+                speakChips.push('Talk about ' + title);
             }
         }
         speakChips.push('Free conversation');
@@ -831,8 +838,9 @@ define([
             vocabChips.push('Practice saying: ' + currentPageTitle);
         }
         for (var i = 0; i < moduleTitles.length && vocabChips.length < 4; i++) {
-            if (moduleTitles[i] && moduleTitles[i] !== currentPageTitle) {
-                vocabChips.push('Pronounce: ' + moduleTitles[i]);
+            var title = moduleTitles[i] && moduleTitles[i].name ? moduleTitles[i].name : '';
+            if (title && title !== currentPageTitle) {
+                vocabChips.push('Pronounce: ' + title);
             }
         }
         vocabChips.push('Free practice');
@@ -2102,6 +2110,36 @@ define([
     };
 
     /**
+     * Show the chat greeting message (custom from admin settings, or default).
+     */
+    const showGreeting = function() {
+        if (customGreeting) {
+            var msg = customGreeting
+                .replace(/\{\{firstname\}\}/gi, firstName || 'there')
+                .replace(/\{\{coursename\}\}/gi, courseName);
+            addAssistantMsg(msg);
+            return;
+        }
+        var displayName = 'SOLA';
+        var rootEl = document.getElementById('local-ai-course-assistant');
+        if (rootEl && rootEl.dataset.displayname) {
+            displayName = rootEl.dataset.displayname;
+        }
+        Str.get_string('chat:greeting', 'local_ai_course_assistant').then(function(greeting) {
+            // Replace {$a} with first name and update hardcoded SOLA with display name.
+            var msg = greeting.replace('{$a}', firstName || 'there');
+            if (displayName !== 'SOLA') {
+                msg = msg.replace(/SOLA/g, displayName);
+            }
+            addAssistantMsg(msg);
+            return;
+        }).catch(function() {
+            addAssistantMsg('Hi, ' + (firstName || 'there') + '! I\'m ' + displayName +
+                ', your personal learning assistant.');
+        });
+    };
+
+    /**
      * Load conversation history.
      */
     const loadHistory = function() {
@@ -2170,21 +2208,10 @@ define([
                     UI.showSuggestions(lastSuggestions, handleSuggestionClick);
                 }
             } else {
-                // Show greeting.
-                Str.get_string('chat:greeting', 'local_ai_course_assistant').then(function(greeting) {
-                    addAssistantMsg(greeting.replace('{$a}', firstName || 'there'));
-                    return;
-                }).catch(function() {
-                    addAssistantMsg('Hi, ' + (firstName || 'there') + '! I\'m SOLA, your Saylor Online Learning Assistant.');
-                });
+                showGreeting();
             }
         }).catch(function() {
-            Str.get_string('chat:greeting', 'local_ai_course_assistant').then(function(greeting) {
-                addAssistantMsg(greeting.replace('{$a}', firstName || 'there'));
-                return;
-            }).catch(function() {
-                addAssistantMsg('Hi, ' + (firstName || 'there') + '! I\'m SOLA, your Saylor Online Learning Assistant.');
-            });
+            showGreeting();
         });
     };
 
@@ -2406,9 +2433,7 @@ define([
 
             Repo.clearHistory(courseId).then(function() {
                 UI.clearMessages();
-                return Str.get_string('chat:greeting', 'local_ai_course_assistant');
-            }).then(function(greeting) {
-                addAssistantMsg(greeting.replace('{$a}', firstName || 'there'));
+                showGreeting();
             }).catch(function() {
                 // Silently fail.
             });

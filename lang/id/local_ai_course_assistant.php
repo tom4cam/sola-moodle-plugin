@@ -360,3 +360,5 @@ $string['chat:voice_error'] = 'Koneksi suara gagal. Periksa pengaturan Anda.';
 $string['chat:quiz_locked'] = 'SOLA dijeda selama kuis untuk mendukung integritas akademik. Semoga berhasil!';
 $string['task:send_inactivity_reminders'] = 'Kirim email pengingat ketidakaktifan mingguan';
 $string['messageprovider:study_notes'] = 'Catatan sesi belajar';
+$string['task:send_inactivity_reminders'] = 'Kirim email pengingat ketidakaktifan mingguan';
+$string['messageprovider:study_notes'] = 'Catatan sesi belajar';

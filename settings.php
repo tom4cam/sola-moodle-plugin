@@ -58,6 +58,22 @@ if ($hassiteconfig) {
         'SOLA'
     ));
 
+    // Welcome message (shown on the first-visit welcome screen).
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/welcome_message',
+        'Welcome Screen Message',
+        'Message shown on the first-visit welcome screen. Use <code>{{firstname}}</code> for the student\'s first name and <code>{{coursename}}</code> for the course name. Leave blank for the default.',
+        ''
+    ));
+
+    // Chat greeting (shown when the chat opens).
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/chat_greeting',
+        'Chat Greeting',
+        'Greeting message shown when the chat window opens. Use <code>{{firstname}}</code> for the student\'s first name and <code>{{coursename}}</code> for the course name. Leave blank for the default.',
+        ''
+    ));
+
     // AI Provider.
     $providers = [
         'claude' => get_string('settings:provider_claude', 'local_ai_course_assistant'),

@@ -352,3 +352,5 @@ $string['chat:voice_error'] = 'Kết nối giọng nói thất bại. Vui lòng 
 $string['chat:quiz_locked'] = 'SOLA tạm dừng trong khi làm bài kiểm tra để hỗ trợ tính trung thực học thuật. Chúc may mắn!';
 $string['task:send_inactivity_reminders'] = 'Gửi email nhắc nhở hàng tuần về việc không hoạt động';
 $string['messageprovider:study_notes'] = 'Ghi chú phiên học tập';
+$string['task:send_inactivity_reminders'] = 'Gửi email nhắc nhở hàng tuần về việc không hoạt động';
+$string['messageprovider:study_notes'] = 'Ghi chú phiên học tập';

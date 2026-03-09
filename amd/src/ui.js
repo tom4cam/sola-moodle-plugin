@@ -1723,9 +1723,27 @@ define([
     const showIntroModal = function() {
         const avatarUrl = root.dataset.avatarurl || '';
         const firstName = root.dataset.firstname || '';
+        const displayName = root.dataset.displayname || 'SOLA';
+        const courseName = root.dataset.coursename || '';
+        const customWelcome = root.dataset.welcomeMessage || '';
         const welcomeName = firstName ? ', ' + firstName : '';
         const hasTts = !!(root.dataset.ttsurl);
         const hasPronunciation = !!(root.querySelector('[data-starter="ell-pronunciation"]'));
+
+        // Build the welcome title and subtitle.
+        var welcomeTitle, welcomeSubtitle;
+        if (customWelcome) {
+            // Replace variables in custom message; split on first newline for title vs subtitle.
+            var resolved = customWelcome
+                .replace(/\{\{firstname\}\}/gi, firstName || 'there')
+                .replace(/\{\{coursename\}\}/gi, courseName);
+            var parts = resolved.split(/\n+/);
+            welcomeTitle = parts[0];
+            welcomeSubtitle = parts.length > 1 ? parts.slice(1).join(' ') : '';
+        } else {
+            welcomeTitle = 'Hi' + welcomeName + ', I\'m ' + displayName + '!';
+            welcomeSubtitle = 'Your personal study coach.';
+        }
 
         const panel = document.createElement('div');
         panel.className = 'local-ai-course-assistant__welcome';
@@ -1736,8 +1754,10 @@ define([
             (avatarUrl
                 ? '<img src="' + avatarUrl + '" alt="" class="local-ai-course-assistant__welcome-avatar" aria-hidden="true" />'
                 : '') +
-            '<h2 class="local-ai-course-assistant__welcome-title">Hi' + welcomeName + ', I\'m SOLA!</h2>' +
-            '<p class="local-ai-course-assistant__welcome-subtitle">Your personal study coach.</p>' +
+            '<h2 class="local-ai-course-assistant__welcome-title">' + welcomeTitle.replace(/</g, '&lt;') + '</h2>' +
+            (welcomeSubtitle
+                ? '<p class="local-ai-course-assistant__welcome-subtitle">' + welcomeSubtitle.replace(/</g, '&lt;') + '</p>'
+                : '') +
             '<ul class="local-ai-course-assistant__welcome-features">' +
             '<li>' +
             '<span class="local-ai-course-assistant__welcome-feature-icon" aria-hidden="true">\ud83c\udfaf</span>' +

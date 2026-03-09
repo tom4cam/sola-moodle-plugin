@@ -350,5 +350,7 @@ $string['chat:voice_speaking'] = 'SOLA ayaa hadlaysa...';
 $string['chat:voice_idle'] = 'Diyaar';
 $string['chat:voice_error'] = 'Xiriirka codka ayaa ku guuldareystay. Fadlan hubi dejimaha.';
 $string['chat:quiz_locked'] = 'SOLA waa la joojiyay inta lagu jiro imtixaanada si loo taageerayo daacadnimada akadeemiga. Nasiib wanaagsan!';
+$string['task:send_inactivity_reminders'] = 'Dir iimaylasha xusuusinta toddobaadlaha ee aan firfircoonayn';
+$string['messageprovider:study_notes'] = 'Qoraallada fadhiga daraasadda';
 $string['task:send_inactivity_reminders'] = 'Dir iimaylka xusuusin ee hawl la'aanta toddobaadlaha ah';
 $string['messageprovider:study_notes'] = 'Qoraallada wareega waxbarashada';
