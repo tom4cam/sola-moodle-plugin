@@ -79,7 +79,7 @@ class hook_callbacks {
 
         // Get config values.
         $position = get_config('local_ai_course_assistant', 'position') ?: 'bottom-right';
-        $displaymode = get_config('local_ai_course_assistant', 'display_mode') ?: 'widget';
+        $displaymode = get_config('local_ai_course_assistant', 'display_mode') ?: 'drawer';
 
         // User's personally chosen avatar (falls back to site default).
         $useravatar = \get_user_preferences('local_ai_course_assistant_avatar', null);
