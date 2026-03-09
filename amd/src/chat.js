@@ -324,11 +324,11 @@ define([
         }
 
 
-        // Conversation starters.
+        // Conversation starters — pass button element for data-type/data-prompt access.
         if (els.root) {
             els.root.querySelectorAll('.local-ai-course-assistant__starter').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    handleStarter(btn.dataset.starter);
+                    handleStarter(btn.dataset.starter, btn);
                 });
             });
         }
@@ -423,37 +423,52 @@ define([
      *
      * @param {string} starterKey
      */
-    const handleStarter = function(starterKey) {
+    const handleStarter = function(starterKey, starterBtn) {
         UI.hideStarters();
 
-        if (starterKey === 'quiz') {
+        // Read type and prompt from the button's data attributes (set by admin config).
+        var starterType = 'prompt';
+        var starterPrompt = '';
+        if (starterBtn) {
+            starterType = starterBtn.dataset.type || 'prompt';
+            starterPrompt = starterBtn.dataset.prompt || '';
+        }
+
+        // Special handler types.
+        if (starterType === 'quiz' || starterKey === 'quiz') {
             handleQuiz();
             return;
         }
+        if (starterType === 'voice' || starterKey === 'ell-practice') {
+            handlePracticeSpeaking();
+            return;
+        }
+        if (starterType === 'pronunciation' || starterKey === 'ell-pronunciation') {
+            handleELLPronunciation();
+            return;
+        }
 
-        // Legacy quick-study still works (redirects to review-practice).
+        // Legacy quick-study still works.
         if (starterKey === 'quick-study') {
             handleQuickStudy();
             return;
         }
 
-        // Practice Speaking — Option B (SSE + TTS + Web Speech API).
-        if (starterKey === 'ell-practice') {
-            handlePracticeSpeaking();
+        // Prompt-type starters: use the configured prompt or fall back to buildStarterPrompt.
+        if (starterPrompt) {
+            // Replace {page} placeholder with current page title.
+            const pageRef = currentPageTitle ? '"' + currentPageTitle + '"' : 'this lesson';
+            const finalPrompt = starterPrompt.replace(/\{page\}/g, pageRef);
+            UI.getElements().input.value = finalPrompt;
+            UI.autoResizeInput();
+            UI.updateSendButton();
+            handleSend();
             return;
         }
 
-        // ELL Pronunciation — Option C (Realtime), phoneme-level feedback.
-        if (starterKey === 'ell-pronunciation') {
-            handleELLPronunciation();
-            return;
-        }
-
-        // Direct-fire starters (no topic picker needed).
-        const directStarters = ['help-page', 'ask-anything', 'review-practice',
-            'help-me', 'key-concepts', 'ai-coach'];
-        if (directStarters.indexOf(starterKey) !== -1) {
-            const prompt = buildStarterPrompt(starterKey, '');
+        // Fallback: use buildStarterPrompt for known keys.
+        const prompt = buildStarterPrompt(starterKey, '');
+        if (prompt) {
             UI.getElements().input.value = prompt;
             UI.autoResizeInput();
             UI.updateSendButton();
@@ -461,7 +476,7 @@ define([
             return;
         }
 
-        // Topic-picker starters (explain, study-plan, help-lesson).
+        // Topic-picker fallback for legacy starters (explain, study-plan, help-lesson).
         const titleKeyMap = {
             'help-lesson':  'chat:topic_picker_title_help',
             'explain':      'chat:topic_picker_title_explain',
@@ -480,11 +495,11 @@ define([
                 titleStr, actionStr,
                 function onSelect(topic) {
                     UI.hideTopicPicker();
-                    const prompt = buildStarterPrompt(starterKey, topic);
-                    if (!prompt) {
+                    const builtPrompt = buildStarterPrompt(starterKey, topic);
+                    if (!builtPrompt) {
                         return;
                     }
-                    UI.getElements().input.value = prompt;
+                    UI.getElements().input.value = builtPrompt;
                     UI.autoResizeInput();
                     UI.updateSendButton();
                     handleSend();

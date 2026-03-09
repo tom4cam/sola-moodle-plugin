@@ -204,6 +204,11 @@ class hook_callbacks {
             }
         }
 
+        // Load conversation starters from config.
+        $starters = \local_ai_course_assistant\starter_manager::get_effective_starters(
+            $courseid, !empty($ttsurl), $ellpronunciationenabled
+        );
+
         // Render template.
         $templatedata = [
             'courseid'           => $courseid,
@@ -241,6 +246,8 @@ class hook_callbacks {
             'coursename'         => $course->fullname,
             'emailreminders'     => (bool)get_config('local_ai_course_assistant', 'reminders_email_enabled'),
             'completionpct'      => $completionpct,
+            'starters'           => $starters,
+            'startersjson'       => json_encode($starters),
         ];
 
         $html = $OUTPUT->render_from_template('local_ai_course_assistant/chat_widget', $templatedata);

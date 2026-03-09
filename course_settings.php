@@ -96,6 +96,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $speakingpractice = optional_param('speaking_practice_enabled', 0, PARAM_INT);
     set_config('speaking_practice_course_' . $courseid, $speakingpractice, 'local_ai_course_assistant');
 
+    // Starter overrides — per-course enable/disable for each starter.
+    $starteroverrides = [];
+    $allstarters = \local_ai_course_assistant\starter_manager::get_global_starters();
+    foreach ($allstarters as $s) {
+        $paramname = 'starter_' . clean_param($s['key'], PARAM_ALPHANUMEXT);
+        $starteroverrides[$s['key']] = (bool) optional_param($paramname, 0, PARAM_INT);
+    }
+    \local_ai_course_assistant\starter_manager::save_course_overrides($courseid, $starteroverrides);
+
     redirect($pageurl, get_string('coursesettings:saved', 'local_ai_course_assistant'),
         null, \core\output\notification::NOTIFY_SUCCESS);
 }
@@ -359,6 +368,50 @@ echo html_writer::div(
         </div>
     </div>
     <?php } ?>
+
+    <?php
+    // Starter overrides section.
+    $allstarters = \local_ai_course_assistant\starter_manager::get_global_starters();
+    $coursestarteroverrides = \local_ai_course_assistant\starter_manager::get_course_overrides($courseid);
+    ?>
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="mb-0"><?php echo get_string('starters:course_section', 'local_ai_course_assistant'); ?></h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted"><?php echo get_string('starters:course_desc', 'local_ai_course_assistant'); ?></p>
+            <?php foreach ($allstarters as $s) {
+                // Determine if enabled: if no course overrides saved yet, use global enabled state.
+                $isenabled = is_array($coursestarteroverrides)
+                    ? !empty($coursestarteroverrides[$s['key']])
+                    : !empty($s['enabled']);
+                $paramname = 'starter_' . clean_param($s['key'], PARAM_ALPHANUMEXT);
+            ?>
+            <div class="form-group row mb-1">
+                <label class="col-sm-5 col-form-label" for="<?php echo $paramname; ?>">
+                    <?php echo s($s['name']); ?>
+                    <?php if (!empty($s['description'])) { ?>
+                        <small class="text-muted d-block"><?php echo s($s['description']); ?></small>
+                    <?php } ?>
+                </label>
+                <div class="col-sm-7">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="<?php echo $paramname; ?>"
+                               name="<?php echo $paramname; ?>" value="1"
+                               <?php if ($isenabled) { echo 'checked'; } ?>>
+                        <label class="custom-control-label" for="<?php echo $paramname; ?>"></label>
+                    </div>
+                </div>
+            </div>
+            <?php } ?>
+            <div class="mt-2">
+                <a href="<?php echo (new moodle_url('/local/ai_course_assistant/starter_settings.php'))->out(false); ?>"
+                   class="btn btn-sm btn-outline-secondary" target="_blank">
+                    <?php echo get_string('starters:admin_title', 'local_ai_course_assistant'); ?> &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
 
     <div class="card mb-3">
         <div class="card-header">

@@ -437,6 +437,19 @@ $string['chat:starter_explain_prompt']      = 'Can you explain the most importan
 // Reset / home button.
 $string['chat:reset']                     = 'Start over';
 
+// Starter admin settings.
+$string['starters:admin_title']     = 'Conversation Starter Settings';
+$string['starters:admin_desc']      = 'Configure the conversation starter chips shown to students when they open the SOLA chat. Drag to reorder, toggle to enable/disable, or add custom starters with your own AI prompts.';
+$string['starters:add_new']         = 'Add new starter';
+$string['starters:save']            = 'Save changes';
+$string['starters:saved']           = 'Starter configuration saved.';
+$string['starters:reset_defaults']  = 'Reset to defaults';
+$string['starters:reset_confirm']   = 'Reset all starters to built-in defaults? Custom starters will be deleted.';
+$string['starters:reset_done']      = 'Starters reset to defaults.';
+$string['starters:back_settings']   = 'Back to settings';
+$string['starters:course_section']  = 'Conversation starters';
+$string['starters:course_desc']     = 'Enable or disable individual starters for this course.';
+
 // Topic picker (used by conversation starters).
 $string['chat:topic_picker_title']        = 'What would you like to focus on?';
 $string['chat:topic_picker_title_help']   = 'What would you like help with?';

@@ -527,6 +527,14 @@ if ($hassiteconfig) {
 
     $ADMIN->add('localplugins', $settings);
 
+    // Register the Starter Settings admin page.
+    $ADMIN->add('localplugins', new admin_externalpage(
+        'local_ai_course_assistant_starters',
+        get_string('starters:admin_title', 'local_ai_course_assistant'),
+        new moodle_url('/local/ai_course_assistant/starter_settings.php'),
+        'moodle/site:config'
+    ));
+
     // Register the RAG admin page as a separate entry in the admin menu.
     $ADMIN->add('localplugins', new admin_externalpage(
         'local_ai_course_assistant_ragadmin',
