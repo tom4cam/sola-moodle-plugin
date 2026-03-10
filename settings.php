@@ -35,6 +35,18 @@ if ($hassiteconfig) {
         0
     ));
 
+    // Top save button (cloned from Moodle's bottom save button).
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/top_save_btn',
+        '',
+        '<div id="aica-top-save" style="margin-bottom:1rem;"></div>' .
+        '<script>document.addEventListener("DOMContentLoaded",function(){' .
+        'var b=document.querySelector(".form-buttons");if(!b)return;' .
+        'var c=b.cloneNode(true);c.id="aica-top-buttons";' .
+        'document.getElementById("aica-top-save").appendChild(c);' .
+        '});</script>'
+    ));
+
     // --- AI Provider & Conversation Settings (most frequently used) ---
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/provider_heading',
