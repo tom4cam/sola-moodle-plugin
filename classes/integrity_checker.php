@@ -75,6 +75,87 @@ class integrity_checker {
     }
 
     /**
+     * Resolve a PHP binary that supports `php -l` syntax checking.
+     *
+     * On some systems (e.g. CGI/FPM), PHP_BINARY does not support -l.
+     * This method tries multiple candidates to find a working CLI binary.
+     *
+     * @return string Path to a working PHP CLI binary, or empty string.
+     */
+    private static function resolve_php_lint_binary(): string {
+        $candidates = [];
+
+        if (PHP_BINARY !== '') {
+            $candidates[] = PHP_BINARY;
+            $bindir = dirname(PHP_BINARY);
+            foreach (self::get_php_cli_candidate_names() as $name) {
+                $candidates[] = $bindir . DIRECTORY_SEPARATOR . $name;
+            }
+        }
+
+        if (defined('PHP_BINDIR') && PHP_BINDIR !== '') {
+            foreach (self::get_php_cli_candidate_names() as $name) {
+                $candidates[] = PHP_BINDIR . DIRECTORY_SEPARATOR . $name;
+            }
+        }
+
+        foreach (self::get_php_cli_candidate_names() as $name) {
+            $candidates[] = $name;
+        }
+
+        $candidates = array_values(array_unique(array_filter(array_map('trim', $candidates))));
+        foreach ($candidates as $candidate) {
+            if (self::binary_supports_php_lint($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Get candidate PHP CLI binary names for the current platform.
+     *
+     * @return array
+     */
+    private static function get_php_cli_candidate_names(): array {
+        $suffix = DIRECTORY_SEPARATOR === '\\' ? '.exe' : '';
+        $majorminor = PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;
+        $major = (string)PHP_MAJOR_VERSION;
+
+        return array_values(array_unique([
+            'php' . $suffix,
+            'php-cli' . $suffix,
+            'php' . $majorminor . $suffix,
+            'php' . str_replace('.', '', $majorminor) . $suffix,
+            'php' . $major . $suffix,
+        ]));
+    }
+
+    /**
+     * Test whether a binary supports `php -l` syntax checking.
+     *
+     * @param string $binary
+     * @return bool
+     */
+    private static function binary_supports_php_lint(string $binary): bool {
+        if ($binary === '' || preg_match('/[\r\n]/', $binary)) {
+            return false;
+        }
+
+        $output = [];
+        $returncode = 0;
+        $command = escapeshellarg($binary) . ' -l ' . escapeshellarg(__FILE__) . ' 2>&1';
+        @exec($command, $output, $returncode);
+        if ($returncode !== 0) {
+            return false;
+        }
+
+        $text = strtolower(trim(implode(' ', $output)));
+        return $text === '' || str_contains($text, 'no syntax errors detected');
+    }
+
+    /**
      * Check PHP syntax of all plugin PHP files.
      */
     private static function test_php_syntax(): array {
@@ -82,10 +163,19 @@ class integrity_checker {
         $files = self::glob_recursive($dir, '*.php');
         $errors = [];
 
+        $phpbin = self::resolve_php_lint_binary();
+        if ($phpbin === '') {
+            return [
+                'name' => 'PHP Syntax',
+                'status' => 'warn',
+                'message' => 'Could not find a PHP CLI binary that supports syntax checking.',
+            ];
+        }
+
         foreach ($files as $file) {
             $output = [];
             $retval = 0;
-            exec(PHP_BINARY . ' -l ' . escapeshellarg($file) . ' 2>&1', $output, $retval);
+            exec($phpbin . ' -l ' . escapeshellarg($file) . ' 2>&1', $output, $retval);
             if ($retval !== 0) {
                 $relpath = str_replace($dir . '/', '', $file);
                 $errors[] = $relpath . ': ' . implode(' ', $output);
@@ -149,6 +239,11 @@ class integrity_checker {
             return ['name' => 'Lang Files', 'status' => 'fail', 'message' => 'lang/ directory not found.'];
         }
 
+        $phpbin = self::resolve_php_lint_binary();
+        if ($phpbin === '') {
+            return ['name' => 'Lang Files', 'status' => 'warn', 'message' => 'No PHP CLI binary available for syntax checking.'];
+        }
+
         foreach (scandir($dir) as $langdir) {
             if ($langdir === '.' || $langdir === '..') {
                 continue;
@@ -161,7 +256,7 @@ class integrity_checker {
             // Use php -l to check syntax without actually including the file.
             $output = [];
             $retval = 0;
-            exec(PHP_BINARY . ' -l ' . escapeshellarg($file) . ' 2>&1', $output, $retval);
+            exec($phpbin . ' -l ' . escapeshellarg($file) . ' 2>&1', $output, $retval);
             if ($retval !== 0) {
                 $errors[] = $langdir;
             }
@@ -395,9 +490,18 @@ class integrity_checker {
             return ['name' => 'SSE Endpoint', 'status' => 'fail', 'message' => 'sse.php not found.'];
         }
 
+        $phpbin = self::resolve_php_lint_binary();
+        if ($phpbin === '') {
+            return [
+                'name' => 'SSE Endpoint',
+                'status' => 'warn',
+                'message' => 'Could not find a PHP CLI binary for syntax checking.',
+            ];
+        }
+
         $output = [];
         $retval = 0;
-        exec(PHP_BINARY . ' -l ' . escapeshellarg($file) . ' 2>&1', $output, $retval);
+        exec($phpbin . ' -l ' . escapeshellarg($file) . ' 2>&1', $output, $retval);
         if ($retval !== 0) {
             return [
                 'name' => 'SSE Endpoint',

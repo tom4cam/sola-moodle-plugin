@@ -77,6 +77,22 @@ class hook_callbacks {
             $userrole = 'student';
         }
 
+        // Quiz hide: optionally suppress widget on all quiz pages (stricter than quizLocked).
+        $hideonquizforstudents = (bool)get_config('local_ai_course_assistant', 'hide_on_quiz_for_students');
+        $hideonquizforstaff = (bool)get_config('local_ai_course_assistant', 'hide_on_quiz_for_staff');
+        $pagetype = $PAGE->pagetype ?? '';
+        $modname_early = '';
+        if ($context->contextlevel === CONTEXT_MODULE && !empty($PAGE->cm)) {
+            $modname_early = (string)($PAGE->cm->modname ?? '');
+        }
+        $isquizpage = ($modname_early === 'quiz') || (strpos((string)$pagetype, 'mod-quiz-') === 0);
+        if ($isquizpage && (
+            ($hideonquizforstudents && $userrole === 'student') ||
+            ($hideonquizforstaff && $userrole !== 'student')
+        )) {
+            return;
+        }
+
         // Get config values.
         $position = get_config('local_ai_course_assistant', 'position') ?: 'bottom-right';
         $displaymode = get_config('local_ai_course_assistant', 'display_mode') ?: 'drawer';

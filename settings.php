@@ -59,6 +59,7 @@ if ($hassiteconfig) {
         'claude' => get_string('settings:provider_claude', 'local_ai_course_assistant'),
         'openai' => get_string('settings:provider_openai', 'local_ai_course_assistant'),
         'deepseek' => get_string('settings:provider_deepseek', 'local_ai_course_assistant'),
+        'gemini' => get_string('settings:provider_gemini', 'local_ai_course_assistant'),
         'ollama' => get_string('settings:provider_ollama', 'local_ai_course_assistant'),
         'minimax' => get_string('settings:provider_minimax', 'local_ai_course_assistant'),
         'custom' => get_string('settings:provider_custom', 'local_ai_course_assistant'),
@@ -252,6 +253,27 @@ if ($hassiteconfig) {
         '<a href="' . $tokenanalyticsurl->out() . '" class="btn btn-sm btn-outline-secondary">' .
             'View Token Analytics &rarr;</a>' .
         '<p class="text-muted mt-1" style="font-size:13px;">Monitor token usage and costs across courses and providers.</p>'
+    ));
+
+    // --- Quiz Hide Settings ---
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/quiz_hide_heading',
+        get_string('settings:quiz_hide_heading', 'local_ai_course_assistant'),
+        get_string('settings:quiz_hide_heading_desc', 'local_ai_course_assistant')
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/hide_on_quiz_for_students',
+        get_string('settings:hide_on_quiz_for_students', 'local_ai_course_assistant'),
+        get_string('settings:hide_on_quiz_for_students_desc', 'local_ai_course_assistant'),
+        0
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/hide_on_quiz_for_staff',
+        get_string('settings:hide_on_quiz_for_staff', 'local_ai_course_assistant'),
+        get_string('settings:hide_on_quiz_for_staff_desc', 'local_ai_course_assistant'),
+        0
     ));
 
     // --- Off-topic Detection Settings ---

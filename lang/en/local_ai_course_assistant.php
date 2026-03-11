@@ -56,6 +56,7 @@ $string['settings:provider_openai'] = 'OpenAI';
 $string['settings:provider_deepseek'] = 'DeepSeek';
 $string['settings:provider_ollama'] = 'Ollama (Local)';
 $string['settings:provider_minimax'] = 'MiniMax';
+$string['settings:provider_gemini'] = 'Google Gemini';
 $string['settings:provider_custom'] = 'Custom (OpenAI-compatible)';
 $string['settings:apikey'] = 'API Key';
 $string['settings:apikey_desc'] = 'API key for the selected provider. Not required for Ollama.';
@@ -514,6 +515,14 @@ $string['chat:voice_speaking']          = 'SOLA is speaking...';
 $string['chat:voice_idle']              = 'Ready';
 $string['chat:voice_error']             = 'Voice connection failed. Please check your settings.';
 $string['chat:quiz_locked']             = 'SOLA is paused during quizzes to support academic integrity. Good luck!';
+
+// Quiz hide settings.
+$string['settings:quiz_hide_heading'] = 'Quiz Page Visibility';
+$string['settings:quiz_hide_heading_desc'] = 'Control whether the SOLA widget appears on Moodle quiz pages. This is stricter than the built-in summative quiz lock, which only disables chat during graded quizzes. These settings completely hide the widget on all quiz pages.';
+$string['settings:hide_on_quiz_for_students'] = 'Hide SOLA on quiz pages for students';
+$string['settings:hide_on_quiz_for_students_desc'] = 'Completely hide the SOLA widget on all quiz pages (view, attempt, review) for students.';
+$string['settings:hide_on_quiz_for_staff'] = 'Hide SOLA on quiz pages for staff';
+$string['settings:hide_on_quiz_for_staff_desc'] = 'Completely hide the SOLA widget on all quiz pages for teachers and administrators.';
 
 // Wellbeing & Safety settings.
 $string['settings:wellbeing_heading']      = 'Wellbeing & Safety';

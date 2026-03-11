@@ -224,6 +224,8 @@ abstract class base_provider implements provider_interface {
                 return new minimax_provider($overrides);
             case 'deepseek':
                 return new deepseek_provider($overrides);
+            case 'gemini':
+                return new gemini_provider($overrides);
             case 'custom':
                 return new custom_provider($overrides);
             default:

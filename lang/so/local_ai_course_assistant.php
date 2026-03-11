@@ -103,17 +103,14 @@ $string['lang:change'] = 'Beddel luqadda';
 $string['lang:english'] = 'Ingiriisi';
 
 // Chat widget.
-$string['chat:title'] = 'Bare AI';
 $string['chat:placeholder'] = 'Su\'aal weydii...';
 $string['chat:send'] = 'Dir';
 $string['chat:close'] = 'Xidh wada-hadalka';
-$string['chat:open'] = 'Fur wada-hadalka barida AI';
 $string['chat:clear'] = 'Nadiifi taariikhda';
 $string['chat:clear_confirm'] = 'Ma hubtaa inaad nadiifin doonto taariikhda wada-hadalkaaga ee koorsadan?';
 $string['chat:copy'] = 'Koobiya wada-hadalka';
 $string['chat:copied'] = 'Wada-hadalka ayaa loo koobaayey clipboard-ka';
 $string['chat:copy_failed'] = 'Koobaynta wada-hadalka ayaa guuldareysatay';
-$string['chat:greeting'] = 'Salaan! Waxaan ahay bare-AI-gaaga ee koorsadan. Sideen kuu caawin karaa maanta?';
 $string['chat:thinking'] = 'Fikiraya...';
 $string['chat:error'] = 'Waan ka xumahay, wax ayaa khaldan. Fadlan isku day mar kale.';
 $string['chat:error_auth'] = 'Khalad xaqiijin. Fadlan la xiriir maamulaha.';
@@ -127,7 +124,6 @@ $string['chat:mic_error'] = 'Khalad maakroofoon. Fadlan hubi ogolaanshiyeyaasha 
 $string['chat:mic_unsupported'] = 'Gelitaanka codka kuma taageerna browser-kan.';
 $string['chat:newline_hint'] = 'Shift+Enter xariiq cusub';
 $string['chat:you'] = 'Adiga';
-$string['chat:assistant'] = 'Bare AI';
 $string['chat:history_loaded'] = 'Wada-hadalka hore ayaa la soo geliyay.';
 $string['chat:history_cleared'] = 'Taariikhda wada-hadalka ayaa la nadiifiyay.';
 $string['chat:offtopic_warning'] = 'Waxay u muuqataa su\'aashaadu kuma xidna koorsadan. Fadlan isku day inaad ku xidnaato mawduuca si aan kuu caawi karo si fiican!';

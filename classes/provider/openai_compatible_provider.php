@@ -65,6 +65,26 @@ abstract class openai_compatible_provider extends base_provider {
     }
 
     /**
+     * Whether this model expects max_completion_tokens instead of max_tokens.
+     *
+     * GPT-5 and OpenAI reasoning-series chat models reject max_tokens.
+     *
+     * @return bool
+     */
+    protected function uses_max_completion_tokens(): bool {
+        $model = strtolower(trim($this->model));
+        if ($model === '') {
+            return false;
+        }
+
+        if (str_starts_with($model, 'gpt-5')) {
+            return true;
+        }
+
+        return preg_match('/^o(?:1|3|4)(?:[-.]|$)/', $model) === 1;
+    }
+
+    /**
      * Build the request body.
      *
      * @param string $systemprompt
@@ -94,7 +114,8 @@ abstract class openai_compatible_provider extends base_provider {
         ];
 
         if (isset($options['max_tokens'])) {
-            $body['max_tokens'] = $options['max_tokens'];
+            $tokenfield = $this->uses_max_completion_tokens() ? 'max_completion_tokens' : 'max_tokens';
+            $body[$tokenfield] = $options['max_tokens'];
         }
 
         if ($stream) {

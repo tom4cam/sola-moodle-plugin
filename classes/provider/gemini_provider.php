@@ -14,18 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_ai_course_assistant\provider;
+
 /**
- * Plugin version and other meta-data.
+ * Google Gemini provider via the OpenAI-compatible Gemini endpoint.
  *
  * @package    local_ai_course_assistant
  * @copyright  2025 AI Course Assistant
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class gemini_provider extends openai_compatible_provider {
 
-defined('MOODLE_INTERNAL') || die();
+    protected function get_default_model(): string {
+        return 'gemini-2.5-flash';
+    }
 
-$plugin->component = 'local_ai_course_assistant';
-$plugin->version = 2026031137;
-$plugin->requires = 2024100700; // Moodle 4.5+.
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '2.3.0';
+    protected function get_default_base_url(): string {
+        return 'https://generativelanguage.googleapis.com/v1beta/openai';
+    }
+}
