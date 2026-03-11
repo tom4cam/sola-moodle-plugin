@@ -114,7 +114,7 @@ async def _ws_session_update(apikey):
     uri = "wss://api.openai.com/v1/realtime?model=gpt-realtime-mini"
     subprotocols = ["realtime", f"openai-insecure-api-key.{token}"]
 
-    async with websockets.connect(uri, subprotocols=subprotocols) as ws:
+    async with websockets.connect(uri, subprotocols=subprotocols, open_timeout=20) as ws:
         # Expect session.created
         msg = json.loads(await asyncio.wait_for(ws.recv(), timeout=10))
         assert msg.get("type") == "session.created", \
@@ -176,7 +176,8 @@ async def _ws_audio_events(apikey):
     token = json.loads(body).get("value", "")
 
     uri = "wss://api.openai.com/v1/realtime?model=gpt-realtime-mini"
-    async with websockets.connect(uri, subprotocols=["realtime", f"openai-insecure-api-key.{token}"]) as ws:
+    async with websockets.connect(uri, subprotocols=["realtime", f"openai-insecure-api-key.{token}"],
+                                  open_timeout=20) as ws:
         await asyncio.wait_for(ws.recv(), timeout=10)  # session.created
 
         await ws.send(json.dumps({
