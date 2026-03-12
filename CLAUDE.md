@@ -27,7 +27,7 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - Study plans and scheduled reminders
 - Analytics dashboard (usage, provider comparison)
 - Per-course configuration (`classes/course_config_manager.php`)
-- 26-language i18n with auto-detection; 43-lang STT/TTS support
+- 46-language i18n with auto-detection; 46-lang STT/TTS support
 - Voice input (STT) and output (OpenAI TTS with browser Speech API fallback)
 - OpenAI Realtime voice mode (WebSocket, live transcript, ELL coaching)
 - Procedurally-generated SVG avatar (3 genders, 5 skin tones, 6 hair colours, 3 styles/gender)
@@ -50,7 +50,7 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - `bindEvents` has null guards on all optional buttons (clearBtn, expandBtn, micBtn, etc.) — if a button is removed from the mustache, it won't crash init
 - Admin settings link removed from header (was duplicate gear); admins use Moodle admin UI for course settings
 - SOLA_NEXT: system prompt emits `[SOLA_NEXT]chip1||chip2||chip3||chip4[/SOLA_NEXT]`; `chat.js` strips tag and calls `UI.showSuggestions()`; tags are never shown to students
-- Starter translations live in `STARTER_LABELS` in `amd/src/speech.js` (43 languages)
+- Starter translations live in `STARTER_LABELS` in `amd/src/speech.js` (46 languages)
 - SVG avatar: `buildFaceSVG()` + `renderAvatar()` in `ui.js`; prefs in localStorage `aica_avatar`; legacy img hidden when SVG active
 
 ---
@@ -72,7 +72,7 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 | `amd/src/chat.js` | Main chat controller; event binding; quiz/STT/voice routing; SOLA_NEXT parsing |
 | `amd/src/ui.js` | DOM manipulation; widget state; drag; expand; SVG avatar; settings panel; suggestions |
 | `amd/src/quiz.js` | Quiz setup panel + interactive question cards + summary |
-| `amd/src/speech.js` | STT/TTS; voice quality scoring; language detection; STARTER_LABELS (43-lang) |
+| `amd/src/speech.js` | STT/TTS; voice quality scoring; language detection; STARTER_LABELS (46-lang) |
 | `amd/src/realtime.js` | OpenAI Realtime WebSocket; mic capture; PCM16 playback; ELL mode |
 | `amd/src/repository.js` | Moodle web service calls (history, avatar, clear, realtime token, etc.) |
 | `amd/src/sse_client.js` | SSE streaming client |
@@ -147,7 +147,7 @@ rsync -a --exclude=.git \
 
 ## i18n
 
-- **26 language files:** en + ar, am, bm, bn, es, fr, ha, hi, id, ig, ms, ne, om, pa, pt_br, ru, so, sw, ta, tl, vi, wo, yo, zh_cn, zu
+- **46 language files:** en + ar, am, bg, bm, bn, cs, da, de, el, es, fi, fr, ha, he, hi, hu, id, ig, it, ja, ko, ms, nb, ne, nl, om, pa, pl, pt_br, ro, ru, sk, so, sv, sw, ta, th, tl, tr, uk, vi, wo, yo, zh_cn, zu
 - Lang codes for STT/TTS: `amd/src/speech.js` → `SUPPORTED_LANGS` (43 total)
 - Starter button translations: `STARTER_LABELS` in `amd/src/speech.js` (43 languages × 5 starters)
 - ISO 639-1 → language name mapping: `classes/context_builder.php::get_multilingual_instructions()`

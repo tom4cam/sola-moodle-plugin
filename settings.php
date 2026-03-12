@@ -422,6 +422,14 @@ if ($hassiteconfig) {
         'Customize the assistant name and appearance.'
     ));
 
+    // Institution name (used in system prompt, avatar label, etc.).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/institution_name',
+        get_string('settings:institution_name', 'local_ai_course_assistant'),
+        get_string('settings:institution_name_desc', 'local_ai_course_assistant'),
+        'Saylor University'
+    ));
+
     // Display name.
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/display_name',
@@ -484,7 +492,8 @@ if ($hassiteconfig) {
 
     // Avatar selection.
     $avatarchoices = [
-        'avatar_01' => get_string('settings:avatar_saylor', 'local_ai_course_assistant'),
+        'avatar_01' => get_string('settings:avatar_saylor', 'local_ai_course_assistant',
+            get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University'),
     ];
     for ($i = 2; $i <= 10; $i++) {
         $num = str_pad($i, 2, '0', STR_PAD_LEFT);

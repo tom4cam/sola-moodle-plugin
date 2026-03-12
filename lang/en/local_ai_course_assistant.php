@@ -65,8 +65,8 @@ $string['settings:model_desc'] = 'The model to use. Default depends on provider 
 $string['settings:apibaseurl'] = 'API Base URL';
 $string['settings:apibaseurl_desc'] = 'Base URL for the API. Auto-filled per provider but can be overridden. Leave blank for provider default.';
 $string['settings:systemprompt'] = 'System Prompt Template';
-$string['settings:systemprompt_desc'] = 'System prompt sent to the AI. Use placeholders: {{coursename}}, {{userrole}}, {{coursetopics}}.';
-$string['settings:systemprompt_default'] = 'You are SOLA (Saylor Online Learning Assistant), an AI learning coach for Saylor Academy students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
+$string['settings:systemprompt_desc'] = 'System prompt sent to the AI. Use placeholders: {{coursename}}, {{userrole}}, {{coursetopics}}, {{institution}}.';
+$string['settings:systemprompt_default'] = 'You are SOLA (Saylor Online Learning Assistant), an AI learning coach for {{institution}} students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
 
 ## Role
 Provide supportive, course-aligned academic help that encourages learning, practice, motivation, and responsible AI use. You complement faculty-designed courses but do not replace instructors.
@@ -109,7 +109,9 @@ $string['settings:maxhistory'] = 'Max Conversation History';
 $string['settings:maxhistory_desc'] = 'Maximum number of message pairs to include in API requests. Older messages are trimmed.';
 $string['settings:avatar'] = 'Chat Avatar';
 $string['settings:avatar_desc'] = 'Select the avatar icon for the chat widget button.';
-$string['settings:avatar_saylor'] = 'Saylor Academy Logo (Default)';
+$string['settings:institution_name'] = 'Institution Name';
+$string['settings:institution_name_desc'] = 'The name of the institution displayed in the system prompt, avatar labels, and demo content. Change this when rebranding.';
+$string['settings:avatar_saylor'] = '{$a} Logo (Default)';
 $string['settings:avatar_color'] = 'Avatar Border Color';
 $string['settings:avatar_color_desc'] = 'Border color of the floating avatar button. Use a hex value, e.g. #4a6cf7.';
 $string['settings:avatar_fill'] = 'Avatar Background Color';
@@ -358,6 +360,14 @@ $string['privacy:metadata:local_ai_course_assistant_reminders:userid'] = 'The ID
 $string['privacy:metadata:local_ai_course_assistant_reminders:channel'] = 'The reminder channel (email or whatsapp).';
 $string['privacy:metadata:local_ai_course_assistant_reminders:destination'] = 'The email address or phone number for reminders.';
 $string['privacy:metadata:local_ai_course_assistant_reminders:country_code'] = 'The user\'s country code for regulatory compliance.';
+
+// AI Insights.
+$string['insights:title'] = 'AI Insights';
+$string['insights:desc'] = 'Analyze feedback, survey, and user testing data to surface issues, feature requests, and recommendations.';
+$string['insights:generate'] = 'Generate AI Insights';
+$string['insights:generating'] = 'Analyzing data… this may take a moment.';
+$string['insights:no_data'] = 'No feedback, survey, or user testing data available to analyze yet. Insights will be available once users submit feedback or complete surveys.';
+$string['insights:error'] = 'Could not generate insights.';
 
 // Analytics dashboard.
 $string['analytics:title'] = 'AI Tutor Analytics';

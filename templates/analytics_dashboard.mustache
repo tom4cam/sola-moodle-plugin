@@ -511,6 +511,30 @@
     <p class="text-muted">No user testing responses collected yet.</p>
     {{/course.has_usertesting_data}}
 
+    {{! AI Insights }}
+    <h3 class="mt-4">AI Insights</h3>
+    <p class="text-muted">Analyze feedback, survey, and user testing data to surface issues, feature requests, and recommendations.</p>
+    {{#course.has_any_feedback_data}}
+    <div class="card mb-4" id="ai-insights-card">
+        <div class="card-body">
+            <div id="ai-insights-content" style="display:none"></div>
+            <div id="ai-insights-placeholder">
+                <button type="button" class="btn btn-primary" id="btn-generate-insights"
+                        data-courseid="{{course.courseid}}">
+                    Generate AI Insights
+                </button>
+                <span id="ai-insights-spinner" class="ml-2" style="display:none">
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                    Analyzing data&hellip; this may take a moment.
+                </span>
+            </div>
+        </div>
+    </div>
+    {{/course.has_any_feedback_data}}
+    {{^course.has_any_feedback_data}}
+    <p class="text-muted">No feedback, survey, or user testing data to analyze yet.</p>
+    {{/course.has_any_feedback_data}}
+
     {{/course.has_data}}
     {{/has_course_selected}}
 
@@ -581,6 +605,56 @@
         }
     });
 })();
+
+    // AI Insights button handler.
+    var insightsBtn = document.getElementById('btn-generate-insights');
+    if (insightsBtn) {
+        insightsBtn.addEventListener('click', function() {
+            var courseid = parseInt(insightsBtn.getAttribute('data-courseid'), 10);
+            var spinner = document.getElementById('ai-insights-spinner');
+            var content = document.getElementById('ai-insights-content');
+            var placeholder = document.getElementById('ai-insights-placeholder');
+
+            insightsBtn.disabled = true;
+            spinner.style.display = 'inline';
+
+            require(['core/ajax'], function(Ajax) {
+                Ajax.call([{
+                    methodname: 'local_ai_course_assistant_generate_insights',
+                    args: { courseid: courseid }
+                }])[0].done(function(result) {
+                    // Simple Markdown → HTML conversion for headings, bold, lists.
+                    var html = result.insights
+                        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                        .replace(/^#### (.+)$/gm, '<h6>$1</h6>')
+                        .replace(/^### (.+)$/gm, '<h5>$1</h5>')
+                        .replace(/^## (.+)$/gm, '<h4>$1</h4>')
+                        .replace(/^# (.+)$/gm, '<h3>$1</h3>')
+                        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/^- (.+)$/gm, '<li>$1</li>')
+                        .replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
+                        .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+                        .replace(/<\/ul>\s*<ul>/g, '')
+                        .replace(/\n{2,}/g, '<br><br>')
+                        .replace(/\n/g, '<br>');
+
+                    content.innerHTML = html;
+                    content.style.display = 'block';
+                    placeholder.style.display = 'none';
+
+                    if (!result.success) {
+                        content.innerHTML = '<div class="alert alert-danger">' + html + '</div>';
+                    }
+                }).fail(function(err) {
+                    content.innerHTML = '<div class="alert alert-danger">Failed to generate insights: '
+                        + (err.message || 'Unknown error') + '</div>';
+                    content.style.display = 'block';
+                    spinner.style.display = 'none';
+                    insightsBtn.disabled = false;
+                });
+            });
+        });
+    }
 {{/js}}
 {{/course.has_data}}
 {{/has_course_selected}}

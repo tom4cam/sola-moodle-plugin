@@ -726,6 +726,13 @@ define([], function() {
             askAnything: 'Έχω μια ερώτηση',
             reviewPractice: 'Επανάληψη και εξάσκηση βασικών εννοιών'
         },
+        'he': {
+            helpPage: 'עזור לי להבין את הדף הזה',
+            quiz: 'תן לי חידון תרגול',
+            studyPlan: 'עזור לי ליצור תוכנית לימודים',
+            askAnything: 'יש לי שאלה',
+            reviewPractice: 'לחזור ולתרגל מושגי מפתח'
+        },
         'hu': {
             helpPage: 'Segíts megérteni ezt az oldalt',
             quiz: 'Adj egy gyakorló kvízt',

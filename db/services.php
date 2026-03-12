@@ -155,4 +155,11 @@ $functions = [
         'ajax'         => true,
         'capabilities' => 'local/ai_course_assistant:use',
     ],
+    'local_ai_course_assistant_generate_insights' => [
+        'classname'    => \local_ai_course_assistant\external\generate_insights::class,
+        'description'  => 'Generate AI-powered insights from feedback and user testing data.',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'moodle/site:config',
+    ],
 ];

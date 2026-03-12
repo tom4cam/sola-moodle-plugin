@@ -321,6 +321,7 @@ if ($courseid > 0) {
             'has_survey_data' => ($surveyData !== null),
             'usertesting_data' => $utData,
             'has_usertesting_data' => ($utData !== null),
+            'has_any_feedback_data' => ($feedbacktotal > 0 || $surveyData !== null || $utData !== null),
             'token_analytics_url' => (new moodle_url('/local/ai_course_assistant/token_analytics.php',
                 ['courseid' => $courseid, 'range' => $range]))->out(false),
         ];

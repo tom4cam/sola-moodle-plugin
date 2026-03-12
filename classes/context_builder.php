@@ -108,10 +108,13 @@ class context_builder {
         // Dynamic display name from admin settings.
         $displayName = get_config('local_ai_course_assistant', 'display_name') ?: 'SOLA';
 
+        // Institution name from settings.
+        $institution = get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University';
+
         // Replace placeholders.
         $prompt = str_replace(
-            ['{{coursename}}', '{{userrole}}', '{{coursetopics}}', '{{coursecontent}}'],
-            [$course->fullname, $userrole, $coursetopics, $coursecontent],
+            ['{{coursename}}', '{{userrole}}', '{{coursetopics}}', '{{coursecontent}}', '{{institution}}'],
+            [$course->fullname, $userrole, $coursetopics, $coursecontent, $institution],
             $template
         );
 
