@@ -94,13 +94,14 @@ define([
     let voiceSessionRequestId = 0;
     /** @type {RegExp} SOLA follow-up marker parser */
     const NEXT_BLOCK_RE = /\n*\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/;
-    /** @type {RegExp} Source attribution tag parser */
-    const SOURCE_TAG_RE = /\n*\[SOURCE:(page|course|general)\]/;
+    /** @type {RegExp} Source attribution tag parser — matches [SOURCE:page], [SOURCE:course], [SOURCE:general], [SOURCE:activity:123] */
+    const SOURCE_TAG_RE = /\n*\[SOURCE:(page|course|general|activity)(?::(\d+))?\]/;
     /** @type {Object<string, string>} */
     const SOURCE_LABELS = {
         page: 'From: Current Page',
         course: 'From: Course Materials',
         general: 'General Knowledge',
+        activity: 'From: Course Materials',
     };
     /** @type {string} Local intro-dismiss key */
     const INTRO_DISMISSED_KEY = 'ai_course_assistant_intro_dismissed';
@@ -113,12 +114,13 @@ define([
      * Parse SOLA metadata markers from an assistant response.
      *
      * @param {string} text
-     * @returns {{text:string,suggestions:Array<string>,sourceType:string|null}}
+     * @returns {{text:string,suggestions:Array<string>,sourceType:string|null,sourceCmid:string|null}}
      */
     const parseAssistantDecorators = function(text) {
         let cleanText = ((text || '') + '');
         let suggestions = [];
         let sourceType = null;
+        let sourceCmid = null;
 
         const nextMatch = cleanText.match(NEXT_BLOCK_RE);
         if (nextMatch) {
@@ -131,6 +133,7 @@ define([
         const sourceMatch = cleanText.match(SOURCE_TAG_RE);
         if (sourceMatch) {
             sourceType = sourceMatch[1];
+            sourceCmid = sourceMatch[2] || null; // Numeric cmid for activity type.
             cleanText = cleanText.replace(SOURCE_TAG_RE, '').trimEnd();
         }
 
@@ -138,6 +141,7 @@ define([
             text: cleanText,
             suggestions: suggestions,
             sourceType: sourceType,
+            sourceCmid: sourceCmid,
         };
     };
 
@@ -192,20 +196,34 @@ define([
     /**
      * Create a source attribution pill element (clickable link or plain span).
      *
-     * @param {string} sourceType 'page', 'course', or 'general'
-     * @param {Object|null} meta SSE metadata with pageurl, courseurl, pagetitle
+     * @param {string} sourceType 'page', 'course', 'general', or 'activity'
+     * @param {Object|null} meta SSE metadata with pageurl, courseurl, pagetitle, modules
+     * @param {string|null} cmid Course module ID for activity source type
      * @returns {HTMLElement}
      */
-    const createSourcePill = function(sourceType, meta) {
+    const createSourcePill = function(sourceType, meta, cmid) {
         var href = '';
+        var label = SOURCE_LABELS[sourceType] || sourceType;
         var title = '';
-        if (sourceType === 'page' && meta && meta.pageurl) {
+
+        if (sourceType === 'activity' && cmid && meta && meta.modules && meta.modules[cmid]) {
+            var mod = meta.modules[cmid];
+            href = mod.url;
+            label = 'From: ' + mod.title;
+            title = mod.title;
+        } else if (sourceType === 'page' && meta && meta.pageurl) {
             href = meta.pageurl;
             title = meta.pagetitle || '';
-        } else if (sourceType === 'course' && meta && meta.courseurl) {
+        } else if ((sourceType === 'course' || sourceType === 'activity') && meta && meta.courseurl) {
             href = meta.courseurl;
-            title = '';
         }
+
+        var linkIcon = ' <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"'
+            + ' fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"'
+            + ' stroke-linejoin="round" style="vertical-align:-1px;margin-left:2px">'
+            + '<path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>'
+            + '<polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+
         var pill;
         if (href) {
             pill = document.createElement('a');
@@ -215,18 +233,12 @@ define([
             if (title) {
                 pill.title = title;
             }
-            // Small external link icon after label.
-            pill.innerHTML = (SOURCE_LABELS[sourceType] || sourceType)
-                + ' <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"'
-                + ' fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"'
-                + ' stroke-linejoin="round" style="vertical-align:-1px;margin-left:2px">'
-                + '<path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>'
-                + '<polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+            pill.innerHTML = label + linkIcon;
         } else {
             pill = document.createElement('span');
-            pill.textContent = SOURCE_LABELS[sourceType] || sourceType;
+            pill.textContent = label;
         }
-        pill.className = 'aica-source-pill aica-source-pill--' + sourceType;
+        pill.className = 'aica-source-pill aica-source-pill--' + (sourceType === 'activity' ? 'course' : sourceType);
         return pill;
     };
 
@@ -2812,9 +2824,11 @@ define([
             text: (text || '') + '',
             suggestions: [],
             sourceType: options.sourceType || null,
+            sourceCmid: options.sourceCmid || null,
         } : parseAssistantDecorators(text);
         const displayText = parsed.text;
         const sourceType = options.sourceType || parsed.sourceType;
+        const sourceCmid = options.sourceCmid || parsed.sourceCmid;
         if (!options.skipHistory) {
             recordConversationMessage('assistant', displayText, ts || Date.now());
         }
@@ -2828,7 +2842,7 @@ define([
                 pageurl: '',
                 pagetitle: ''
             };
-            el.appendChild(createSourcePill(sourceType, histMeta));
+            el.appendChild(createSourcePill(sourceType, histMeta, sourceCmid));
         }
         return el;
     };
@@ -3734,6 +3748,7 @@ define([
                         addAssistantMsg(text, msg.timecreated ? msg.timecreated * 1000 : null, {
                             skipHistory: true,
                             sourceType: parsed.sourceType,
+                            sourceCmid: parsed.sourceCmid,
                             alreadyClean: true,
                         });
                     } else {
@@ -3913,11 +3928,11 @@ define([
                 if (fullText) {
                     const parsed = parseAssistantDecorators(fullText);
                     UI.finishStreaming(parsed.text, (getTtsUrl() || Speech.isTTSSupported()) ? handleSpeak : null);
-                    // Append clickable source pill using SSE metadata (page/course URLs).
+                    // Append clickable source pill using SSE metadata (page/course URLs + modules map).
                     if (parsed.sourceType) {
                         var lastMsgEl = getLastAssistantMessageEl();
                         if (lastMsgEl) {
-                            lastMsgEl.appendChild(createSourcePill(parsed.sourceType, streamMeta));
+                            lastMsgEl.appendChild(createSourcePill(parsed.sourceType, streamMeta, parsed.sourceCmid));
                         }
                     }
                     recordConversationMessage('assistant', parsed.text, Date.now());
@@ -3957,7 +3972,7 @@ define([
                     if (parsed.sourceType) {
                         var errLastMsgEl = getLastAssistantMessageEl();
                         if (errLastMsgEl) {
-                            errLastMsgEl.appendChild(createSourcePill(parsed.sourceType, streamMeta));
+                            errLastMsgEl.appendChild(createSourcePill(parsed.sourceType, streamMeta, parsed.sourceCmid));
                         }
                     }
                     recordConversationMessage('assistant', parsed.text, Date.now());

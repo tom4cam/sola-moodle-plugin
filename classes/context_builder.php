@@ -299,13 +299,13 @@ class context_builder {
                 $line .= ": {$summary}";
             }
 
-            // Add visible activities.
+            // Add visible activities with cmid for source attribution.
             $activities = [];
             if (!empty($modinfo->sections[$section->section])) {
                 foreach ($modinfo->sections[$section->section] as $cmid) {
                     $cm = $modinfo->get_cm($cmid);
                     if ($cm->visible && $cm->has_view()) {
-                        $activities[] = "{$cm->name} ({$cm->modname})";
+                        $activities[] = "{$cm->name} ({$cm->modname}, id:{$cmid})";
                     }
                 }
             }
@@ -586,8 +586,11 @@ class context_builder {
         return "\n\n## Source Attribution\n"
             . "After your response (but BEFORE the [SOLA_NEXT] block), indicate the primary source "
             . "of your answer on its own line using exactly one of these tags:\n"
-            . "[SOURCE:page] — your answer is primarily based on the current page content\n"
-            . "[SOURCE:course] — your answer draws from other course materials (not the current page)\n"
+            . "[SOURCE:page] — your answer is primarily based on the current page the student is viewing\n"
+            . "[SOURCE:activity:ID] — your answer draws from a specific course activity/resource. "
+            . "Use the numeric id from the course structure above (e.g. [SOURCE:activity:47]). "
+            . "Always prefer this over [SOURCE:course] when you can identify the specific activity.\n"
+            . "[SOURCE:course] — your answer draws from course materials generally but you cannot identify one specific activity\n"
             . "[SOURCE:general] — your answer uses general knowledge not found in the course materials\n\n"
             . "Always include exactly one [SOURCE:xxx] tag. Place it on its own line just before [SOLA_NEXT].";
     }

@@ -293,7 +293,28 @@ try {
             $pageurl = (new \moodle_url('/mod/' . $cm->modname . '/view.php', ['id' => $pageid]))->out(false);
         }
     }
-    sse_send(['type' => 'meta', 'pageurl' => $pageurl, 'courseurl' => $courseurl, 'pagetitle' => $pagetitle ?? '']);
+    // Build modules lookup map (cmid → url, title) for specific source attribution.
+    $modulesmap = [];
+    try {
+        $modinfo = get_fast_modinfo($courseid);
+        foreach ($modinfo->get_cms() as $cmobj) {
+            if ($cmobj->uservisible && $cmobj->has_view() && !empty($cmobj->name)) {
+                $modulesmap[(string) $cmobj->id] = [
+                    'url' => (new \moodle_url('/mod/' . $cmobj->modname . '/view.php', ['id' => $cmobj->id]))->out(false),
+                    'title' => $cmobj->name,
+                ];
+            }
+        }
+    } catch (\Throwable $e) {
+        // Non-critical; pill will fall back to generic course link.
+    }
+    sse_send([
+        'type' => 'meta',
+        'pageurl' => $pageurl,
+        'courseurl' => $courseurl,
+        'pagetitle' => $pagetitle ?? '',
+        'modules' => $modulesmap,
+    ]);
 
     $provider->chat_completion_stream($systemprompt, $history, function (string $chunk) use (&$fullresponse) {
         $fullresponse .= $chunk;
