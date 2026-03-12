@@ -47,6 +47,8 @@ define([], function() {
     var micStream = null;
     /** @type {string} Current connection state */
     var currentState = 'disconnected';
+    /** @type {boolean} Whether a response is currently in progress */
+    var responseActive = false;
     /** @type {string[]} Accumulated base64 PCM16 audio chunks for current response */
     var audioChunks = [];
     /** @type {Function|null} State change callback */
@@ -339,9 +341,10 @@ define([], function() {
                                 currentSource = null;
                             }
                             audioChunks = [];
-                            if (ws && ws.readyState === WebSocket.OPEN) {
+                            if (responseActive && ws && ws.readyState === WebSocket.OPEN) {
                                 ws.send(JSON.stringify({type: 'response.cancel'}));
                             }
+                            responseActive = false;
                         }
                         setState('listening');
                     }
@@ -361,6 +364,7 @@ define([], function() {
                             silenceCount = 0;
                             // Commit the buffered audio and ask the model to respond.
                             ws.send(JSON.stringify({type: 'input_audio_buffer.commit'}));
+                            responseActive = true;
                             ws.send(JSON.stringify({type: 'response.create'}));
                         }
                     }
@@ -406,6 +410,7 @@ define([], function() {
                 break;
 
             case 'response.output_audio.delta':
+                responseActive = true;
                 if (msg.delta) {
                     audioChunks.push(msg.delta);
                 }
@@ -447,6 +452,7 @@ define([], function() {
                 break;
 
             case 'response.done':
+                responseActive = false;
                 // Show hardcoded ELL practice chips (SOLA_NEXT is unreliable in audio mode).
                 if (onSuggestionsCb) {
                     onSuggestionsCb([
@@ -461,8 +467,14 @@ define([], function() {
                 break;
 
             case 'error':
+                var errMsg = msg.error ? msg.error.message : 'Unknown error';
+                // Suppress harmless cancellation race condition — this occurs when
+                // response.cancel is sent after the response has already finished.
+                if (errMsg && errMsg.indexOf('Cancellation failed') !== -1) {
+                    break;
+                }
                 if (onErrorCb) {
-                    onErrorCb(msg.error ? msg.error.message : 'Unknown error');
+                    onErrorCb(errMsg);
                     // Null out so the WebSocket close event that follows disconnect()
                     // does not fire a second redundant error message.
                     onErrorCb = null;
@@ -620,6 +632,7 @@ define([], function() {
         // asynchronously after ws.close() never surfaces a spurious error message
         // (e.g. code 1005 / 1000) for intentional disconnects.
         onErrorCb = null;
+        responseActive = false;
 
         // Stop any playing audio — silence master gain first.
         if (masterGain && audioCtx) {
@@ -700,7 +713,10 @@ define([], function() {
                 currentSource = null;
             }
             audioChunks = [];
-            ws.send(JSON.stringify({type: 'response.cancel'}));
+            if (responseActive) {
+                ws.send(JSON.stringify({type: 'response.cancel'}));
+                responseActive = false;
+            }
         }
 
         // Show user text in the transcript.
@@ -717,6 +733,7 @@ define([], function() {
                 content: [{type: 'input_text', text: text}],
             },
         }));
+        responseActive = true;
         ws.send(JSON.stringify({type: 'response.create'}));
     };
 
