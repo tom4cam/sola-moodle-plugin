@@ -61,14 +61,40 @@ if ($action === 'toggleut' && confirm_sesskey()) {
         ['courseid' => $courseid, 'range' => $range]));
 }
 
-// ── Handle bulk enable/disable all courses ──────────────────────────────────
+// ── Handle bulk actions (SOLA enable/disable, user testing enable/disable) ──
 if ($action === 'bulktoggle' && confirm_sesskey()) {
     $enabled = required_param('enabled', PARAM_INT);
-    $allVisible = $DB->get_records_sql(
-        "SELECT c.id FROM {course} c WHERE c.id > 1 AND c.visible = 1"
-    );
-    foreach ($allVisible as $c) {
-        set_config('sola_enabled_course_' . $c->id, $enabled ? '1' : '0', 'local_ai_course_assistant');
+    $scope = optional_param('scope', 'all', PARAM_ALPHA); // 'all' or 'selected'.
+    $selectedIds = optional_param('selected_ids', '', PARAM_RAW);
+    if ($scope === 'selected' && !empty($selectedIds)) {
+        $ids = array_map('intval', explode(',', $selectedIds));
+    } else {
+        $ids = array_map(function($c) { return (int)$c->id; },
+            $DB->get_records_sql("SELECT c.id FROM {course} c WHERE c.id > 1 AND c.visible = 1"));
+    }
+    foreach ($ids as $cid) {
+        set_config('sola_enabled_course_' . $cid, $enabled ? '1' : '0', 'local_ai_course_assistant');
+    }
+    redirect(new moodle_url('/local/ai_course_assistant/analytics.php',
+        ['courseid' => $courseid, 'range' => $range]));
+}
+
+if ($action === 'bulktoggleut' && confirm_sesskey()) {
+    $utvalue = required_param('utvalue', PARAM_RAW);
+    $scope = optional_param('scope', 'all', PARAM_ALPHA);
+    $selectedIds = optional_param('selected_ids', '', PARAM_RAW);
+    if ($scope === 'selected' && !empty($selectedIds)) {
+        $ids = array_map('intval', explode(',', $selectedIds));
+    } else {
+        $ids = array_map(function($c) { return (int)$c->id; },
+            $DB->get_records_sql("SELECT c.id FROM {course} c WHERE c.id > 1 AND c.visible = 1"));
+    }
+    foreach ($ids as $cid) {
+        if ($utvalue === '') {
+            unset_config('sola_usertesting_course_' . $cid, 'local_ai_course_assistant');
+        } else {
+            set_config('sola_usertesting_course_' . $cid, $utvalue, 'local_ai_course_assistant');
+        }
     }
     redirect(new moodle_url('/local/ai_course_assistant/analytics.php',
         ['courseid' => $courseid, 'range' => $range]));
@@ -403,6 +429,8 @@ $templatedata = [
         ['range' => $range]))->out(false),
     'settings_url' => (new moodle_url('/admin/settings.php',
         ['section' => 'local_ai_course_assistant']))->out(false),
+    'analytics_base_url' => (new moodle_url('/local/ai_course_assistant/analytics.php',
+        ['range' => $range]))->out(false),
 ];
 
 echo $OUTPUT->header();

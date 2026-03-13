@@ -227,6 +227,9 @@
     {{! ═══ Per-Course Analytics (if selected) ═══ }}
     {{#has_course_selected}}
     <hr>
+    <div class="mb-2">
+        <a href="{{analytics_base_url}}" class="btn btn-sm btn-outline-secondary">&larr; Back to All Courses</a>
+    </div>
     <h2>{{course.coursename}}</h2>
 
     {{! Time range selector }}
