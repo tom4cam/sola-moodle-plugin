@@ -30,6 +30,11 @@ use core_external\external_value;
  */
 class get_realtime_token extends external_api {
 
+    /**
+     * Returns description of method parameters.
+     *
+     * @return external_function_parameters
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
@@ -111,6 +116,11 @@ class get_realtime_token extends external_api {
         ];
     }
 
+    /**
+     * Returns description of method result value.
+     *
+     * @return external_single_structure
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'token' => new external_value(PARAM_RAW, 'Ephemeral session token'),

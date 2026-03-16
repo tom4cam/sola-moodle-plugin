@@ -21,6 +21,7 @@ use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
+use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
 use local_ai_course_assistant\conversation_manager;
 use local_ai_course_assistant\study_planner;
@@ -65,6 +66,10 @@ class provider implements
                 'role' => 'privacy:metadata:local_ai_course_assistant_msgs:role',
                 'message' => 'privacy:metadata:local_ai_course_assistant_msgs:message',
                 'tokens_used' => 'privacy:metadata:local_ai_course_assistant_msgs:tokens_used',
+                'prompt_tokens' => 'privacy:metadata:local_ai_course_assistant_msgs:prompt_tokens',
+                'completion_tokens' => 'privacy:metadata:local_ai_course_assistant_msgs:completion_tokens',
+                'model_name' => 'privacy:metadata:local_ai_course_assistant_msgs:model_name',
+                'provider' => 'privacy:metadata:local_ai_course_assistant_msgs:provider',
                 'timecreated' => 'privacy:metadata:local_ai_course_assistant_msgs:timecreated',
             ],
             'privacy:metadata:local_ai_course_assistant_msgs'
@@ -90,6 +95,77 @@ class provider implements
                 'country_code' => 'privacy:metadata:local_ai_course_assistant_reminders:country_code',
             ],
             'privacy:metadata:local_ai_course_assistant_reminders'
+        );
+
+        $collection->add_database_table(
+            'local_ai_course_assistant_feedback',
+            [
+                'userid' => 'privacy:metadata:local_ai_course_assistant_feedback:userid',
+                'courseid' => 'privacy:metadata:local_ai_course_assistant_feedback:courseid',
+                'rating' => 'privacy:metadata:local_ai_course_assistant_feedback:rating',
+                'comment' => 'privacy:metadata:local_ai_course_assistant_feedback:comment',
+                'browser' => 'privacy:metadata:local_ai_course_assistant_feedback:browser',
+                'os' => 'privacy:metadata:local_ai_course_assistant_feedback:os',
+                'device' => 'privacy:metadata:local_ai_course_assistant_feedback:device',
+                'screen_size' => 'privacy:metadata:local_ai_course_assistant_feedback:screen_size',
+                'user_agent' => 'privacy:metadata:local_ai_course_assistant_feedback:user_agent',
+                'page_url' => 'privacy:metadata:local_ai_course_assistant_feedback:page_url',
+                'timecreated' => 'privacy:metadata:local_ai_course_assistant_feedback:timecreated',
+            ],
+            'privacy:metadata:local_ai_course_assistant_feedback'
+        );
+
+        $collection->add_database_table(
+            'local_ai_course_assistant_survey_resp',
+            [
+                'userid' => 'privacy:metadata:local_ai_course_assistant_survey_resp:userid',
+                'courseid' => 'privacy:metadata:local_ai_course_assistant_survey_resp:courseid',
+                'question_index' => 'privacy:metadata:local_ai_course_assistant_survey_resp:question_index',
+                'answer' => 'privacy:metadata:local_ai_course_assistant_survey_resp:answer',
+                'timecreated' => 'privacy:metadata:local_ai_course_assistant_survey_resp:timecreated',
+            ],
+            'privacy:metadata:local_ai_course_assistant_survey_resp'
+        );
+
+        $collection->add_database_table(
+            'local_ai_course_assistant_ut_resp',
+            [
+                'userid' => 'privacy:metadata:local_ai_course_assistant_ut_resp:userid',
+                'courseid' => 'privacy:metadata:local_ai_course_assistant_ut_resp:courseid',
+                'task_index' => 'privacy:metadata:local_ai_course_assistant_ut_resp:task_index',
+                'rating' => 'privacy:metadata:local_ai_course_assistant_ut_resp:rating',
+                'answer' => 'privacy:metadata:local_ai_course_assistant_ut_resp:answer',
+                'timecreated' => 'privacy:metadata:local_ai_course_assistant_ut_resp:timecreated',
+            ],
+            'privacy:metadata:local_ai_course_assistant_ut_resp'
+        );
+
+        $collection->add_database_table(
+            'local_ai_course_assistant_audit',
+            [
+                'userid' => 'privacy:metadata:local_ai_course_assistant_audit:userid',
+                'courseid' => 'privacy:metadata:local_ai_course_assistant_audit:courseid',
+                'action' => 'privacy:metadata:local_ai_course_assistant_audit:action',
+                'ipaddress' => 'privacy:metadata:local_ai_course_assistant_audit:ipaddress',
+                'useragent' => 'privacy:metadata:local_ai_course_assistant_audit:useragent',
+                'details' => 'privacy:metadata:local_ai_course_assistant_audit:details',
+                'timecreated' => 'privacy:metadata:local_ai_course_assistant_audit:timecreated',
+            ],
+            'privacy:metadata:local_ai_course_assistant_audit'
+        );
+
+        $collection->add_database_table(
+            'local_ai_course_assistant_practice_scores',
+            [
+                'userid' => 'privacy:metadata:local_ai_course_assistant_practice_scores:userid',
+                'courseid' => 'privacy:metadata:local_ai_course_assistant_practice_scores:courseid',
+                'session_type' => 'privacy:metadata:local_ai_course_assistant_practice_scores:session_type',
+                'overall_score' => 'privacy:metadata:local_ai_course_assistant_practice_scores:overall_score',
+                'scores' => 'privacy:metadata:local_ai_course_assistant_practice_scores:scores',
+                'ai_feedback' => 'privacy:metadata:local_ai_course_assistant_practice_scores:ai_feedback',
+                'timecreated' => 'privacy:metadata:local_ai_course_assistant_practice_scores:timecreated',
+            ],
+            'privacy:metadata:local_ai_course_assistant_practice_scores'
         );
 
         return $collection;
@@ -133,6 +209,51 @@ class provider implements
             'userid' => $userid,
         ]);
 
+        $sql = "SELECT DISTINCT ctx.id
+                  FROM {local_ai_course_assistant_feedback} f
+                  JOIN {context} ctx ON ctx.instanceid = f.courseid AND ctx.contextlevel = :contextlevel
+                 WHERE f.userid = :userid";
+        $contextlist->add_from_sql($sql, [
+            'contextlevel' => CONTEXT_COURSE,
+            'userid' => $userid,
+        ]);
+
+        $sql = "SELECT DISTINCT ctx.id
+                  FROM {local_ai_course_assistant_survey_resp} sr
+                  JOIN {context} ctx ON ctx.instanceid = sr.courseid AND ctx.contextlevel = :contextlevel
+                 WHERE sr.userid = :userid";
+        $contextlist->add_from_sql($sql, [
+            'contextlevel' => CONTEXT_COURSE,
+            'userid' => $userid,
+        ]);
+
+        $sql = "SELECT DISTINCT ctx.id
+                  FROM {local_ai_course_assistant_ut_resp} ur
+                  JOIN {context} ctx ON ctx.instanceid = ur.courseid AND ctx.contextlevel = :contextlevel
+                 WHERE ur.userid = :userid";
+        $contextlist->add_from_sql($sql, [
+            'contextlevel' => CONTEXT_COURSE,
+            'userid' => $userid,
+        ]);
+
+        $sql = "SELECT DISTINCT ctx.id
+                  FROM {local_ai_course_assistant_audit} a
+                  JOIN {context} ctx ON ctx.instanceid = a.courseid AND ctx.contextlevel = :contextlevel
+                 WHERE a.userid = :userid";
+        $contextlist->add_from_sql($sql, [
+            'contextlevel' => CONTEXT_COURSE,
+            'userid' => $userid,
+        ]);
+
+        $sql = "SELECT DISTINCT ctx.id
+                  FROM {local_ai_course_assistant_practice_scores} ps
+                  JOIN {context} ctx ON ctx.instanceid = ps.courseid AND ctx.contextlevel = :contextlevel
+                 WHERE ps.userid = :userid";
+        $contextlist->add_from_sql($sql, [
+            'contextlevel' => CONTEXT_COURSE,
+            'userid' => $userid,
+        ]);
+
         return $contextlist;
     }
 
@@ -150,7 +271,41 @@ class provider implements
         $sql = "SELECT DISTINCT userid
                   FROM {local_ai_course_assistant_convs}
                  WHERE courseid = :courseid";
+        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
 
+        $sql = "SELECT DISTINCT userid
+                  FROM {local_ai_course_assistant_plans}
+                 WHERE courseid = :courseid";
+        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
+
+        $sql = "SELECT DISTINCT userid
+                  FROM {local_ai_course_assistant_reminders}
+                 WHERE courseid = :courseid";
+        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
+
+        $sql = "SELECT DISTINCT userid
+                  FROM {local_ai_course_assistant_feedback}
+                 WHERE courseid = :courseid";
+        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
+
+        $sql = "SELECT DISTINCT userid
+                  FROM {local_ai_course_assistant_survey_resp}
+                 WHERE courseid = :courseid";
+        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
+
+        $sql = "SELECT DISTINCT userid
+                  FROM {local_ai_course_assistant_ut_resp}
+                 WHERE courseid = :courseid";
+        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
+
+        $sql = "SELECT DISTINCT userid
+                  FROM {local_ai_course_assistant_audit}
+                 WHERE courseid = :courseid";
+        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
+
+        $sql = "SELECT DISTINCT userid
+                  FROM {local_ai_course_assistant_practice_scores}
+                 WHERE courseid = :courseid";
         $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
     }
 
@@ -197,6 +352,140 @@ class provider implements
                     ]
                 );
             }
+
+            // Export study plans.
+            $plans = $DB->get_records('local_ai_course_assistant_plans', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            foreach ($plans as $plan) {
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_ai_course_assistant'), 'study_plans', $plan->id],
+                    (object) [
+                        'hours_per_week' => $plan->hours_per_week,
+                        'plan_data' => $plan->plan_data,
+                        'preferred_days' => $plan->preferred_days,
+                        'preferred_time' => $plan->preferred_time,
+                        'timecreated' => transform::datetime($plan->timecreated),
+                        'timemodified' => transform::datetime($plan->timemodified),
+                    ]
+                );
+            }
+
+            // Export reminder preferences.
+            $reminders = $DB->get_records('local_ai_course_assistant_reminders', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            foreach ($reminders as $reminder) {
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_ai_course_assistant'), 'reminders', $reminder->id],
+                    (object) [
+                        'channel' => $reminder->channel,
+                        'destination' => $reminder->destination,
+                        'country_code' => $reminder->country_code,
+                        'frequency' => $reminder->frequency,
+                        'enabled' => transform::yesno($reminder->enabled),
+                        'timecreated' => transform::datetime($reminder->timecreated),
+                    ]
+                );
+            }
+
+            // Export feedback.
+            $feedbacks = $DB->get_records('local_ai_course_assistant_feedback', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            foreach ($feedbacks as $feedback) {
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_ai_course_assistant'), 'feedback', $feedback->id],
+                    (object) [
+                        'rating' => $feedback->rating,
+                        'comment' => $feedback->comment,
+                        'browser' => $feedback->browser,
+                        'os' => $feedback->os,
+                        'device' => $feedback->device,
+                        'screen_size' => $feedback->screen_size,
+                        'user_agent' => $feedback->user_agent,
+                        'page_url' => $feedback->page_url,
+                        'timecreated' => transform::datetime($feedback->timecreated),
+                    ]
+                );
+            }
+
+            // Export survey responses.
+            $surveyresps = $DB->get_records('local_ai_course_assistant_survey_resp', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            foreach ($surveyresps as $resp) {
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_ai_course_assistant'), 'survey_responses', $resp->id],
+                    (object) [
+                        'surveyid' => $resp->surveyid,
+                        'question_index' => $resp->question_index,
+                        'answer' => $resp->answer,
+                        'timecreated' => transform::datetime($resp->timecreated),
+                    ]
+                );
+            }
+
+            // Export user testing responses.
+            $utresps = $DB->get_records('local_ai_course_assistant_ut_resp', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            foreach ($utresps as $resp) {
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_ai_course_assistant'), 'ut_responses', $resp->id],
+                    (object) [
+                        'tasksetid' => $resp->tasksetid,
+                        'task_index' => $resp->task_index,
+                        'rating' => $resp->rating,
+                        'answer' => $resp->answer,
+                        'message_count' => $resp->message_count,
+                        'session_minutes' => $resp->session_minutes,
+                        'timecreated' => transform::datetime($resp->timecreated),
+                    ]
+                );
+            }
+
+            // Export audit log entries.
+            $auditentries = $DB->get_records('local_ai_course_assistant_audit', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            foreach ($auditentries as $entry) {
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_ai_course_assistant'), 'audit_log', $entry->id],
+                    (object) [
+                        'action' => $entry->action,
+                        'ipaddress' => $entry->ipaddress,
+                        'useragent' => $entry->useragent,
+                        'details' => $entry->details,
+                        'timecreated' => transform::datetime($entry->timecreated),
+                    ]
+                );
+            }
+
+            // Export practice scores.
+            $scores = $DB->get_records('local_ai_course_assistant_practice_scores', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            foreach ($scores as $score) {
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_ai_course_assistant'), 'practice_scores', $score->id],
+                    (object) [
+                        'session_type' => $score->session_type,
+                        'overall_score' => $score->overall_score,
+                        'scores' => $score->scores,
+                        'ai_feedback' => $score->ai_feedback,
+                        'session_duration' => $score->session_duration,
+                        'timecreated' => transform::datetime($score->timecreated),
+                    ]
+                );
+            }
         }
     }
 
@@ -213,6 +502,11 @@ class provider implements
         conversation_manager::delete_course_data($context->instanceid);
         $DB->delete_records('local_ai_course_assistant_plans', ['courseid' => $context->instanceid]);
         $DB->delete_records('local_ai_course_assistant_reminders', ['courseid' => $context->instanceid]);
+        $DB->delete_records('local_ai_course_assistant_feedback', ['courseid' => $context->instanceid]);
+        $DB->delete_records('local_ai_course_assistant_survey_resp', ['courseid' => $context->instanceid]);
+        $DB->delete_records('local_ai_course_assistant_ut_resp', ['courseid' => $context->instanceid]);
+        $DB->delete_records('local_ai_course_assistant_audit', ['courseid' => $context->instanceid]);
+        $DB->delete_records('local_ai_course_assistant_practice_scores', ['courseid' => $context->instanceid]);
     }
 
     /**
@@ -247,6 +541,26 @@ class provider implements
                 'userid' => $userid,
                 'courseid' => $context->instanceid,
             ]);
+            $DB->delete_records('local_ai_course_assistant_feedback', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            $DB->delete_records('local_ai_course_assistant_survey_resp', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            $DB->delete_records('local_ai_course_assistant_ut_resp', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            $DB->delete_records('local_ai_course_assistant_audit', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            $DB->delete_records('local_ai_course_assistant_practice_scores', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
         }
     }
 
@@ -273,6 +587,35 @@ class provider implements
             foreach ($convs as $conv) {
                 conversation_manager::clear_conversation($conv->id, $userid);
             }
+
+            $DB->delete_records('local_ai_course_assistant_plans', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            $DB->delete_records('local_ai_course_assistant_reminders', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            $DB->delete_records('local_ai_course_assistant_feedback', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            $DB->delete_records('local_ai_course_assistant_survey_resp', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            $DB->delete_records('local_ai_course_assistant_ut_resp', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            $DB->delete_records('local_ai_course_assistant_audit', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            $DB->delete_records('local_ai_course_assistant_practice_scores', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
         }
     }
 }

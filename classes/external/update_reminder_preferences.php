@@ -31,6 +31,11 @@ use local_ai_course_assistant\reminder_manager;
  */
 class update_reminder_preferences extends external_api {
 
+    /**
+     * Returns description of method parameters.
+     *
+     * @return external_function_parameters
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
@@ -42,6 +47,17 @@ class update_reminder_preferences extends external_api {
         ]);
     }
 
+    /**
+     * Subscribe, update, or disable reminder preferences for the current user.
+     *
+     * @param int $courseid The course ID.
+     * @param string $channel Reminder channel: 'email' or 'whatsapp'.
+     * @param string $destination Email address or phone number.
+     * @param string $country_code ISO country code (for WhatsApp).
+     * @param string $frequency Reminder frequency: 'daily', 'every_other_day', or 'weekly'.
+     * @param bool $enabled Whether to enable or disable the reminder.
+     * @return array Success flag.
+     */
     public static function execute(
         int $courseid,
         string $channel,
@@ -103,6 +119,11 @@ class update_reminder_preferences extends external_api {
         return ['success' => true];
     }
 
+    /**
+     * Returns description of method result value.
+     *
+     * @return external_single_structure
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'success' => new external_value(PARAM_BOOL, 'Success flag'),

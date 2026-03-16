@@ -65,9 +65,9 @@ if ($action === 'toggleut' && confirm_sesskey()) {
 if ($action === 'bulktoggle' && confirm_sesskey()) {
     $enabled = required_param('enabled', PARAM_INT);
     $scope = optional_param('scope', 'all', PARAM_ALPHA); // 'all' or 'selected'.
-    $selectedIds = optional_param('selected_ids', '', PARAM_RAW);
-    if ($scope === 'selected' && !empty($selectedIds)) {
-        $ids = array_map('intval', explode(',', $selectedIds));
+    $selected_ids = optional_param('selected_ids', '', PARAM_RAW);
+    if ($scope === 'selected' && !empty($selected_ids)) {
+        $ids = array_map('intval', explode(',', $selected_ids));
     } else {
         $ids = array_map(function($c) { return (int)$c->id; },
             $DB->get_records_sql("SELECT c.id FROM {course} c WHERE c.id > 1 AND c.visible = 1"));
@@ -82,9 +82,9 @@ if ($action === 'bulktoggle' && confirm_sesskey()) {
 if ($action === 'bulktoggleut' && confirm_sesskey()) {
     $utvalue = required_param('utvalue', PARAM_RAW);
     $scope = optional_param('scope', 'all', PARAM_ALPHA);
-    $selectedIds = optional_param('selected_ids', '', PARAM_RAW);
-    if ($scope === 'selected' && !empty($selectedIds)) {
-        $ids = array_map('intval', explode(',', $selectedIds));
+    $selected_ids = optional_param('selected_ids', '', PARAM_RAW);
+    if ($scope === 'selected' && !empty($selected_ids)) {
+        $ids = array_map('intval', explode(',', $selected_ids));
     } else {
         $ids = array_map(function($c) { return (int)$c->id; },
             $DB->get_records_sql("SELECT c.id FROM {course} c WHERE c.id > 1 AND c.visible = 1"));
@@ -111,7 +111,7 @@ $since = $range > 0 ? time() - ($range * 86400) : 0;
 
 // ── Build course list with stats ────────────────────────────────────────────
 // Get all courses that have at least one SOLA message.
-$coursesWithData = $DB->get_records_sql(
+$courses_with_data = $DB->get_records_sql(
     "SELECT DISTINCT m.courseid, c.fullname, c.shortname
        FROM {local_ai_course_assistant_msgs} m
        JOIN {course} c ON c.id = m.courseid
@@ -120,7 +120,7 @@ $coursesWithData = $DB->get_records_sql(
 );
 
 // Also get all visible courses (for the enable/disable toggle even if no data yet).
-$allCourses = $DB->get_records_sql(
+$all_courses = $DB->get_records_sql(
     "SELECT c.id, c.fullname, c.shortname
        FROM {course} c
       WHERE c.id > 1 AND c.visible = 1
@@ -128,27 +128,27 @@ $allCourses = $DB->get_records_sql(
 );
 
 // Merge: courses with data + all visible courses.
-$courseList = [];
-foreach ($allCourses as $c) {
-    $hasData = isset($coursesWithData[$c->id]);
-    $enabledVal = get_config('local_ai_course_assistant', 'sola_enabled_course_' . $c->id);
-    $isEnabled = ($enabledVal !== '0'); // Default: enabled.
-    $utVal = get_config('local_ai_course_assistant', 'sola_usertesting_course_' . $c->id);
+$course_list = [];
+foreach ($all_courses as $c) {
+    $has_data = isset($courses_with_data[$c->id]);
+    $enabled_val = get_config('local_ai_course_assistant', 'sola_enabled_course_' . $c->id);
+    $is_enabled = ($enabled_val !== '0'); // Default: enabled.
+    $ut_val = get_config('local_ai_course_assistant', 'sola_usertesting_course_' . $c->id);
     // User testing state: '' = inherit, '1' = on, '0' = off.
-    $utState = ($utVal === '1') ? 'on' : (($utVal === '0') ? 'off' : 'inherit');
-    $utGlobal = (bool) get_config('local_ai_course_assistant', 'usertesting_enabled');
-    $utEffective = ($utVal === '1') || ($utVal !== '0' && $utGlobal);
-    $courseList[] = [
+    $ut_state = ($ut_val === '1') ? 'on' : (($ut_val === '0') ? 'off' : 'inherit');
+    $ut_global = (bool) get_config('local_ai_course_assistant', 'usertesting_enabled');
+    $ut_effective = ($ut_val === '1') || ($ut_val !== '0' && $ut_global);
+    $course_list[] = [
         'id'        => (int) $c->id,
         'fullname'  => $c->fullname,
         'shortname' => $c->shortname,
-        'has_data'  => $hasData,
-        'enabled'   => $isEnabled,
+        'has_data'  => $has_data,
+        'enabled'   => $is_enabled,
         'selected'  => ((int) $c->id === $courseid),
-        'ut_on'     => $utState === 'on',
-        'ut_off'    => $utState === 'off',
-        'ut_inherit'=> $utState === 'inherit',
-        'ut_effective' => $utEffective,
+        'ut_on'     => $ut_state === 'on',
+        'ut_off'    => $ut_state === 'off',
+        'ut_inherit'=> $ut_state === 'inherit',
+        'ut_effective' => $ut_effective,
         'sesskey'   => sesskey(),
         'range'     => $range,
         'courseid_param' => $courseid,
@@ -157,29 +157,29 @@ foreach ($allCourses as $c) {
 }
 
 // ── Cross-course summary stats ──────────────────────────────────────────────
-$totalMsgsAll = $DB->count_records_sql(
+$total_msgs_all = $DB->count_records_sql(
     "SELECT COUNT(m.id) FROM {local_ai_course_assistant_msgs} m
        JOIN {course} c ON c.id = m.courseid WHERE c.id > 1"
 );
-$activeStudentsAll = $DB->count_records_sql(
+$active_students_all = $DB->count_records_sql(
     "SELECT COUNT(DISTINCT m.userid) FROM {local_ai_course_assistant_msgs} m
        JOIN {course} c ON c.id = m.courseid WHERE c.id > 1 AND m.role = 'user'"
 );
-$activeCourses = count($coursesWithData);
-$enabledCourses = 0;
-foreach ($courseList as $cl) {
+$active_courses = count($courses_with_data);
+$enabled_courses = 0;
+foreach ($course_list as $cl) {
     if ($cl['enabled']) {
-        $enabledCourses++;
+        $enabled_courses++;
     }
 }
 
 // ── Per-course analytics (if a course is selected) ──────────────────────────
-$courseData = null;
-$courseName = '';
+$course_data = null;
+$course_name = '';
 if ($courseid > 0) {
     $course = $DB->get_record('course', ['id' => $courseid]);
     if ($course) {
-        $courseName = $course->fullname;
+        $course_name = $course->fullname;
         $overview = analytics::get_overview($courseid, $since);
         $dailyusage = analytics::get_daily_usage($courseid, $range > 0 ? $range : 90);
         $hotspots = analytics::get_hotspots($courseid, $since);
@@ -252,12 +252,12 @@ if ($courseid > 0) {
             ? round((float) $feedbacksummary->avg_rating, 1) : 0;
 
         // Survey results.
-        $surveyData = null;
+        $survey_data = null;
         try {
-            $surveyResults = \local_ai_course_assistant\survey_manager::get_survey_results($courseid, $since);
-            if ($surveyResults['total_responses'] > 0) {
-                $surveyQuestions = [];
-                foreach ($surveyResults['questions'] as $q) {
+            $survey_results = \local_ai_course_assistant\survey_manager::get_survey_results($courseid, $since);
+            if ($survey_results['total_responses'] > 0) {
+                $survey_questions = [];
+                foreach ($survey_results['questions'] as $q) {
                     $sq = [
                         'text' => $q['text'],
                         'type' => $q['type'],
@@ -284,18 +284,18 @@ if ($courseid > 0) {
                         $sq['distribution'] = $dist;
                     }
                     if ($q['type'] === 'long_text' && !empty($q['answers'])) {
-                        $textAnswers = [];
+                        $text_answers = [];
                         foreach (array_slice($q['answers'], 0, 20) as $a) {
-                            $textAnswers[] = ['text' => htmlspecialchars($a)];
+                            $text_answers[] = ['text' => htmlspecialchars($a)];
                         }
-                        $sq['answers'] = $textAnswers;
+                        $sq['answers'] = $text_answers;
                         $sq['has_answers'] = true;
                     }
-                    $surveyQuestions[] = $sq;
+                    $survey_questions[] = $sq;
                 }
-                $surveyData = [
-                    'total_responses' => $surveyResults['total_responses'],
-                    'questions' => $surveyQuestions,
+                $survey_data = [
+                    'total_responses' => $survey_results['total_responses'],
+                    'questions' => $survey_questions,
                 ];
             }
         } catch (\Throwable $e) {
@@ -303,12 +303,12 @@ if ($courseid > 0) {
         }
 
         // User testing results.
-        $utData = null;
+        $ut_data = null;
         try {
-            $utResults = \local_ai_course_assistant\usertesting_manager::get_results($courseid);
-            if ($utResults['total_respondents'] > 0) {
-                $utTasks = [];
-                foreach ($utResults['tasks'] as $t) {
+            $ut_results = \local_ai_course_assistant\usertesting_manager::get_results($courseid);
+            if ($ut_results['total_respondents'] > 0) {
+                $ut_tasks = [];
+                foreach ($ut_results['tasks'] as $t) {
                     $ut = [
                         'instruction' => $t['instruction'],
                         'type' => $t['type'],
@@ -343,20 +343,20 @@ if ($courseid > 0) {
                         $ut['answers'] = $answers;
                         $ut['has_answers'] = !empty($answers);
                     }
-                    $utTasks[] = $ut;
+                    $ut_tasks[] = $ut;
                 }
-                $utData = [
-                    'total_respondents' => $utResults['total_respondents'],
-                    'tasks' => $utTasks,
+                $ut_data = [
+                    'total_respondents' => $ut_results['total_respondents'],
+                    'tasks' => $ut_tasks,
                 ];
             }
         } catch (\Throwable $e) {
             // User testing tables may not exist yet.
         }
 
-        $courseData = [
+        $course_data = [
             'courseid'   => $courseid,
-            'coursename' => $courseName,
+            'coursename' => $course_name,
             'overview'   => $overview,
             'has_data'   => $overview['total_messages'] > 0,
             'daily_usage_json' => json_encode($dailyusage),
@@ -379,11 +379,11 @@ if ($courseid > 0) {
             'feedback_ratings' => $ratingrows,
             'feedback_entries' => $feedbackentries,
             'has_feedback'    => $feedbacktotal > 0,
-            'survey_data'     => $surveyData,
-            'has_survey_data' => ($surveyData !== null),
-            'usertesting_data' => $utData,
-            'has_usertesting_data' => ($utData !== null),
-            'has_any_feedback_data' => ($feedbacktotal > 0 || $surveyData !== null || $utData !== null),
+            'survey_data'     => $survey_data,
+            'has_survey_data' => ($survey_data !== null),
+            'usertesting_data' => $ut_data,
+            'has_usertesting_data' => ($ut_data !== null),
+            'has_any_feedback_data' => ($feedbacktotal > 0 || $survey_data !== null || $ut_data !== null),
             'token_analytics_url' => (new moodle_url('/local/ai_course_assistant/token_analytics.php',
                 ['courseid' => $courseid, 'range' => $range]))->out(false),
         ];
@@ -393,19 +393,19 @@ if ($courseid > 0) {
 // ── Build template data ─────────────────────────────────────────────────────
 $templatedata = [
     // Cross-course summary.
-    'total_messages_all'  => $totalMsgsAll,
-    'active_students_all' => $activeStudentsAll,
-    'active_courses'      => $activeCourses,
-    'enabled_courses'     => $enabledCourses,
-    'total_courses'       => count($courseList),
+    'total_messages_all'  => $total_msgs_all,
+    'active_students_all' => $active_students_all,
+    'active_courses'      => $active_courses,
+    'enabled_courses'     => $enabled_courses,
+    'total_courses'       => count($course_list),
 
     // Course list for selector + toggle table.
-    'courses'     => $courseList,
-    'has_courses' => !empty($courseList),
+    'courses'     => $course_list,
+    'has_courses' => !empty($course_list),
 
     // Per-course analytics (null if none selected).
-    'has_course_selected' => ($courseData !== null),
-    'course'              => $courseData,
+    'has_course_selected' => ($course_data !== null),
+    'course'              => $course_data,
 
     // Time range.
     'range'              => $range,

@@ -594,3 +594,13 @@ $string['mobile_disabled']      = 'SOLA is not available for this course.';
 $string['mobile_chip_concepts'] = 'Key Concepts';
 $string['mobile_chip_studyplan'] = 'Study Plan';
 $string['mobile_chip_quiz']     = 'Quiz Me';
+
+// Rate limiting and error strings.
+$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
+$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
+$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
+
+// Reminder validation errors.
+$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
+$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';

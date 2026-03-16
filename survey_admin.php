@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Load current survey.
 survey_manager::ensure_default_survey();
 $survey = survey_manager::get_active_survey($courseid);
-$isInherited = ($survey && (int) $survey->courseid !== $courseid && $courseid > 0);
+$is_inherited = ($survey && (int) $survey->courseid !== $courseid && $courseid > 0);
 $questions = $survey ? $survey->questions : survey_manager::DEFAULT_QUESTIONS;
 $title = $survey ? $survey->title : 'SOLA End-of-Course Survey';
 
@@ -241,7 +241,7 @@ echo $OUTPUT->header();
         </div>
     </div>
 
-    <?php if ($isInherited): ?>
+    <?php if ($is_inherited): ?>
     <div class="aica-sq-inherited-badge">
         This course has no custom survey. Showing the global default. Edit below to create a course-specific override.
     </div>
@@ -267,7 +267,7 @@ echo $OUTPUT->header();
         <div class="d-flex flex-wrap" style="gap:8px;margin-top:16px">
             <button type="submit" class="btn btn-primary">Save Survey</button>
             <button type="button" class="btn btn-outline-secondary" id="aica-preview-btn">Preview</button>
-            <?php if ($courseid > 0 && !$isInherited): ?>
+            <?php if ($courseid > 0 && !$is_inherited): ?>
             <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">Remove Course Override</button>
             <?php elseif ($courseid === 0): ?>
             <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">Reset to Defaults</button>

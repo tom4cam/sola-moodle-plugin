@@ -63,8 +63,8 @@ class hook_callbacks {
         }
 
         // Per-course SOLA disable check (default: enabled).
-        $courseEnabled = get_config('local_ai_course_assistant', 'sola_enabled_course_' . $courseid);
-        if ($courseEnabled === '0') {
+        $course_enabled = get_config('local_ai_course_assistant', 'sola_enabled_course_' . $courseid);
+        if ($course_enabled === '0') {
             return;
         }
 
@@ -331,11 +331,11 @@ class hook_callbacks {
      * @return bool
      */
     private static function is_usertesting_enabled(int $courseid): bool {
-        $perCourse = get_config('local_ai_course_assistant', 'sola_usertesting_course_' . $courseid);
-        if ($perCourse === '1') {
+        $per_course = get_config('local_ai_course_assistant', 'sola_usertesting_course_' . $courseid);
+        if ($per_course === '1') {
             return true;
         }
-        if ($perCourse === '0') {
+        if ($per_course === '0') {
             return false;
         }
         // Inherit global setting.

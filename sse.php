@@ -79,7 +79,7 @@ if (rate_limiter::is_rate_limited($USER->id, 'sse_stream', 20, 60)) {
 if (rate_limiter::is_ip_rate_limited('sse_stream', 100, 60)) {
     http_response_code(429);
     header('Retry-After: 60');
-    echo json_encode(['error' => 'Too many requests from your IP address']);
+    echo json_encode(['error' => get_string('error_rate_limit_ip', 'local_ai_course_assistant')]);
     die();
 }
 

@@ -33,6 +33,11 @@ use local_ai_course_assistant\provider\base_provider;
  */
 class generate_quiz extends external_api {
 
+    /**
+     * Returns description of method parameters.
+     *
+     * @return external_function_parameters
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
@@ -42,6 +47,15 @@ class generate_quiz extends external_api {
         ]);
     }
 
+    /**
+     * Generate a practice quiz via AI for a given course.
+     *
+     * @param int $courseid The course ID.
+     * @param int $count Number of questions to generate (1-10).
+     * @param string $topic Topic string, '__guided__' for AI-guided, or empty for current page.
+     * @param int $cmid Course module ID for current-page mode (0 if not applicable).
+     * @return array Quiz data with success flag, error message, topic, and questions.
+     */
     public static function execute(int $courseid, int $count = 3, string $topic = '__guided__', int $cmid = 0): array {
         global $DB, $USER;
 
@@ -155,6 +169,11 @@ class generate_quiz extends external_api {
         ];
     }
 
+    /**
+     * Returns description of method result value.
+     *
+     * @return external_single_structure
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'success'   => new external_value(PARAM_BOOL, 'Whether the quiz was generated successfully'),

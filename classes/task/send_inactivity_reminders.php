@@ -35,7 +35,7 @@ class send_inactivity_reminders extends \core\task\scheduled_task {
 
         $threshold = (int) get_config('local_ai_course_assistant', 'inactivity_threshold_days') ?: 7;
         $cutoff = time() - ($threshold * 86400);
-        $displayName = get_config('local_ai_course_assistant', 'display_name') ?: 'SOLA';
+        $display_name = get_config('local_ai_course_assistant', 'display_name') ?: 'SOLA';
 
         // Find users with active email reminders who haven't accessed their course recently.
         $sql = "SELECT r.id, r.userid, r.courseid, r.destination, r.last_sent,
@@ -67,14 +67,14 @@ class send_inactivity_reminders extends \core\task\scheduled_task {
                 }
             }
 
-            $daysSince = $rec->lastaccess > 0 ? round((time() - $rec->lastaccess) / 86400) : 0;
+            $days_since = $rec->lastaccess > 0 ? round((time() - $rec->lastaccess) / 86400) : 0;
             $subject = "We miss you in {$rec->coursename}!";
             $body = "Hi {$rec->firstname},\n\n"
-                . "It's been " . ($daysSince > 0 ? "{$daysSince} days" : "a while")
+                . "It's been " . ($days_since > 0 ? "{$days_since} days" : "a while")
                 . " since you last visited {$rec->coursename}. "
-                . "{$displayName} is ready to help you pick up where you left off.\n\n"
+                . "{$display_name} is ready to help you pick up where you left off.\n\n"
                 . "Even 10 minutes of review can make a difference. Log in and let's keep your momentum going!\n\n"
-                . "— {$displayName}";
+                . "— {$display_name}";
 
             try {
                 $user = $DB->get_record('user', ['id' => $rec->userid], '*', MUST_EXIST);

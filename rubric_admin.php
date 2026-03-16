@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Load current rubric.
 rubric_manager::ensure_default_rubric($type);
 $rubric = rubric_manager::get_rubric($courseid, $type);
-$isInherited = ($rubric && (int) $rubric->courseid !== $courseid && $courseid > 0);
+$is_inherited = ($rubric && (int) $rubric->courseid !== $courseid && $courseid > 0);
 $criteria = $rubric ? $rubric->criteria : rubric_manager::get_default_criteria($type);
 
 // Get list of courses for the scope selector.
@@ -232,7 +232,7 @@ echo $OUTPUT->header();
            class="<?php echo $type === 'pronunciation' ? 'active' : ''; ?>">Pronunciation Practice</a>
     </div>
 
-    <?php if ($isInherited): ?>
+    <?php if ($is_inherited): ?>
     <div class="aica-rb-inherited-badge">
         This course has no custom rubric. Showing the global default. Edit below to create a course-specific override.
     </div>
@@ -251,7 +251,7 @@ echo $OUTPUT->header();
         <div class="d-flex flex-wrap" style="gap:8px;margin-top:16px">
             <button type="submit" class="btn btn-primary">Save Rubric</button>
             <button type="button" class="btn btn-outline-secondary" id="aica-preview-btn">Preview</button>
-            <?php if ($courseid > 0 && !$isInherited): ?>
+            <?php if ($courseid > 0 && !$is_inherited): ?>
             <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">Remove Course Override</button>
             <?php elseif ($courseid === 0): ?>
             <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">Reset to Defaults</button>

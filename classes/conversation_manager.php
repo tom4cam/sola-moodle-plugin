@@ -53,7 +53,18 @@ class conversation_manager {
         $conv->title = '';
         $conv->timecreated = $now;
         $conv->timemodified = $now;
-        $conv->id = $DB->insert_record('local_ai_course_assistant_convs', $conv);
+        try {
+            $conv->id = $DB->insert_record('local_ai_course_assistant_convs', $conv);
+        } catch (\dml_write_exception $e) {
+            // Race condition: another request created the conversation first.
+            $conv = $DB->get_record('local_ai_course_assistant_convs', [
+                'userid' => $userid,
+                'courseid' => $courseid,
+            ]);
+            if (!$conv) {
+                throw $e;
+            }
+        }
 
         return $conv;
     }

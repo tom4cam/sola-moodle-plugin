@@ -444,5 +444,59 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026031712, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026031713) {
+        $dbman = $DB->get_manager();
+
+        // Fix embedding field type on chunks table (longtext → text).
+        $table = new xmldb_table('local_ai_course_assistant_chunks');
+        if ($dbman->table_exists($table)) {
+            $field = new xmldb_field('embedding', XMLDB_TYPE_TEXT, null, null, null, null, null, 'contenthash');
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->change_field_type($table, $field);
+            }
+        }
+
+        // Make userid_courseid index unique on convs table to prevent race condition duplicates.
+        $table = new xmldb_table('local_ai_course_assistant_convs');
+        $index = new xmldb_index('userid_courseid', XMLDB_INDEX_NOTUNIQUE, ['userid', 'courseid']);
+        if ($dbman->index_exists($table, $index)) {
+            // Remove duplicates before making index unique — keep the oldest conversation per user+course.
+            $dupes = $DB->get_records_sql(
+                "SELECT MIN(id) AS keepid, userid, courseid
+                   FROM {local_ai_course_assistant_convs}
+               GROUP BY userid, courseid
+                 HAVING COUNT(*) > 1"
+            );
+            foreach ($dupes as $dupe) {
+                // Move orphaned messages from duplicate conversations to the kept one.
+                $dupconvids = $DB->get_fieldset_select(
+                    'local_ai_course_assistant_convs',
+                    'id',
+                    'userid = ? AND courseid = ? AND id > ?',
+                    [$dupe->userid, $dupe->courseid, $dupe->keepid]
+                );
+                if (!empty($dupconvids)) {
+                    list($insql, $inparams) = $DB->get_in_or_equal($dupconvids);
+                    $DB->execute(
+                        "UPDATE {local_ai_course_assistant_msgs} SET conversationid = ? WHERE conversationid $insql",
+                        array_merge([$dupe->keepid], $inparams)
+                    );
+                }
+                $DB->delete_records_select(
+                    'local_ai_course_assistant_convs',
+                    'userid = ? AND courseid = ? AND id > ?',
+                    [$dupe->userid, $dupe->courseid, $dupe->keepid]
+                );
+            }
+            $dbman->drop_index($table, $index);
+        }
+        $index = new xmldb_index('userid_courseid', XMLDB_INDEX_UNIQUE, ['userid', 'courseid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2026031713, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

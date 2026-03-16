@@ -49,18 +49,18 @@ class email_study_notes extends external_api {
         require_capability('local/ai_course_assistant:use', $context);
 
         $course = $DB->get_record('course', ['id' => $params['courseid']], 'id,fullname', MUST_EXIST);
-        $displayName = get_config('local_ai_course_assistant', 'display_name') ?: 'SOLA';
+        $display_name = get_config('local_ai_course_assistant', 'display_name') ?: 'SOLA';
 
         $message = new \core\message\message();
         $message->component = 'local_ai_course_assistant';
         $message->name = 'study_notes';
         $message->userfrom = \core_user::get_noreply_user();
         $message->userto = $USER;
-        $message->subject = $displayName . ' Study Notes — ' . $course->fullname;
+        $message->subject = $display_name . ' Study Notes — ' . $course->fullname;
         $message->fullmessage = $params['notes'];
         $message->fullmessageformat = FORMAT_PLAIN;
         $message->fullmessagehtml = '<div style="font-family:sans-serif;max-width:600px">'
-            . '<h2>' . $displayName . ' Study Notes</h2>'
+            . '<h2>' . $display_name . ' Study Notes</h2>'
             . '<p><strong>Course:</strong> ' . htmlspecialchars($course->fullname) . '</p>'
             . '<hr>'
             . '<div style="white-space:pre-wrap">' . htmlspecialchars($params['notes']) . '</div>'

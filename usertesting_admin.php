@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Load current task set.
 usertesting_manager::ensure_default_taskset();
 $taskset = usertesting_manager::get_active_taskset($courseid);
-$isInherited = ($taskset && (int) $taskset->courseid !== $courseid && $courseid > 0);
+$is_inherited = ($taskset && (int) $taskset->courseid !== $courseid && $courseid > 0);
 $tasks = $taskset ? $taskset->tasks : usertesting_manager::DEFAULT_TASKS;
 $title = $taskset ? $taskset->title : 'SOLA Usability Test';
 $externalurl = ($taskset && isset($taskset->external_url)) ? $taskset->external_url : '';
@@ -224,7 +224,7 @@ echo $OUTPUT->header();
         </div>
     </div>
 
-    <?php if ($isInherited): ?>
+    <?php if ($is_inherited): ?>
     <div class="aica-ut-inherited-badge">
         This course has no custom task set. Showing the global default. Edit below to create a course-specific override.
     </div>
@@ -259,7 +259,7 @@ echo $OUTPUT->header();
         <div class="d-flex flex-wrap" style="gap:8px;margin-top:16px">
             <button type="submit" class="btn btn-primary">Save Task Set</button>
             <button type="button" class="btn btn-outline-secondary" id="aica-ut-preview-btn">Preview</button>
-            <?php if ($courseid > 0 && !$isInherited): ?>
+            <?php if ($courseid > 0 && !$is_inherited): ?>
             <button type="button" class="btn btn-outline-danger" id="aica-ut-reset-btn">Remove Course Override</button>
             <?php elseif ($courseid === 0): ?>
             <button type="button" class="btn btn-outline-danger" id="aica-ut-reset-btn">Reset to Defaults</button>

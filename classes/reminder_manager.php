@@ -57,17 +57,16 @@ class reminder_manager {
 
         // Check channel is enabled.
         if ($channel === 'email' && !get_config('local_ai_course_assistant', 'reminders_email_enabled')) {
-            throw new \moodle_exception('invalidparameter', 'error', '', 'Email reminders are not enabled.');
+            throw new \moodle_exception('error_reminders_email_disabled', 'local_ai_course_assistant');
         }
         if ($channel === 'whatsapp' && !get_config('local_ai_course_assistant', 'reminders_whatsapp_enabled')) {
-            throw new \moodle_exception('invalidparameter', 'error', '', 'WhatsApp reminders are not enabled.');
+            throw new \moodle_exception('error_reminders_whatsapp_disabled', 'local_ai_course_assistant');
         }
 
         // Check country restrictions for WhatsApp.
         if ($channel === 'whatsapp' && !empty($countrycode)) {
             if (self::is_country_blocked($countrycode)) {
-                throw new \moodle_exception('invalidparameter', 'error', '',
-                    'WhatsApp reminders are not available in your country.');
+                throw new \moodle_exception('error_reminders_whatsapp_country_blocked', 'local_ai_course_assistant');
             }
         }
 

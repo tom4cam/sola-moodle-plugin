@@ -43,7 +43,7 @@ $PAGE->set_url($pageurl);
 $PAGE->set_title(get_string('coursesettings:title', 'local_ai_course_assistant'));
 $PAGE->set_heading($course->fullname . ': ' . get_string('coursesettings:title', 'local_ai_course_assistant'));
 $PAGE->set_pagelayout('admin');
-$PAGE->set_context($syscontext);
+$PAGE->set_context($context);
 
 // Global admin settings URL for the "back to global" link.
 $globalsettingsurl = new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant']);

@@ -31,6 +31,11 @@ use local_ai_course_assistant\study_planner;
  */
 class update_study_plan extends external_api {
 
+    /**
+     * Returns description of method parameters.
+     *
+     * @return external_function_parameters
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
@@ -41,6 +46,16 @@ class update_study_plan extends external_api {
         ]);
     }
 
+    /**
+     * Save or update a study plan for the current user.
+     *
+     * @param int $courseid The course ID.
+     * @param float $hours_per_week Hours per week the student plans to study.
+     * @param string $preferred_days Comma-separated preferred study days.
+     * @param string $preferred_time Preferred time of day for studying.
+     * @param string $plan_data JSON-encoded plan data.
+     * @return array Success flag.
+     */
     public static function execute(
         int $courseid,
         float $hours_per_week,
@@ -76,6 +91,11 @@ class update_study_plan extends external_api {
         return ['success' => true];
     }
 
+    /**
+     * Returns description of method result value.
+     *
+     * @return external_single_structure
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'success' => new external_value(PARAM_BOOL, 'Success flag'),

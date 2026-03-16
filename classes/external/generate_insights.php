@@ -81,10 +81,10 @@ class generate_insights extends external_api {
         // Gather usability testing data.
         $uttext = '';
         try {
-            $utResults = \local_ai_course_assistant\usertesting_manager::get_results($courseid);
-            if ($utResults['total_respondents'] > 0) {
-                $uttext = "## Usability Testing Results ({$utResults['total_respondents']} respondents)\n\n";
-                foreach ($utResults['tasks'] as $t) {
+            $ut_results = \local_ai_course_assistant\usertesting_manager::get_results($courseid);
+            if ($ut_results['total_respondents'] > 0) {
+                $uttext = "## Usability Testing Results ({$ut_results['total_respondents']} respondents)\n\n";
+                foreach ($ut_results['tasks'] as $t) {
                     $uttext .= "### Task: {$t['instruction']}\n";
                     $uttext .= "Type: {$t['type']} | Responses: {$t['response_count']} | "
                         . "Avg messages: {$t['avg_messages']} | Avg session: {$t['avg_session_minutes']} min\n";
@@ -120,10 +120,10 @@ class generate_insights extends external_api {
         // Gather survey data.
         $surveytext = '';
         try {
-            $surveyResults = \local_ai_course_assistant\survey_manager::get_survey_results($courseid, 0);
-            if ($surveyResults['total_responses'] > 0) {
-                $surveytext = "## Survey Results ({$surveyResults['total_responses']} responses)\n\n";
-                foreach ($surveyResults['questions'] as $q) {
+            $survey_results = \local_ai_course_assistant\survey_manager::get_survey_results($courseid, 0);
+            if ($survey_results['total_responses'] > 0) {
+                $surveytext = "## Survey Results ({$survey_results['total_responses']} responses)\n\n";
+                foreach ($survey_results['questions'] as $q) {
                     $surveytext .= "### Q: {$q['text']}\n";
                     $surveytext .= "Type: {$q['type']} | Responses: {$q['response_count']}\n";
 

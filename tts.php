@@ -54,7 +54,7 @@ if (empty($apikey)) {
 }
 if (empty($apikey)) {
     http_response_code(503);
-    echo json_encode(['error' => 'No OpenAI API key configured for TTS.']);
+    echo json_encode(['error' => get_string('error_no_tts_key', 'local_ai_course_assistant')]);
     exit;
 }
 
