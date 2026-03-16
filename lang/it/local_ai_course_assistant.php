@@ -256,10 +256,10 @@ $string['chat:quiz_locked'] = 'SOLA è in pausa durante i quiz per supportare l\
 $string['chat:mode_nav'] = 'Navigazione modalità';
 $string['chat:mode_chat'] = 'Chat';
 $string['chat:mode_voice'] = 'Voce';
-$string['chat:mode_history'] = 'Cronologia';
+$string['chat:mode_history'] = 'Note';
 
 // History panel.
-$string['chat:history_title'] = 'Cronologia conversazioni';
+$string['chat:history_title'] = 'Note e cronologia della conversazione';
 $string['chat:history_subtitle'] = 'I tuoi messaggi recenti in questo corso.';
 $string['chat:history_empty'] = 'Ancora nessuna conversazione.';
 $string['chat:history_refresh'] = 'Aggiorna';

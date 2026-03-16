@@ -327,6 +327,15 @@ $string['chat:voice_speaking'] = 'SOLA কথা বলছে...';
 $string['chat:voice_idle'] = 'প্রস্তুত';
 $string['chat:voice_error'] = 'ভয়েস সংযোগ ব্যর্থ হয়েছে। আপনার সেটিংস পরীক্ষা করুন।';
 $string['chat:quiz_locked'] = 'একাডেমিক সততা সমর্থনের জন্য কুইজ চলাকালীন SOLA বিরতিতে রয়েছে। শুভকামনা!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'নোট';
+
+// History panel.
+$string['chat:history_title'] = 'নোট এবং কথোপকথনের ইতিহাস';
 $string['task:send_inactivity_reminders'] = 'সাপ্তাহিক নিষ্ক্রিয়তা স্মরণ ইমেল পাঠান';
 $string['messageprovider:study_notes'] = 'অধ্যয়ন সেশন নোট';
 $string['task:send_inactivity_reminders'] = 'সাপ্তাহিক নিষ্ক্রিয়তা অনুস্মারক ইমেল পাঠান';

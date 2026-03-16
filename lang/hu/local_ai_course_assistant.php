@@ -256,10 +256,10 @@ $string['chat:quiz_locked'] = 'A SOLA szünetel a tesztek alatt az akadémiai ti
 $string['chat:mode_nav'] = 'Mód navigáció';
 $string['chat:mode_chat'] = 'Csevegés';
 $string['chat:mode_voice'] = 'Hang';
-$string['chat:mode_history'] = 'Előzmények';
+$string['chat:mode_history'] = 'Jegyzetek';
 
 // History panel.
-$string['chat:history_title'] = 'Beszélgetési előzmények';
+$string['chat:history_title'] = 'Jegyzetek és beszélgetési előzmények';
 $string['chat:history_subtitle'] = 'Legutóbbi üzenetei ebben a kurzusban.';
 $string['chat:history_empty'] = 'Még nincsenek beszélgetések.';
 $string['chat:history_refresh'] = 'Frissítés';

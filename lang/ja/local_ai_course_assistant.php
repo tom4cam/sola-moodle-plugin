@@ -329,5 +329,14 @@ $string['chat:voice_speaking'] = 'SOLAが話しています...';
 $string['chat:voice_idle'] = '準備完了';
 $string['chat:voice_error'] = '音声接続に失敗しました。設定を確認してください。';
 $string['chat:quiz_locked'] = '学術的誠実性を維持するため、クイズ中はSOLAを一時停止しています。頑張ってください！';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'メモ';
+
+// History panel.
+$string['chat:history_title'] = 'メモと会話履歴';
 $string['task:send_inactivity_reminders'] = '週次の非アクティビティリマインダーメールを送信する';
 $string['messageprovider:study_notes'] = '学習セッションノート';

@@ -546,10 +546,10 @@ $string['chat:quiz_locked']             = 'SOLA is paused during quizzes to supp
 $string['chat:mode_nav']                = 'Mode navigation';
 $string['chat:mode_chat']               = 'Chat';
 $string['chat:mode_voice']              = 'Voice';
-$string['chat:mode_history']            = 'History';
+$string['chat:mode_history']            = 'Notes';
 
 // History panel.
-$string['chat:history_title']           = 'Conversation History';
+$string['chat:history_title']           = 'Notes and Conversation History';
 $string['chat:history_subtitle']        = 'Your recent messages in this course.';
 $string['chat:history_empty']           = 'No conversations yet.';
 $string['chat:history_refresh']         = 'Refresh';

@@ -350,6 +350,15 @@ $string['chat:voice_speaking'] = 'SOLA anazungumza...';
 $string['chat:voice_idle'] = 'Tayari';
 $string['chat:voice_error'] = 'Muunganisho wa sauti umeshindwa. Tafadhali angalia mipangilio yako.';
 $string['chat:quiz_locked'] = 'SOLA imesimamishwa wakati wa mitihani ili kusaidia uaminifu wa kitaaluma. Bahati njema!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Maelezo';
+
+// History panel.
+$string['chat:history_title'] = 'Maelezo na Historia ya Mazungumzo';
 $string['task:send_inactivity_reminders'] = 'Tuma barua pepe za ukumbusho wa kila wiki kwa kutokuwa na shughuli';
 $string['messageprovider:study_notes'] = 'Maelezo ya kipindi cha masomo';
 $string['task:send_inactivity_reminders'] = 'Tuma barua pepe za ukumbusho wa kutofanya kazi kila wiki';

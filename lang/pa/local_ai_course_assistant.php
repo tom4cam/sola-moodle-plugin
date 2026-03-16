@@ -350,6 +350,15 @@ $string['chat:voice_speaking'] = 'SOLA ਬੋਲ ਰਿਹਾ ਹੈ...';
 $string['chat:voice_idle'] = 'ਤਿਆਰ';
 $string['chat:voice_error'] = 'ਆਵਾਜ਼ ਕਨੈਕਸ਼ਨ ਅਸਫਲ ਰਿਹਾ। ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀਆਂ ਸੈਟਿੰਗਾਂ ਜਾਂਚੋ।';
 $string['chat:quiz_locked'] = 'ਅਕਾਦਮਿਕ ਇਮਾਨਦਾਰੀ ਦਾ ਸਮਰਥਨ ਕਰਨ ਲਈ ਕੁਇਜ਼ ਦੌਰਾਨ SOLA ਰੁਕਿਆ ਹੋਇਆ ਹੈ। ਸ਼ੁਭ ਕਾਮਨਾਵਾਂ!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'ਨੋਟਸ';
+
+// History panel.
+$string['chat:history_title'] = 'ਨੋਟਸ ਅਤੇ ਗੱਲਬਾਤ ਦਾ ਇਤਿਹਾਸ';
 $string['task:send_inactivity_reminders'] = 'ਹਫ਼ਤਾਵਾਰੀ ਅਕਿਰਿਆਸ਼ੀਲਤਾ ਯਾਦ-ਦਹਾਨੀ ਈਮੇਲ ਭੇਜੋ';
 $string['messageprovider:study_notes'] = 'ਅਧਿਐਨ ਸੈਸ਼ਨ ਨੋਟਸ';
 $string['task:send_inactivity_reminders'] = 'ਹਫ਼ਤਾਵਾਰੀ ਅਕਿਰਿਆਸ਼ੀਲਤਾ ਯਾਦ-ਦਹਾਨੀ ਈਮੇਲ ਭੇਜੋ';

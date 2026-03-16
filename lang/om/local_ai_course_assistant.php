@@ -333,5 +333,14 @@ $string['chat:voice_speaking'] = 'SOLA dubbataa jira...';
 $string['chat:voice_idle'] = 'Qophii dha';
 $string['chat:voice_error'] = 'Walitti hidhamuu sagalee kufee. Maaloo qindaa\'ina kee ilaalii.';
 $string['chat:quiz_locked'] = 'SOLA qormaata yeroo dhaabbatee jira akka haqiinsaa barnootaa deeggaruuf. Carraa gaarii!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Yaadannoo';
+
+// History panel.
+$string['chat:history_title'] = 'Yaadannoo fi Seenaa Dubbii';
 $string['task:send_inactivity_reminders'] = 'Ergaa yaadannoo torban torbaniin socho\'ummaa dhabuu erguu';
 $string['messageprovider:study_notes'] = 'Yaadannoo yeroo qo\'annoo';

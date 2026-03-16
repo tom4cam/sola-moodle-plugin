@@ -329,5 +329,14 @@ $string['chat:voice_speaking'] = 'SOLA vorbește...';
 $string['chat:voice_idle'] = 'Pregătit';
 $string['chat:voice_error'] = 'Conexiunea vocală a eșuat. Verificați setările.';
 $string['chat:quiz_locked'] = 'SOLA este în pauză în timpul testelor pentru a păstra integritatea academică. Succes!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Note';
+
+// History panel.
+$string['chat:history_title'] = 'Note și istoricul conversației';
 $string['task:send_inactivity_reminders'] = 'Trimiteți e-mailuri săptămânale de memento privind inactivitatea';
 $string['messageprovider:study_notes'] = 'Note ale sesiunii de studiu';

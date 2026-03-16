@@ -329,5 +329,14 @@ $string['chat:voice_speaking'] = 'SOLA spreekt...';
 $string['chat:voice_idle'] = 'Gereed';
 $string['chat:voice_error'] = 'Stemverbinding mislukt. Controleer uw instellingen.';
 $string['chat:quiz_locked'] = 'SOLA is gepauzeerd tijdens quizzen om academische integriteit te waarborgen. Succes!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Notities';
+
+// History panel.
+$string['chat:history_title'] = 'Notities en gespreksgeschiedenis';
 $string['task:send_inactivity_reminders'] = 'Wekelijkse herinneringse-mails bij inactiviteit verzenden';
 $string['messageprovider:study_notes'] = 'Notities van studiesessie';

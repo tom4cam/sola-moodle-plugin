@@ -350,6 +350,15 @@ $string['chat:voice_speaking'] = 'SOLA está falando...';
 $string['chat:voice_idle'] = 'Pronto';
 $string['chat:voice_error'] = 'Falha na conexão de voz. Verifique suas configurações.';
 $string['chat:quiz_locked'] = 'SOLA está pausado durante os quizzes para apoiar a integridade acadêmica. Boa sorte!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Notas';
+
+// History panel.
+$string['chat:history_title'] = 'Notas e histórico de conversa';
 $string['task:send_inactivity_reminders'] = 'Enviar e-mails semanais de lembrete de inatividade';
 $string['messageprovider:study_notes'] = 'Notas da sessão de estudo';
 $string['task:send_inactivity_reminders'] = 'Enviar e-mails de lembrete semanal de inatividade';

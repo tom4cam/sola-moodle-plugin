@@ -350,6 +350,15 @@ $string['chat:voice_speaking'] = 'SOLA ń sọ̀rọ̀...';
 $string['chat:voice_idle'] = 'Ó ti ṣetán';
 $string['chat:voice_error'] = 'Ìsopọ̀ ohùn kùnà. Jọ̀wọ́ ṣàyẹ̀wò àwọn ètò rẹ.';
 $string['chat:quiz_locked'] = 'SOLA dáwọ́ dúró nígbà ìdánwò láti ṣe àtìlẹyìn ìmọ̀ ẹ̀kọ́ tó tọ̀. Ire o!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Àkọsílẹ̀';
+
+// History panel.
+$string['chat:history_title'] = 'Àkọsílẹ̀ àti Ìtàn Ìfọ̀rọ̀wánilẹ́nuwò';
 $string['task:send_inactivity_reminders'] = 'Fi àwọn ìmẹ́lì ìránlọ́wọ́ ọ̀ṣọ̀ọ̀ṣẹ̀ ránṣẹ́ nítorí àìṣiṣẹ́';
 $string['messageprovider:study_notes'] = 'Àwọn àkọsílẹ̀ àkókò ìkẹ́kọ̀ọ́';
 $string['task:send_inactivity_reminders'] = 'Fi imeeli iranti aiṣiṣẹ ni ọsẹ-ọsẹ ranṣẹ';

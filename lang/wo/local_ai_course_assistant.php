@@ -350,6 +350,15 @@ $string['chat:voice_speaking'] = 'SOLA dañuy wax...';
 $string['chat:voice_idle'] = 'Jëm';
 $string['chat:voice_error'] = 'Connexion jàng bi defoo kaay. Seeti sa réglages yi.';
 $string['chat:quiz_locked'] = 'SOLA dafa suspendu ci kanam ëntërviu yi ngir soxor intégrité académique bi. Yëgël sa jàng!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Xam-xam';
+
+// History panel.
+$string['chat:history_title'] = 'Xam-xam ak Waxtaan bi';
 $string['task:send_inactivity_reminders'] = 'Yónne bataaxal ci ayu-bis yu ngën-ngën yi ngir bañ liggéey';
 $string['messageprovider:study_notes'] = 'Téere yi ci diggante jàng bi';
 $string['task:send_inactivity_reminders'] = 'Yónnal bataaxal xalaat ci at ci biir ayu-bés';

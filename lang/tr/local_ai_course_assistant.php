@@ -329,5 +329,14 @@ $string['chat:voice_speaking'] = 'SOLA konuşuyor...';
 $string['chat:voice_idle'] = 'Hazır';
 $string['chat:voice_error'] = 'Ses bağlantısı başarısız oldu. Lütfen ayarlarınızı kontrol edin.';
 $string['chat:quiz_locked'] = 'Akademik dürüstlüğü korumak için testler sırasında SOLA duraklatılmıştır. İyi şanslar!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Notlar';
+
+// History panel.
+$string['chat:history_title'] = 'Notlar ve Konuşma Geçmişi';
 $string['task:send_inactivity_reminders'] = 'Haftalık hareketsizlik hatırlatma e-postaları gönder';
 $string['messageprovider:study_notes'] = 'Çalışma oturumu notları';

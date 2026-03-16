@@ -329,5 +329,14 @@ $string['chat:voice_speaking'] = 'SOLA taler...';
 $string['chat:voice_idle'] = 'Klar';
 $string['chat:voice_error'] = 'Stemmeforbindelsen mislykkedes. Kontroller venligst dine indstillinger.';
 $string['chat:quiz_locked'] = 'SOLA er sat på pause under quizzer for at bevare akademisk integritet. Held og lykke!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Noter';
+
+// History panel.
+$string['chat:history_title'] = 'Noter og samtalehistorik';
 $string['task:send_inactivity_reminders'] = 'Send ugentlige påmindelses-e-mails ved inaktivitet';
 $string['messageprovider:study_notes'] = 'Studiesessionsnotater';

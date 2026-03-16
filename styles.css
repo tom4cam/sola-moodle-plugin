@@ -683,6 +683,16 @@ a.aica-source-pill:hover svg {
     font-size: 12px;
     line-height: 1.5;
     color: #52616c;
+    cursor: default;
+    border-radius: 4px;
+    padding: 2px 4px;
+    transition: background 0.15s, outline 0.15s;
+}
+.aica-history-panel__message--editing {
+    background: #f8fafc;
+    outline: 1.5px solid var(--aica-brand-color, #173140);
+    cursor: text;
+    white-space: pre-wrap;
 }
 
 .aica-mode-card__status {

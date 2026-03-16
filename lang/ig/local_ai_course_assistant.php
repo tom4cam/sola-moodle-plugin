@@ -344,6 +344,15 @@ $string['chat:voice_speaking'] = 'SOLA na-ekwu okwu...';
 $string['chat:voice_idle'] = 'Dị njikere';
 $string['chat:voice_error'] = 'Njikọ olu dara ada. Biko lelee ntọala gị.';
 $string['chat:quiz_locked'] = 'A kwụsịtara SOLA n\'oge ule iji kwado ịdị ziri ezi n\'ọmụmụ ihe. Ọ ga-adị mma!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Ndetu';
+
+// History panel.
+$string['chat:history_title'] = 'Ndetu na Akụkọ Mkparịta Ụka';
 $string['task:send_inactivity_reminders'] = 'Ziga ozi email ncheta nke izu nke izu maka enweghị ọrụ';
 $string['messageprovider:study_notes'] = 'Ndetu oge ọmụmụ ihe';
 $string['task:send_inactivity_reminders'] = 'Ziga ozi email ncheta nke izu maka enweghị ọrụ';

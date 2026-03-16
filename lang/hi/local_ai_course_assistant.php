@@ -358,6 +358,15 @@ $string['chat:voice_speaking'] = 'SOLA बोल रही है...';
 $string['chat:voice_idle'] = 'तैयार';
 $string['chat:voice_error'] = 'वॉइस कनेक्शन विफल हुआ। कृपया अपनी सेटिंग जाँचें।';
 $string['chat:quiz_locked'] = 'शैक्षणिक ईमानदारी बनाए रखने के लिए प्रश्नोत्तरी के दौरान SOLA रुकी हुई है। शुभकामनाएँ!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'नोट्स';
+
+// History panel.
+$string['chat:history_title'] = 'नोट्स और बातचीत का इतिहास';
 $string['task:send_inactivity_reminders'] = 'साप्ताहिक निष्क्रियता अनुस्मारक ईमेल भेजें';
 $string['messageprovider:study_notes'] = 'अध्ययन सत्र नोट्स';
 $string['task:send_inactivity_reminders'] = 'साप्ताहिक निष्क्रियता अनुस्मारक ईमेल भेजें';

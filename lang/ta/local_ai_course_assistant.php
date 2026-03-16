@@ -350,6 +350,15 @@ $string['chat:voice_speaking'] = 'SOLA பேசுகிறது...';
 $string['chat:voice_idle'] = 'தயார்';
 $string['chat:voice_error'] = 'குரல் இணைப்பு தோல்வியுற்றது. அமைப்புகளை சரிபார்க்கவும்.';
 $string['chat:quiz_locked'] = 'கல்வி நேர்மையை ஆதரிக்க வினாடி வினாக்களின் போது SOLA இடைநிறுத்தப்பட்டுள்ளது. வாழ்த்துக்கள்!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'குறிப்புகள்';
+
+// History panel.
+$string['chat:history_title'] = 'குறிப்புகள் மற்றும் உரையாடல் வரலாறு';
 $string['task:send_inactivity_reminders'] = 'வாராந்திர செயலற்ற நிலை நினைவூட்டல் மின்னஞ்சல்களை அனுப்பு';
 $string['messageprovider:study_notes'] = 'படிப்பு அமர்வு குறிப்புகள்';
 $string['task:send_inactivity_reminders'] = 'வாராந்திர செயலற்ற நினைவூட்டல் மின்னஞ்சல்களை அனுப்பவும்';

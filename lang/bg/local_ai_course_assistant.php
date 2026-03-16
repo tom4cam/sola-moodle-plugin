@@ -329,5 +329,14 @@ $string['chat:voice_speaking'] = 'SOLA говори...';
 $string['chat:voice_idle'] = 'Готово';
 $string['chat:voice_error'] = 'Гласовата връзка не бе осъществена. Моля, проверете настройките си.';
 $string['chat:quiz_locked'] = 'SOLA е на пауза по време на тестове, за да се запази академичната почтеност. Успех!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Бележки';
+
+// History panel.
+$string['chat:history_title'] = 'Бележки и история на разговора';
 $string['task:send_inactivity_reminders'] = 'Изпращане на седмични имейли за напомняне при неактивност';
 $string['messageprovider:study_notes'] = 'Бележки от учебна сесия';

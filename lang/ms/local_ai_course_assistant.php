@@ -350,6 +350,15 @@ $string['chat:voice_speaking'] = 'SOLA sedang bercakap...';
 $string['chat:voice_idle'] = 'Sedia';
 $string['chat:voice_error'] = 'Sambungan suara gagal. Sila semak tetapan anda.';
 $string['chat:quiz_locked'] = 'SOLA dijeda semasa kuiz untuk menyokong integriti akademik. Semoga berjaya!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Nota';
+
+// History panel.
+$string['chat:history_title'] = 'Nota dan Sejarah Perbualan';
 $string['task:send_inactivity_reminders'] = 'Hantar e-mel peringatan ketidakaktifan mingguan';
 $string['messageprovider:study_notes'] = 'Nota sesi pengajian';
 $string['task:send_inactivity_reminders'] = 'Hantar e-mel peringatan ketidakaktifan mingguan';

@@ -256,10 +256,10 @@ $string['chat:quiz_locked'] = 'SOLA מושהה במהלך מבחנים כדי ל
 $string['chat:mode_nav'] = 'ניווט מצבים';
 $string['chat:mode_chat'] = 'צ\'אט';
 $string['chat:mode_voice'] = 'קול';
-$string['chat:mode_history'] = 'היסטוריה';
+$string['chat:mode_history'] = 'הערות';
 
 // History panel.
-$string['chat:history_title'] = 'היסטוריית שיחות';
+$string['chat:history_title'] = 'הערות והיסטוריית שיחות';
 $string['chat:history_subtitle'] = 'ההודעות האחרונות שלך בקורס זה.';
 $string['chat:history_empty'] = 'אין שיחות עדיין.';
 $string['chat:history_refresh'] = 'רענן';

@@ -329,5 +329,14 @@ $string['chat:voice_speaking'] = 'SOLA mluví...';
 $string['chat:voice_idle'] = 'Připraveno';
 $string['chat:voice_error'] = 'Hlasové připojení selhalo. Zkontrolujte prosím svá nastavení.';
 $string['chat:quiz_locked'] = 'SOLA je během testů pozastavena, aby byla zachována akademická integrita. Hodně štěstí!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Poznámky';
+
+// History panel.
+$string['chat:history_title'] = 'Poznámky a historie konverzace';
 $string['task:send_inactivity_reminders'] = 'Odeslat týdenní e-maily s připomínkou při nečinnosti';
 $string['messageprovider:study_notes'] = 'Poznámky ze studijní relace';

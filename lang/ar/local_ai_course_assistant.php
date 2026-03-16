@@ -327,6 +327,15 @@ $string['chat:voice_speaking'] = 'SOLA يتحدث...';
 $string['chat:voice_idle'] = 'جاهز';
 $string['chat:voice_error'] = 'فشل الاتصال الصوتي. يرجى التحقق من إعداداتك.';
 $string['chat:quiz_locked'] = 'تم إيقاف SOLA مؤقتًا أثناء الاختبارات دعمًا للنزاهة الأكاديمية. حظًا موفقًا!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'ملاحظات';
+
+// History panel.
+$string['chat:history_title'] = 'الملاحظات وتاريخ المحادثة';
 $string['task:send_inactivity_reminders'] = 'إرسال رسائل تذكير أسبوعية بالبريد الإلكتروني بسبب عدم النشاط';
 $string['messageprovider:study_notes'] = 'ملاحظات جلسة الدراسة';
 $string['task:send_inactivity_reminders'] = 'إرسال رسائل تذكير أسبوعية بعدم النشاط';

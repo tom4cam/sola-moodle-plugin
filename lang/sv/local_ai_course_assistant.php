@@ -329,5 +329,14 @@ $string['chat:voice_speaking'] = 'SOLA talar...';
 $string['chat:voice_idle'] = 'Redo';
 $string['chat:voice_error'] = 'Röstanslutningen misslyckades. Kontrollera dina inställningar.';
 $string['chat:quiz_locked'] = 'SOLA är pausad under quiz för att bevara akademisk integritet. Lycka till!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Anteckningar';
+
+// History panel.
+$string['chat:history_title'] = 'Anteckningar och konversationshistorik';
 $string['task:send_inactivity_reminders'] = 'Skicka veckovisa påminnelser om inaktivitet via e-post';
 $string['messageprovider:study_notes'] = 'Studiesessionsanteckningar';

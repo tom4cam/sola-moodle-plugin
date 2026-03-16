@@ -347,5 +347,14 @@ $string['chat:voice_speaking'] = 'SOLA ayaa hadlaysa...';
 $string['chat:voice_idle'] = 'Diyaar';
 $string['chat:voice_error'] = 'Xiriirka codka ayaa ku guuldareystay. Fadlan hubi dejimaha.';
 $string['chat:quiz_locked'] = 'SOLA waa la joojiyay inta lagu jiro imtixaanada si loo taageerayo daacadnimada akadeemiga. Nasiib wanaagsan!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Xusuusin';
+
+// History panel.
+$string['chat:history_title'] = 'Xusuusin iyo Taariikhdii Wada-hadalka';
 $string['task:send_inactivity_reminders'] = 'Dir iimaylasha xusuusinta toddobaadlaha ee aan firfircoonayn';
 $string['messageprovider:study_notes'] = 'Qoraallada fadhiga daraasadda';

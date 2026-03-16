@@ -350,6 +350,15 @@ $string['chat:voice_speaking'] = 'SOLA ikhuluma...';
 $string['chat:voice_idle'] = 'Ilungile';
 $string['chat:voice_error'] = 'Ukuxhumana kwezwi kuhlulekile. Sicela uhlole izilungiselelo zakho.';
 $string['chat:quiz_locked'] = 'SOLA imisiwe ngesikhathi sokuhlola ukuze isekele ubuqotho bezemfundo. Ngikufisela inhlanhla!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Amanothi';
+
+// History panel.
+$string['chat:history_title'] = 'Amanothi nomlando wengxoxo';
 $string['task:send_inactivity_reminders'] = 'Thumela ama-imeyili esikhumbuzo samasonto ngokungasebenzi';
 $string['messageprovider:study_notes'] = 'Amanothi esikhathi sokufunda';
 $string['task:send_inactivity_reminders'] = 'Thumela ama-imeyili esikhumbuzo sokungasebenzi njalo ngesonto';

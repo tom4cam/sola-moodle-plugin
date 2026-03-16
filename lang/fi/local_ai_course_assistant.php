@@ -329,5 +329,14 @@ $string['chat:voice_speaking'] = 'SOLA puhuu...';
 $string['chat:voice_idle'] = 'Valmis';
 $string['chat:voice_error'] = 'Ääniyhteys epäonnistui. Tarkista asetuksesi.';
 $string['chat:quiz_locked'] = 'SOLA on tauolla kokeiden aikana akateemisen rehellisyyden säilyttämiseksi. Onnea!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Muistiinpanot';
+
+// History panel.
+$string['chat:history_title'] = 'Muistiinpanot ja keskusteluhistoria';
 $string['task:send_inactivity_reminders'] = 'Lähetä viikoittaiset muistutussähköpostit toimettomuudesta';
 $string['messageprovider:study_notes'] = 'Opiskeluistunnon muistiinpanot';

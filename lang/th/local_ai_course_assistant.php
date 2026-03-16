@@ -329,5 +329,14 @@ $string['chat:voice_speaking'] = 'SOLA กำลังพูด...';
 $string['chat:voice_idle'] = 'พร้อม';
 $string['chat:voice_error'] = 'การเชื่อมต่อเสียงล้มเหลว กรุณาตรวจสอบการตั้งค่าของคุณ';
 $string['chat:quiz_locked'] = 'SOLA ถูกหยุดชั่วคราวระหว่างทำแบบทดสอบเพื่อรักษาความซื่อสัตย์ทางวิชาการ โชคดี!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'บันทึก';
+
+// History panel.
+$string['chat:history_title'] = 'บันทึกและประวัติการสนทนา';
 $string['task:send_inactivity_reminders'] = 'ส่งอีเมลแจ้งเตือนการไม่ใช้งานรายสัปดาห์';
 $string['messageprovider:study_notes'] = 'บันทึกเซสชันการเรียน';

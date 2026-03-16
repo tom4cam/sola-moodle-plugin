@@ -589,7 +589,7 @@ define([
         try { localStorage.removeItem(AVATAR_KEY); } catch (e) { /**/ }
         initSVGAvatars();
         historyPanelMessages = [];
-        setHistoryPanelView('recent');
+        setHistoryPanelView('saved');
         setBottomMode('chat');
         syncCloseTogglePosition();
 
@@ -2489,40 +2489,87 @@ define([
                 return;
             }
 
-            savedItems.forEach(function(item) {
-                const entry = document.createElement('div');
+            savedItems.forEach(function(item, itemIdx) {
+                var entry = document.createElement('div');
                 entry.className = 'aica-history-panel__item';
 
-                const meta = document.createElement('div');
+                var meta = document.createElement('div');
                 meta.className = 'aica-history-panel__meta';
 
-                const role = document.createElement('span');
+                var role = document.createElement('span');
                 role.className = 'aica-history-panel__role aica-history-panel__role--saved';
                 role.textContent = 'Saved';
                 meta.appendChild(role);
 
-                const stamp = formatHistoryTimestamp(item.saved_at || null);
+                var stamp = formatHistoryTimestamp(item.saved_at || null);
                 if (stamp) {
-                    const time = document.createElement('span');
+                    var time = document.createElement('span');
                     time.className = 'aica-history-panel__time';
                     time.textContent = stamp;
                     meta.appendChild(time);
                 }
 
-                const text = document.createElement('p');
+                var text = document.createElement('p');
                 text.className = 'aica-history-panel__message';
                 text.textContent = (item.text || '').replace(/\s+/g, ' ').trim();
 
-                const actions = document.createElement('div');
+                // Double-click or edit button to make editable.
+                var makeEditable = function() {
+                    text.contentEditable = 'true';
+                    text.classList.add('aica-history-panel__message--editing');
+                    text.focus();
+                    // Select all text.
+                    var range = document.createRange();
+                    range.selectNodeContents(text);
+                    var sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                };
+                var commitEdit = function() {
+                    text.contentEditable = 'false';
+                    text.classList.remove('aica-history-panel__message--editing');
+                    var newText = text.textContent.trim();
+                    if (newText && newText !== item.text) {
+                        // Update the bookmark in storage.
+                        var bmarks = getBookmarks();
+                        var realIdx = bmarks.length - 1 - itemIdx;
+                        if (realIdx >= 0 && realIdx < bmarks.length) {
+                            bmarks[realIdx].text = newText;
+                            saveBookmarks();
+                        }
+                    }
+                };
+                text.addEventListener('dblclick', makeEditable);
+                text.addEventListener('blur', commitEdit);
+                text.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        text.blur();
+                    }
+                    if (e.key === 'Escape') {
+                        text.textContent = (item.text || '').replace(/\s+/g, ' ').trim();
+                        text.contentEditable = 'false';
+                        text.classList.remove('aica-history-panel__message--editing');
+                    }
+                });
+
+                var actions = document.createElement('div');
                 actions.className = 'aica-history-panel__actions';
 
-                const copyBtn = document.createElement('button');
+                var editBtn = document.createElement('button');
+                editBtn.type = 'button';
+                editBtn.className = 'aica-history-panel__action';
+                editBtn.textContent = 'Edit';
+                editBtn.addEventListener('click', makeEditable);
+                actions.appendChild(editBtn);
+
+                var copyBtn = document.createElement('button');
                 copyBtn.type = 'button';
                 copyBtn.className = 'aica-history-panel__action';
                 copyBtn.textContent = 'Copy';
                 copyBtn.addEventListener('click', function() {
                     if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(item.text || '').then(function() {
+                        navigator.clipboard.writeText(text.textContent || '').then(function() {
                             showNotification('Saved response copied');
                         }).catch(function() {
                             showNotification('Could not copy saved response right now.', 'error');
@@ -2531,7 +2578,7 @@ define([
                 });
                 actions.appendChild(copyBtn);
 
-                const removeBtn = document.createElement('button');
+                var removeBtn = document.createElement('button');
                 removeBtn.type = 'button';
                 removeBtn.className = 'aica-history-panel__action';
                 removeBtn.textContent = 'Remove';
@@ -2600,31 +2647,95 @@ define([
         const assistantLabel = panel.dataset.assistantLabel || 'SOLA';
 
         items.forEach(function(msg) {
-            const entry = document.createElement('div');
+            var entry = document.createElement('div');
             entry.className = 'aica-history-panel__item';
 
-            const meta = document.createElement('div');
+            var meta = document.createElement('div');
             meta.className = 'aica-history-panel__meta';
 
-            const role = document.createElement('span');
+            var role = document.createElement('span');
             role.className = 'aica-history-panel__role aica-history-panel__role--' + msg.role;
             role.textContent = msg.role === 'user' ? youLabel : assistantLabel;
             meta.appendChild(role);
 
-            const stamp = formatHistoryTimestamp(msg.timestamp);
+            var stamp = formatHistoryTimestamp(msg.timestamp);
             if (stamp) {
-                const time = document.createElement('span');
+                var time = document.createElement('span');
                 time.className = 'aica-history-panel__time';
                 time.textContent = stamp;
                 meta.appendChild(time);
             }
 
-            const text = document.createElement('p');
+            var text = document.createElement('p');
             text.className = 'aica-history-panel__message';
             text.textContent = msg.text.length > 180 ? msg.text.slice(0, 177).trim() + '...' : msg.text;
 
             entry.appendChild(meta);
             entry.appendChild(text);
+
+            // Footer row: source link left, action buttons right.
+            var entryFooter = document.createElement('div');
+            entryFooter.className = 'aica-history-panel__footer';
+            if (msg.source) {
+                var srcEl;
+                if (msg.sourceHref) {
+                    srcEl = document.createElement('a');
+                    srcEl.href = msg.sourceHref;
+                    srcEl.target = '_blank';
+                    srcEl.rel = 'noopener';
+                } else {
+                    srcEl = document.createElement('span');
+                }
+                srcEl.className = 'aica-history-panel__source';
+                srcEl.textContent = msg.source;
+                entryFooter.appendChild(srcEl);
+            } else {
+                var spacer = document.createElement('div');
+                entryFooter.appendChild(spacer);
+            }
+
+            var actions = document.createElement('div');
+            actions.className = 'aica-history-panel__actions';
+
+            var copyBtn = document.createElement('button');
+            copyBtn.type = 'button';
+            copyBtn.className = 'aica-history-panel__action';
+            copyBtn.textContent = 'Copy';
+            copyBtn.addEventListener('click', function() {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(msg.text || '').then(function() {
+                        showNotification('Message copied');
+                    }).catch(function() {
+                        showNotification('Could not copy right now.', 'error');
+                    });
+                }
+            });
+            actions.appendChild(copyBtn);
+
+            var saveBtn = document.createElement('button');
+            saveBtn.type = 'button';
+            saveBtn.className = 'aica-history-panel__action';
+            saveBtn.textContent = isBookmarked(msg.text) ? 'Saved' : 'Save';
+            saveBtn.addEventListener('click', function() {
+                var bmarks = getBookmarks();
+                if (!isBookmarked(msg.text)) {
+                    var bEntry = {text: msg.text, saved_at: Date.now()};
+                    if (msg.source) {
+                        bEntry.source = msg.source;
+                        if (msg.sourceHref) {
+                            bEntry.sourceHref = msg.sourceHref;
+                        }
+                    }
+                    bmarks.push(bEntry);
+                    saveBookmarks();
+                    showNotification('Saved!');
+                    saveBtn.textContent = 'Saved';
+                }
+            });
+            actions.appendChild(saveBtn);
+
+            entryFooter.appendChild(actions);
+            entry.appendChild(entryFooter);
             list.appendChild(entry);
         });
     };

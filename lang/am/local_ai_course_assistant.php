@@ -356,6 +356,15 @@ $string['chat:voice_speaking'] = 'SOLA እየናገረ ነው...';
 $string['chat:voice_idle'] = 'ዝግጁ';
 $string['chat:voice_error'] = 'የድምፅ ግንኙነት አልተሳካም። ቅንብሮችዎን ይፈትሹ።';
 $string['chat:quiz_locked'] = 'ሳይለር SOLA ፈተና ወቅት ተቋርጧል። ጥሩ እድል!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'ማስታወሻዎች';
+
+// History panel.
+$string['chat:history_title'] = 'ማስታወሻዎች እና የውይይት ታሪክ';
 $string['task:send_inactivity_reminders'] = 'ሳምንታዊ የእንቅስቃሴ-አልባ ማስታወሻ ኢሜይሎችን ላክ';
 $string['messageprovider:study_notes'] = 'የጥናት ክፍለ ጊዜ ማስታወሻዎች';
 $string['task:send_inactivity_reminders'] = 'ሳምንታዊ የእንቅስቃሴ ማስታወሻ ኢሜይሎችን ላክ';

@@ -329,5 +329,14 @@ $string['chat:voice_speaking'] = 'SOLA가 말하고 있습니다...';
 $string['chat:voice_idle'] = '준비됨';
 $string['chat:voice_error'] = '음성 연결에 실패했습니다. 설정을 확인하세요.';
 $string['chat:quiz_locked'] = '학술적 무결성을 위해 퀴즈 중에는 SOLA가 일시 중지됩니다. 행운을 빕니다!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = '메모';
+
+// History panel.
+$string['chat:history_title'] = '메모 및 대화 기록';
 $string['task:send_inactivity_reminders'] = '주간 비활동 알림 이메일 보내기';
 $string['messageprovider:study_notes'] = '학습 세션 노트';

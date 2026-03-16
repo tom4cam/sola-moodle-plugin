@@ -357,6 +357,15 @@ $string['chat:voice_speaking'] = 'SOLA bɛ kuma...';
 $string['chat:voice_idle'] = 'Lakɛlɛn';
 $string['chat:voice_error'] = 'Kuma jɔyɔrɔ ma se. I ka laadiliw lajɛ.';
 $string['chat:quiz_locked'] = 'SOLA datugun kɛra ɲɛtaa waati la kalansen tiɲɛya kɔlɔsili kama. I ni baara ɲuman!';
+
+// Bottom nav.
+$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_chat'] = 'Chat';
+$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_history'] = 'Dɔgɔkun';
+
+// History panel.
+$string['chat:history_title'] = 'Dɔgɔkunw ni kuma taarixi';
 $string['task:send_inactivity_reminders'] = 'Dɔgɔkun kelen kelen na hakili-jigin-bataki ci baara-bali kama';
 $string['messageprovider:study_notes'] = 'Kalanko waati sɛbɛnniw';
 $string['task:send_inactivity_reminders'] = 'Ci dɔgɔkun dɔgɔkun ladilikan bataki walasa ka baarakɛbaliya kɔfɔ';

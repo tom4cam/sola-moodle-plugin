@@ -256,10 +256,10 @@ $string['chat:quiz_locked'] = 'Ο SOLA είναι σε παύση κατά τη 
 $string['chat:mode_nav'] = 'Πλοήγηση λειτουργιών';
 $string['chat:mode_chat'] = 'Συνομιλία';
 $string['chat:mode_voice'] = 'Φωνή';
-$string['chat:mode_history'] = 'Ιστορικό';
+$string['chat:mode_history'] = 'Σημειώσεις';
 
 // History panel.
-$string['chat:history_title'] = 'Ιστορικό Συνομιλίας';
+$string['chat:history_title'] = 'Σημειώσεις και ιστορικό συνομιλίας';
 $string['chat:history_subtitle'] = 'Τα πρόσφατα μηνύματά σας σε αυτό το μάθημα.';
 $string['chat:history_empty'] = 'Δεν υπάρχουν συνομιλίες ακόμα.';
 $string['chat:history_refresh'] = 'Ανανέωση';
