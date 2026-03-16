@@ -542,6 +542,11 @@ a.aica-source-pill svg {
 a.aica-source-pill:hover svg {
     opacity: 1;
 }
+/* Extra bottom padding when source pill is present so msg-actions buttons
+   (copy/bookmark/TTS) don't overlap with the pill. */
+.local-ai-course-assistant__message--assistant .aica-source-pill {
+    margin-bottom: 22px;
+}
 
 
 /* Typing indicator */

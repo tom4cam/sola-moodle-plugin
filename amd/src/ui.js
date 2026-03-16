@@ -3919,6 +3919,7 @@ define([
         });
 
         appendMessageNode(container);
+        scrollToBottom();
     };
 
     /**
