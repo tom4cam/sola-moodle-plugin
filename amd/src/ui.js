@@ -478,15 +478,17 @@ define([
             ' fill="currentColor" aria-hidden="true">' +
             '<path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>' +
             '</svg>';
-        scrollDownBtn.addEventListener('click', function() {
+        scrollDownBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
             if (streamingEl) {
                 // Streaming in progress — enter follow mode and snap immediately.
                 scrollFollowMode = true;
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            } else {
-                // No streaming — smooth jump to bottom.
-                messagesContainer.scrollTo({top: messagesContainer.scrollHeight, behavior: 'smooth'});
             }
+            programmaticScroll = true;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            programmaticScroll = false;
+            // Hide the button immediately after clicking.
+            scrollDownBtn.classList.remove('local-ai-course-assistant__scroll-down--visible');
         });
         messagesContainer.appendChild(scrollDownBtn);
 
