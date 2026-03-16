@@ -337,14 +337,13 @@ def main():
     # Step 9: Verify deployed version.
     print("Step 9: Verifying deployment...")
     try:
-        html, _ = get(f"{BASE_URL}/admin/plugins.php?plugin=local_ai_course_assistant")
-        ver_match = re.search(r'(?:Version|version)\s*(?:</[^>]+>\s*)*(\d{10})', html)
+        html, _ = get(f"{BASE_URL}/admin/plugins.php")
+        # Look for the plugin row and its version — Moodle renders version as 10-digit YYYYMMDDNN.
+        ver_match = re.search(r'local_ai_course_assistant.*?(\d{10})', html, re.DOTALL)
         if ver_match:
             print(f"  Live version: {ver_match.group(1)}")
         else:
-            # Try the environment page
-            html, _ = get(f"{BASE_URL}/admin/environment.php")
-            print("  Could not parse version from plugins page (check manually).")
+            print("  Could not parse version (check Site Admin > Plugins).")
     except Exception as e:
         print(f"  Version check warning: {e}")
 

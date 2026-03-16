@@ -2188,7 +2188,7 @@ define([
     const showIntroModal = function(onComplete) {
         const avatarUrl = root.dataset.avatarurl || '';
         const firstName = root.dataset.firstname || '';
-        const displayName = root.dataset.displayname || 'SOLA';
+        const displayName = root.dataset.shortname || root.dataset.displayname || 'SOLA';
         const courseName = root.dataset.coursename || '';
         const customWelcome = root.dataset.welcomeMessage || '';
         const welcomeName = firstName ? ', ' + firstName : '';
@@ -2250,9 +2250,9 @@ define([
                 : '') +
             '</ul>' +
             '<div class="local-ai-course-assistant__welcome-disclaimer">' +
-            '<strong>AI notice:</strong> SOLA uses AI-generated responses to support learning. It can be wrong, incomplete, or outdated, so students should double-check important information with course materials and their instructor.' +
+            '<strong>AI notice:</strong> ' + displayName + ' uses AI-generated responses to support learning. It can be wrong, incomplete, or outdated, so students should double-check important information with course materials and their instructor.' +
             '</div>' +
-            '<button class="local-ai-course-assistant__welcome-cta">Let\'s get started \u2192</button>';
+            '<button class="local-ai-course-assistant__welcome-cta">Continue \u2192</button>';
 
         // Insert as a flex child immediately after the header so it naturally
         // starts below it — no absolute positioning or height measurement needed.
@@ -2644,7 +2644,7 @@ define([
         }
 
         const youLabel = panel.dataset.youLabel || 'You';
-        const assistantLabel = panel.dataset.assistantLabel || 'SOLA';
+        const assistantLabel = panel.dataset.assistantLabel || (root && root.dataset.shortname) || 'SOLA';
 
         items.forEach(function(msg) {
             var entry = document.createElement('div');
@@ -2982,17 +2982,6 @@ define([
         }
         bar.appendChild(middle);
 
-        // End button.
-        const endBtn = document.createElement('button');
-        endBtn.className = 'aica-voice-end';
-        endBtn.type = 'button';
-        endBtn.setAttribute('aria-label', 'End voice session');
-        endBtn.textContent = 'End';
-        endBtn.addEventListener('click', function() {
-            if (onEnd) { onEnd(); }
-        });
-        bar.appendChild(endBtn);
-
         // Insert before input area so messages remain visible above it.
         const inputArea = drawer.querySelector('.local-ai-course-assistant__input-area');
         if (inputArea) {
@@ -3034,11 +3023,12 @@ define([
         bar.classList.add('aica-voice-bar--' + state);
 
         const statusEl = bar.querySelector('.aica-voice-status');
+        var shortName = (root && root.dataset.shortname) || (root && root.dataset.displayname) || 'SOLA';
         const labels = {
             connecting:   'Connecting…',
             idle:         'Listening…',
             listening:    'Listening…',
-            speaking:     'SOLA is speaking…',
+            speaking:     shortName + ' is speaking…',
             disconnected: 'Disconnected',
         };
         if (statusEl) {

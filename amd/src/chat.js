@@ -2506,7 +2506,7 @@ define([
 
         const avatarUrl = root ? root.dataset.avatarurl : '';
         const voice = getPreferredVoice(root);
-        var assistantName = (root && root.dataset.displayname) ? root.dataset.displayname : 'SOLA';
+        var assistantName = (root && root.dataset.shortname) || (root && root.dataset.displayname) || 'SOLA';
 
         const endSession = function() {
             stopActiveVoiceSession();
@@ -2610,7 +2610,7 @@ define([
         }
 
         if (isRealtimeVoicePreferred(root)) {
-            var assistantName = (root && root.dataset.displayname) ? root.dataset.displayname : 'SOLA';
+            var assistantName = (root && root.dataset.shortname) || (root && root.dataset.displayname) || 'SOLA';
             startRealtimeVoiceSession({
                 root: root,
                 overlayInstruction: 'Start speaking \u2014 ' + assistantName +
@@ -2668,7 +2668,7 @@ define([
             return;
         }
 
-        var assistantName = (root && root.dataset.displayname) ? root.dataset.displayname : 'SOLA';
+        var assistantName = (root && root.dataset.shortname) || (root && root.dataset.displayname) || 'SOLA';
         startRealtimeVoiceSession({
             root: root,
             overlayInstruction: 'Choose a phrase to practice or start speaking \u2014 ' + assistantName +
@@ -4039,22 +4039,14 @@ define([
             addAssistantMsg(msg, null, {skipHistory: true});
             return;
         }
-        var displayName = 'SOLA';
-        var institutionName = 'Saylor University';
         var rootEl = document.getElementById('local-ai-course-assistant');
-        if (rootEl && rootEl.dataset.displayname) {
-            displayName = rootEl.dataset.displayname;
-        }
-        if (rootEl && rootEl.dataset.institution) {
-            institutionName = rootEl.dataset.institution;
-        }
+        var displayName = (rootEl && rootEl.dataset.shortname) || (rootEl && rootEl.dataset.displayname) || 'SOLA';
+        var institutionName = (rootEl && rootEl.dataset.institution) || 'Saylor University';
         Str.get_string('chat:greeting', 'local_ai_course_assistant').then(function(greeting) {
             // Replace placeholders with configured values.
             var msg = greeting.replace('{$a}', firstName || 'there');
             msg = msg.replace('{INSTITUTION}', institutionName);
-            if (displayName !== 'SOLA') {
-                msg = msg.replace(/SOLA/g, displayName);
-            }
+            msg = msg.replace(/SOLA/g, displayName);
             addAssistantMsg(msg, null, {skipHistory: true});
             return;
         }).catch(function() {
@@ -4455,7 +4447,8 @@ define([
 
         // Format as markdown.
         const markdown = messages.map(function(msg) {
-            const role = msg.role === 'user' ? 'You' : 'SOLA';
+            var rootEl = els.root || document.getElementById('local-ai-course-assistant');
+            const role = msg.role === 'user' ? 'You' : ((rootEl && rootEl.dataset.shortname) || (rootEl && rootEl.dataset.displayname) || 'SOLA');
             const timestamp = new Date(msg.timestamp || Date.now()).toLocaleString();
             return '**' + role + '** (' + timestamp + ')\n' + msg.content + '\n';
         }).join('\n---\n\n');

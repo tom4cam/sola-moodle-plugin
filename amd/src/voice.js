@@ -42,7 +42,8 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
      * Not sent to SSE (prompt is server-side); exposed so callers can test the value.
      * @type {string}
      */
-    var ELL_INSTRUCTIONS = 'You are SOLA in a real-time voice conversation. Keep responses brief (2–3 sentences). ' +
+    var ELL_INSTRUCTIONS = 'You are an AI assistant in a real-time voice conversation. Keep responses very brief (1–2 sentences max). ' +
+        'Finish speaking before expecting a response — do not ask a question and continue talking. ' +
         '[ELL Coaching Mode] You are an English conversation and pronunciation coach. While having natural ' +
         'conversation: gently correct grammar errors by modeling the correct form ("You might say: \'...\'"), ' +
         'offer pronunciation tips when speech sounds unclear. For pronunciation practice, speak a target ' +

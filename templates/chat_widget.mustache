@@ -58,6 +58,7 @@
      data-canviewanalytics="{{#canviewanalytics}}1{{/canviewanalytics}}"
      data-displaymode="{{displaymode}}"
      data-displayname="{{displayname}}"
+     data-shortname="{{shortname_label}}"
      data-institution="{{institution}}"
      data-practice-scoring="{{#practicescoring}}1{{/practicescoring}}"
      data-welcome-message="{{welcomemessage}}"
@@ -355,7 +356,7 @@
                 </div>
                 <div class="aica-mode-card__body">
                     <div class="aica-mode-card__eyebrow">{{#str}}chat:mode_voice, local_ai_course_assistant{{/str}}</div>
-                    <h3 class="aica-mode-card__title">{{#str}}chat:voice_title, local_ai_course_assistant{{/str}}</h3>
+                    <h3 class="aica-mode-card__title">Talk with {{shortname_label}} (Experimental)</h3>
                     <p class="aica-mode-card__text">{{#str}}chat:voice_copy, local_ai_course_assistant{{/str}}</p>
                     <p class="aica-mode-card__status">{{#str}}chat:voice_ready, local_ai_course_assistant{{/str}}</p>
                 </div>
