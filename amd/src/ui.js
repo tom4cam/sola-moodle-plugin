@@ -1985,20 +1985,20 @@ define([
         });
         actions.appendChild(bookmarkBtn);
 
-        // Thumbs up button.
+        // Thumbs up button — styled to match copy/bookmark/speak buttons.
         const thumbUpBtn = document.createElement('button');
-        thumbUpBtn.className = 'aica-btn-thumb';
+        thumbUpBtn.className = 'local-ai-course-assistant__btn-thumb-up';
         thumbUpBtn.setAttribute('aria-label', 'Thumbs up');
         thumbUpBtn.setAttribute('title', 'Helpful');
-        thumbUpBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>';
+        thumbUpBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88L14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88z"/></svg>';
         actions.appendChild(thumbUpBtn);
 
-        // Thumbs down button.
+        // Thumbs down button — styled to match copy/bookmark/speak buttons.
         const thumbDownBtn = document.createElement('button');
-        thumbDownBtn.className = 'aica-btn-thumb';
+        thumbDownBtn.className = 'local-ai-course-assistant__btn-thumb-down';
         thumbDownBtn.setAttribute('aria-label', 'Thumbs down');
         thumbDownBtn.setAttribute('title', 'Not helpful');
-        thumbDownBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>';
+        thumbDownBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12L10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88z"/></svg>';
         actions.appendChild(thumbDownBtn);
 
         // Wire up thumb rating handlers.
