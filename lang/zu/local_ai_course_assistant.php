@@ -273,7 +273,7 @@ $string['usersettings:data_deleted'] = 'Idatha yakho isuswe.';
 
 // === SOLA v1.0.12 — updated/new strings ===
 
-$string['chat:greeting'] = 'Sawubona, {$a}! Ngingu-SOLA, umsizi wakho wokufunda online we-{INSTITUTION}.';
+$string['chat:greeting'] = 'Sawubona, {$a}! Ngingu-SOLA. Ngingakusiza kanjani namuhla?';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = 'Vula SOLA';

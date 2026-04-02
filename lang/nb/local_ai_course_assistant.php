@@ -245,7 +245,7 @@ $string['usersettings:data_deleted'] = 'Dataene dine er slettet.';
 // === SOLA v1.0.12 — updated/new strings ===
 
 // Updated strings (override earlier values):
-$string['chat:greeting'] = 'Hei, {$a}! Jeg er SOLA, din {INSTITUTION} nettlæringsassistent.';
+$string['chat:greeting'] = 'Hei, {$a}! Jeg er SOLA. Hvordan kan jeg hjelpe deg i dag?';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = 'Åpne SOLA';

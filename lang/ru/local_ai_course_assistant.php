@@ -273,7 +273,7 @@ $string['usersettings:data_deleted'] = 'Ваши данные удалены.';
 
 // === SOLA v1.0.12 — updated/new strings ===
 
-$string['chat:greeting'] = 'Привет, {$a}! Я SOLA, твой онлайн-помощник {INSTITUTION} по обучению.';
+$string['chat:greeting'] = 'Привет, {$a}! Я SOLA. Чем могу помочь сегодня?';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = 'Открыть SOLA';

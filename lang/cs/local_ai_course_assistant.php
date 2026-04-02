@@ -245,7 +245,7 @@ $string['usersettings:data_deleted'] = 'Vaše data byla smazána.';
 // === SOLA v1.0.12 — updated/new strings ===
 
 // Updated strings (override earlier values):
-$string['chat:greeting'] = 'Dobrý den, {$a}! Jsem SOLA, váš online studijní asistent od {INSTITUTION}.';
+$string['chat:greeting'] = 'Ahoj, {$a}! Jsem SOLA. Jak vám mohu dnes pomoci?';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = 'Otevřít SOLA';

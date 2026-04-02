@@ -260,7 +260,7 @@ $string['usersettings:data_deleted'] = 'Ehichapụrụ data gị.';
 // === SOLA v1.0.12 — updated/new strings ===
 
 // Updated strings (override earlier values):
-$string['chat:greeting'] = 'Nnọọ, {$a}! Abụ m SOLA, onye enyemaka mụta n\'ịntanetị {INSTITUTION} gị.';
+$string['chat:greeting'] = 'Nnọọ, {$a}! Abụ m SOLA. Kedu ka m ga-esi nyere gị aka taa?';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = 'Meghee SOLA';

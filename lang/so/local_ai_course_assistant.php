@@ -270,7 +270,7 @@ $string['usersettings:data_deleted'] = 'Xogahaaga waa la tirtiray.';
 
 // === SOLA v1.0.12 — updated/new strings ===
 
-$string['chat:greeting'] = 'Salaan, {$a}! Waxaan ahay SOLA, kaaliyahaaga barashada onlaynka ee {INSTITUTION}.';
+$string['chat:greeting'] = 'Salaan, {$a}! Waxaan ahay SOLA. Sideen kugu caawin karaa maanta?';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = 'Fur SOLA';

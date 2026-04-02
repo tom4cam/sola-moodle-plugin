@@ -273,7 +273,7 @@ $string['usersettings:data_deleted'] = '您的数据已被删除。';
 
 // === SOLA v1.0.12 — updated/new strings ===
 
-$string['chat:greeting'] = '你好，{$a}！我是SOLA，你的{INSTITUTION}在线学习助手。';
+$string['chat:greeting'] = '你好，{$a}！我是SOLA。今天我能帮你什么？';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = '打开 SOLA';

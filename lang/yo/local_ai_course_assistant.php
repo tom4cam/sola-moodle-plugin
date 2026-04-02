@@ -273,7 +273,7 @@ $string['usersettings:data_deleted'] = 'A ti parẹ́ data rẹ.';
 
 // === SOLA v1.0.12 — updated/new strings ===
 
-$string['chat:greeting'] = 'Ẹ káàbọ̀, {$a}! Mo jẹ SOLA, olùrànlọ́wọ́ ẹ̀kọ́ orí ẹ̀rọ {INSTITUTION} rẹ.';
+$string['chat:greeting'] = 'Ẹ káàbọ̀, {$a}! Mo jẹ SOLA. Báwo ni mo ṣe lè ràn ọ́ lọ́wọ́ lónìí?';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = 'Ṣí SOLA';

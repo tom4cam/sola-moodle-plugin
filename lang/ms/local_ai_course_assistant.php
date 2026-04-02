@@ -273,7 +273,7 @@ $string['usersettings:data_deleted'] = 'Data anda telah dipadam.';
 
 // === SOLA v1.0.12 — updated/new strings ===
 
-$string['chat:greeting'] = 'Hai, {$a}! Saya SOLA, Pembantu Pembelajaran Dalam Talian {INSTITUTION} anda.';
+$string['chat:greeting'] = 'Hai, {$a}! Saya SOLA. Bagaimana saya boleh membantu anda hari ini?';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = 'Buka SOLA';

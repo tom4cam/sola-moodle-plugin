@@ -272,7 +272,7 @@ $string['usersettings:confirm_delete_all'] = '¿Estás seguro de que deseas elim
 $string['usersettings:data_deleted'] = 'Tus datos han sido eliminados.';
 
 // === SOLA v1.0.12 — new features translation ===
-$string['chat:greeting'] = '¡Hola, {$a}! Soy SOLA, tu asistente de aprendizaje en línea de {INSTITUTION}.';
+$string['chat:greeting'] = '¡Hola, {$a}! Soy SOLA. ¿Cómo puedo ayudarte hoy?';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = 'Abrir SOLA';

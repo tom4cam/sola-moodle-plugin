@@ -245,7 +245,7 @@ $string['usersettings:data_deleted'] = 'Verileriniz silindi.';
 // === SOLA v1.0.12 — updated/new strings ===
 
 // Updated strings (override earlier values):
-$string['chat:greeting'] = 'Merhaba, {$a}! Ben SOLA, {INSTITUTION} çevrimiçi öğrenme asistanınız.';
+$string['chat:greeting'] = 'Merhaba, {$a}! Ben SOLA. Bugün size nasıl yardımcı olabilirim?';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = 'SOLA\'yı aç';

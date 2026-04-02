@@ -273,7 +273,7 @@ $string['usersettings:confirm_delete_all'] = 'I b\'a fɛ ka i ka AI karamɔgɔ k
 $string['usersettings:data_deleted'] = 'I ka kunnafoniw bɔra.';
 
 // === SOLA v1.0.12 — new features translation ===
-$string['chat:greeting'] = 'I ni ce, {$a}! Ne ye SOLA ye, i ka kalanko dɛmɛbaga {INSTITUTION} fɛ.';
+$string['chat:greeting'] = 'I ni ce, {$a}! Ne ye SOLA ye. Bɛɛ bɛ se ka i dɛmɛ bi wa?';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = 'SOLA dayɛlɛ';

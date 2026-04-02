@@ -273,7 +273,7 @@ $string['usersettings:data_deleted'] = 'Seus dados foram excluídos.';
 
 // === SOLA v1.0.12 — updated/new strings ===
 
-$string['chat:greeting'] = 'Olá, {$a}! Sou SOLA, seu Assistente de Aprendizagem Online da {INSTITUTION}.';
+$string['chat:greeting'] = 'Olá, {$a}! Sou SOLA. Como posso ajudá-lo hoje?';
 $string['chat:title'] = 'SOLA';
 $string['chat:assistant'] = 'SOLA';
 $string['chat:open'] = 'Abrir SOLA';
