@@ -47,6 +47,8 @@ define([], function() {
     var micStream = null;
     /** @type {string} Current connection state */
     var currentState = 'disconnected';
+    /** @type {number} Session start timestamp (ms) for cost tracking */
+    var sessionStartMs = 0;
     /** @type {boolean} Whether a response is currently in progress */
     var responseActive = false;
     /** @type {string[]} Accumulated base64 PCM16 audio chunks for current response */
@@ -398,6 +400,7 @@ define([], function() {
             case 'session.created':
                 // Session is live — clear connection timeout and start mic.
                 if (connectionTimeout) { clearTimeout(connectionTimeout); connectionTimeout = null; }
+                sessionStartMs = Date.now();
                 setState('idle');
                 startMicCapture();
                 break;
@@ -683,6 +686,40 @@ define([], function() {
         }
 
         audioChunks = [];
+
+        // Log Realtime session cost: estimate tokens from duration.
+        // OpenAI Realtime charges ~$5/M input + $20/M output tokens.
+        // Rough estimate: ~50 tokens/second of audio (input + output combined).
+        if (sessionStartMs > 0) {
+            var durationSec = Math.round((Date.now() - sessionStartMs) / 1000);
+            var approxTokens = Math.max(1, durationSec * 50);
+            sessionStartMs = 0;
+            try {
+                var rootEl = document.getElementById('local-ai-course-assistant');
+                var courseid = rootEl ? parseInt(rootEl.dataset.courseid, 10) || 0 : 0;
+                var sesskey = rootEl ? rootEl.dataset.sesskey : '';
+                if (sesskey && courseid) {
+                    var body = JSON.stringify([{
+                        index: 0,
+                        methodname: 'local_ai_course_assistant_rate_message',
+                        args: {messageid: 0, rating: 0, is_hallucination: 0,
+                               comment: '__realtime_cost__:' + durationSec + 's:' + approxTokens + 'tok'}
+                    }]);
+                    // Use a lightweight fetch to log — don't block disconnect.
+                    // Actually, use a dedicated approach: write a system message via SSE endpoint.
+                    var formData = new FormData();
+                    formData.append('courseid', courseid);
+                    formData.append('sesskey', sesskey);
+                    formData.append('message', '[Realtime Voice Session: ' + durationSec + 's]');
+                    formData.append('interaction_type', 'practice_pronunciation');
+                    formData.append('log_only', '1');
+                    fetch('/local/ai_course_assistant/sse.php', {
+                        method: 'POST', body: formData
+                    }).catch(function() {});
+                }
+            } catch (e) { /* silent */ }
+        }
+
         setState('disconnected');
     };
 

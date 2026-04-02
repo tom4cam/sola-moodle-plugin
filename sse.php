@@ -58,6 +58,29 @@ $timelimit  = optional_param('timelimit', 0, PARAM_INT);      // Time constraint
 $firstgen        = optional_param('firstgen', 0, PARAM_BOOL);      // First-generation student mode.
 $completion      = optional_param('completion', 0, PARAM_INT);      // Course completion percentage (0-100).
 $interactiontype = optional_param('interaction_type', 'chat', PARAM_ALPHA); // Interaction mode: chat, voice, quiz, etc.
+$logonly         = optional_param('log_only', 0, PARAM_BOOL);              // Log a system message without AI call.
+
+// Log-only mode: record a cost/usage entry without calling the AI provider.
+if ($logonly) {
+    header('Content-Type: application/json');
+    $context = context_course::instance($courseid);
+    require_capability('local/ai_course_assistant:use', $context);
+    $userid = $USER->id;
+    $conv = conversation_manager::get_or_create_conversation($userid, $courseid);
+    // Parse duration from message like "[Realtime Voice Session: 120s]".
+    $durationsec = 0;
+    if (preg_match('/(\d+)s/', $message, $m)) {
+        $durationsec = (int) $m[1];
+    }
+    $approxtokens = max(1, $durationsec * 50);
+    conversation_manager::add_message(
+        $conv->id, $userid, $courseid, 'system', $message,
+        0, 'openai_realtime', $approxtokens, 0, 'gpt-4o-realtime',
+        $interactiontype, $pageid ?: null
+    );
+    echo json_encode(['logged' => true]);
+    exit;
+}
 
 // English lock: force English for ELL courses regardless of student language preference.
 $englishlock = get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid);
