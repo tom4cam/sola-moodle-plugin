@@ -59,16 +59,16 @@ class plugin_updater {
             $headers[] = 'Authorization: Bearer ' . $token;
         }
 
-        $ch = curl_init(self::GITHUB_API);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_TIMEOUT => 15,
-            CURLOPT_HTTPHEADER => $headers,
+        // Use Moodle's curl class so proxy settings are applied automatically.
+        $curl = new \curl();
+        $curl->setopt([
+            'CURLOPT_HTTPHEADER' => $headers,
+            'CURLOPT_RETURNTRANSFER' => true,
+            'CURLOPT_FOLLOWLOCATION' => true,
+            'CURLOPT_TIMEOUT' => 15,
         ]);
-        $body = curl_exec($ch);
-        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        $body = $curl->get(self::GITHUB_API);
+        $code = (int) ($curl->get_info()['http_code'] ?? 0);
 
         if ($code !== 200 || !$body) {
             return null;
@@ -136,19 +136,20 @@ class plugin_updater {
             $headers[] = 'Authorization: Bearer ' . $token;
         }
 
-        $ch = curl_init($zipurl);
-        $fp = fopen($zippath, 'w');
-        curl_setopt_array($ch, [
-            CURLOPT_FILE => $fp,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_MAXREDIRS => 5,
-            CURLOPT_TIMEOUT => 120,
-            CURLOPT_HTTPHEADER => $headers,
+        // Use Moodle's curl class so proxy settings are applied automatically.
+        $curl = new \curl();
+        $curl->setopt([
+            'CURLOPT_HTTPHEADER' => $headers,
+            'CURLOPT_FOLLOWLOCATION' => true,
+            'CURLOPT_MAXREDIRS' => 5,
+            'CURLOPT_TIMEOUT' => 120,
         ]);
-        curl_exec($ch);
-        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        fclose($fp);
+        $content = $curl->get($zipurl);
+        $code = (int) ($curl->get_info()['http_code'] ?? 0);
+
+        if ($code === 200 && !empty($content)) {
+            file_put_contents($zippath, $content);
+        }
 
         if ($code !== 200 || !file_exists($zippath) || filesize($zippath) < 1000) {
             @unlink($zippath);
