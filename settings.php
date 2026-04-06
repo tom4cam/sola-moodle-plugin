@@ -43,6 +43,124 @@ if ($hassiteconfig) {
         '</div>'
     ));
 
+    // Tab navigation JS: converts heading sections into a tabbed interface.
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/tab_nav',
+        '',
+        '<style>
+            .aica-settings-tabs { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:16px; border-bottom:2px solid #dee2e6; padding-bottom:0; }
+            .aica-settings-tab { padding:8px 16px; cursor:pointer; border:1px solid transparent; border-bottom:none;
+                border-radius:6px 6px 0 0; font-size:13px; font-weight:500; color:#495057; background:transparent; transition:all .15s; }
+            .aica-settings-tab:hover { background:#f1f3f5; }
+            .aica-settings-tab.active { background:#fff; border-color:#dee2e6; color:#023e8a; font-weight:600; margin-bottom:-2px; border-bottom:2px solid #fff; }
+            .aica-settings-section { display:none; }
+            .aica-settings-section.active { display:block; }
+        </style>
+        <div class="aica-settings-tabs" id="aica-settings-tabs"></div>
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var container = document.querySelector("#adminsettings");
+            if (!container) return;
+
+            var tabBar = document.getElementById("aica-settings-tabs");
+            if (!tabBar) return;
+
+            // Tab definitions: [heading ID substring, tab label].
+            var tabDefs = [
+                ["provider_heading", "AI Provider"],
+                ["rag_heading", "RAG"],
+                ["quiz_hide_heading", "Quiz"],
+                ["offtopic_heading", "Safety"],
+                ["studyplan_heading", "Study Plans"],
+                ["branding_heading", "Branding"],
+                ["faq_heading", "FAQ & Support"],
+                ["realtime_heading", "Voice"],
+                ["updates_heading", "Updates"],
+                ["cdn_heading", "CDN"],
+                ["redash_heading", "Analytics Export"],
+                ["integrity_heading", "Integrity"],
+                ["survey_heading", "Surveys"],
+                ["practice_heading", "Practice Scoring"],
+                ["usertesting_heading", "Usability Testing"]
+            ];
+
+            // Find all heading elements and group settings between them.
+            var headings = container.querySelectorAll("[id*=\\"_heading\\"]");
+            if (headings.length < 2) return;
+
+            // Collect the enable/disable setting (before first heading) as part of first tab.
+            var sections = [];
+            var currentElements = [];
+
+            // Get all direct children of the form.
+            var allItems = Array.from(container.children);
+
+            // Find the tab bar element and skip everything before it.
+            var tabBarParent = tabBar.closest(".form-item, .clearer, div");
+            var started = false;
+            var currentHeadingId = "__general__";
+
+            allItems.forEach(function(el) {
+                // Skip the tab bar and version banner.
+                if (el.contains(tabBar)) return;
+                if (el.id && el.id.indexOf("version_banner") >= 0) return;
+                if (el.id && el.id.indexOf("tab_nav") >= 0) return;
+
+                var headingMatch = el.querySelector("[id*=\\"_heading\\"]") || (el.id && el.id.indexOf("_heading") >= 0 ? el : null);
+                if (headingMatch) {
+                    if (currentElements.length > 0) {
+                        sections.push({id: currentHeadingId, elements: currentElements});
+                    }
+                    currentHeadingId = headingMatch.id || el.id || "";
+                    currentElements = [el];
+                } else {
+                    currentElements.push(el);
+                }
+            });
+            if (currentElements.length > 0) {
+                sections.push({id: currentHeadingId, elements: currentElements});
+            }
+
+            if (sections.length < 2) return;
+
+            // Wrap each section and create tabs.
+            sections.forEach(function(section, i) {
+                var wrapper = document.createElement("div");
+                wrapper.className = "aica-settings-section" + (i === 0 ? " active" : "");
+                wrapper.dataset.tab = i;
+
+                section.elements.forEach(function(el) {
+                    wrapper.appendChild(el);
+                });
+                container.insertBefore(wrapper, container.querySelector("[type=submit]") || null);
+
+                // Find the tab label.
+                var label = "Section " + (i + 1);
+                for (var t = 0; t < tabDefs.length; t++) {
+                    if (section.id.indexOf(tabDefs[t][0]) >= 0) {
+                        label = tabDefs[t][1];
+                        break;
+                    }
+                }
+                if (section.id === "__general__") label = "General";
+
+                var tab = document.createElement("button");
+                tab.type = "button";
+                tab.className = "aica-settings-tab" + (i === 0 ? " active" : "");
+                tab.textContent = label;
+                tab.dataset.tab = i;
+                tab.addEventListener("click", function() {
+                    document.querySelectorAll(".aica-settings-tab").forEach(function(t) { t.classList.remove("active"); });
+                    document.querySelectorAll(".aica-settings-section").forEach(function(s) { s.classList.remove("active"); });
+                    this.classList.add("active");
+                    document.querySelector(".aica-settings-section[data-tab=\\"" + this.dataset.tab + "\\"]").classList.add("active");
+                });
+                tabBar.appendChild(tab);
+            });
+        });
+        </script>'
+    ));
+
     // Enable/disable.
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/enabled',
@@ -540,7 +658,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/avatar_color',
         get_string('settings:avatar_color', 'local_ai_course_assistant'),
         get_string('settings:avatar_color_desc', 'local_ai_course_assistant'),
-        '#023e8a'
+        '#152233'
     ));
 
     // Avatar fill/background color.
