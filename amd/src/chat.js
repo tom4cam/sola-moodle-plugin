@@ -2565,6 +2565,8 @@ define([
                     sseUrl:   sseUrl,
                     lang:     Speech.getLang(),
                     greeting: buildPracticeSpeakingGreeting(selectionLabel),
+                    pageId: currentPageId || 0,
+                    pageTitle: currentPageTitle || '',
                 }
             );
         };

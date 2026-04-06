@@ -499,6 +499,7 @@
                 </span>
                 <span class="local-ai-course-assistant__mode-label">{{#str}}chat:mode_chat, local_ai_course_assistant{{/str}}</span>
             </button>
+            {{#voicetabenabled}}
             <button type="button"
                     class="local-ai-course-assistant__mode-btn"
                     data-mode="voice"
@@ -510,6 +511,7 @@
                 </span>
                 <span class="local-ai-course-assistant__mode-label">{{#str}}chat:mode_voice, local_ai_course_assistant{{/str}}</span>
             </button>
+            {{/voicetabenabled}}
             <button type="button"
                     class="local-ai-course-assistant__mode-btn"
                     data-mode="history"

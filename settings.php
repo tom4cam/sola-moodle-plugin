@@ -759,6 +759,14 @@ if ($hassiteconfig) {
         $realtimevoices
     ));
 
+    // Voice tab visibility (bottom navigation).
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/voice_tab_enabled',
+        'Enable Voice Tab',
+        'Show the Voice tab in the bottom navigation bar. When disabled, students only see Chat and Notes tabs. Voice features (Conversation Practice, Pronunciation Practice) can still be accessed via conversation starters if enabled separately.',
+        0
+    ));
+
     // --- Plugin Updates ---
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/updates_heading',

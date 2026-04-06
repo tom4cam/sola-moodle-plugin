@@ -459,6 +459,12 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
         if (cfg.lang) {
             postBody.lang = cfg.lang;
         }
+        if (cfg.pageId) {
+            postBody.pageid = cfg.pageId;
+        }
+        if (cfg.pageTitle) {
+            postBody.pagetitle = cfg.pageTitle;
+        }
 
         if (sseController) {
             try { sseController.abort(); } catch (e) { /**/ }
@@ -794,6 +800,8 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
             sseUrl:   config.sseUrl   || '',
             lang:     config.lang     || 'en-US',
             voice:    voice || 'shimmer',
+            pageId:   config.pageId   || 0,
+            pageTitle: config.pageTitle || '',
         };
 
         // Derive TTS URL from SSE URL.

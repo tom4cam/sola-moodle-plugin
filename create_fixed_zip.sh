@@ -14,7 +14,11 @@ zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*/TROUBLESHOOTING.md" \
   -x "*/ENHANCEMENT_ESTIMATE.md" \
   -x "*/SAYLOR_ACADEMY_PROPOSAL.md" \
-  -x "*/amd/build/*.map"
+  -x "*/amd/build/*.map" \
+  -x "*/cdn/node_modules/*" \
+  -x "*/cdn/dist/*" \
+  -x "*/cdn/package-lock.json" \
+  -x "*/.wiki/*"
 
 echo "✅ Created: ${SCRIPT_DIR}/ai_course_assistant.zip"
 echo ""

@@ -3060,21 +3060,23 @@ define([
     const appendVoiceTranscript = function(role, text) {
         if (!messagesContainer) { return; }
 
-        // Accumulate assistant deltas into the last assistant voice message.
-        if (role === 'assistant') {
-            const assistantMsgs = messagesContainer.querySelectorAll('.aica-voice-msg--assistant');
-            const last = assistantMsgs.length ? assistantMsgs[assistantMsgs.length - 1] : null;
-            if (last) {
-                const content = last.querySelector('.aica-voice-msg__text');
-                if (content) { content.textContent += text; }
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                return;
-            }
+        // Find the last voice message in the container.
+        var allVoiceMsgs = messagesContainer.querySelectorAll('.aica-voice-msg');
+        var lastMsg = allVoiceMsgs.length ? allVoiceMsgs[allVoiceMsgs.length - 1] : null;
+        var lastRole = lastMsg ? (lastMsg.classList.contains('aica-voice-msg--assistant') ? 'assistant' : 'user') : null;
+
+        // Append to the last message only if it's the same role (streaming chunks).
+        if (lastMsg && lastRole === role) {
+            var content = lastMsg.querySelector('.aica-voice-msg__text');
+            if (content) { content.textContent += text; }
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            return;
         }
 
-        const msg = document.createElement('div');
+        // Different role or no previous message: create a new message element.
+        var msg = document.createElement('div');
         msg.className = 'aica-voice-msg aica-voice-msg--' + role;
-        const content = document.createElement('span');
+        var content = document.createElement('span');
         content.className = 'aica-voice-msg__text';
         content.textContent = text;
         msg.appendChild(content);
