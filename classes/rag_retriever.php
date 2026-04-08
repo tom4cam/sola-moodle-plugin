@@ -48,6 +48,11 @@ class rag_retriever {
     public static function retrieve(int $courseid, string $query, int $topk = 5): array {
         global $DB;
 
+        // Static cache of decoded embeddings — avoids re-decoding JSON on
+        // subsequent RAG queries within the same PHP request.
+        static $embedding_cache = [];
+        $cache_key = "course_{$courseid}";
+
         // Embed the query.
         $provider   = base_embedding_provider::create_from_config();
         $queryvec   = $provider->embed($query);
@@ -56,28 +61,36 @@ class rag_retriever {
             return [];
         }
 
-        // Load all embedded chunks for this course.
-        $rows = $DB->get_records_select(
-            'local_ai_course_assistant_chunks',
-            'courseid = :courseid AND embedding IS NOT NULL',
-            ['courseid' => $courseid],
-            '',
-            'id, content, embedding'
-        );
+        // Load and decode embeddings (cached per-course within the request).
+        if (!isset($embedding_cache[$cache_key])) {
+            $rows = $DB->get_records_select(
+                'local_ai_course_assistant_chunks',
+                'courseid = :courseid AND embedding IS NOT NULL',
+                ['courseid' => $courseid],
+                '',
+                'id, content, embedding'
+            );
 
-        if (empty($rows)) {
+            $embedding_cache[$cache_key] = [];
+            if (!empty($rows)) {
+                foreach ($rows as $row) {
+                    $vec = json_decode($row->embedding, true);
+                    if (is_array($vec) && !empty($vec)) {
+                        $embedding_cache[$cache_key][$row->id] = ['content' => $row->content, 'vec' => $vec];
+                    }
+                }
+            }
+        }
+
+        if (empty($embedding_cache[$cache_key])) {
             return [];
         }
 
         // Score each chunk.
         $scored = [];
-        foreach ($rows as $row) {
-            $chunkvec = json_decode($row->embedding, true);
-            if (!is_array($chunkvec) || empty($chunkvec)) {
-                continue;
-            }
-            $score    = self::cosine($queryvec, $chunkvec);
-            $scored[] = ['content' => $row->content, 'score' => $score];
+        foreach ($embedding_cache[$cache_key] as $entry) {
+            $score    = self::cosine($queryvec, $entry['vec']);
+            $scored[] = ['content' => $entry['content'], 'score' => $score];
         }
 
         if (empty($scored)) {

@@ -354,8 +354,8 @@ class context_builder {
         global $DB;
 
         // Per-resource character cap and total cap.
-        $maxperresource = 3000;
-        $maxtotal       = 40000;
+        $maxperresource = 1500;
+        $maxtotal       = 15000;
         $total          = 0;
         $sections       = [];
 

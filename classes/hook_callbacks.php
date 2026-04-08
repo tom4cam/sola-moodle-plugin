@@ -312,7 +312,7 @@ class hook_callbacks {
             'serverpageheading'  => $serverpageheading,
             'llmoptionsjson'     => json_encode($llmoptions),
             'hasstarterdata'     => $hasstarterdata,
-            'voicetabenabled'    => (bool)get_config('local_ai_course_assistant', 'voice_tab_enabled'),
+            'voicetabenabled'    => self::is_voice_tab_enabled($courseid),
         ];
 
         // CDN mode: serve JS/CSS from external CDN instead of Moodle's AMD loader.
@@ -396,6 +396,27 @@ class hook_callbacks {
             $strings[$key] = get_string($key, 'local_ai_course_assistant');
         }
         return $strings;
+    }
+
+    /**
+     * Check if the voice tab is enabled for a given course.
+     *
+     * Per-course override takes precedence over the global setting.
+     * Values: '' (not set) = inherit global, '1' = force on, '0' = force off.
+     *
+     * @param int $courseid
+     * @return bool
+     */
+    private static function is_voice_tab_enabled(int $courseid): bool {
+        $per_course = get_config('local_ai_course_assistant', 'sola_voicetab_course_' . $courseid);
+        if ($per_course === '1') {
+            return true;
+        }
+        if ($per_course === '0') {
+            return false;
+        }
+        // Inherit global setting.
+        return (bool) get_config('local_ai_course_assistant', 'voice_tab_enabled');
     }
 
     /**

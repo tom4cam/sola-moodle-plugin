@@ -92,6 +92,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $englishlock = optional_param('english_lock', 0, PARAM_INT);
     set_config('english_lock_course_' . $courseid, $englishlock, 'local_ai_course_assistant');
 
+    // Voice Tab — per-course override (inherit / force on / force off).
+    $voicetab = optional_param('voice_tab', '', PARAM_RAW_TRIMMED);
+    if ($voicetab === '1' || $voicetab === '0') {
+        set_config('sola_voicetab_course_' . $courseid, $voicetab, 'local_ai_course_assistant');
+    } else {
+        unset_config('sola_voicetab_course_' . $courseid, 'local_ai_course_assistant');
+    }
+
     // Starter overrides — per-course enable/disable for each starter.
     $starteroverrides = [];
     $allstarters = \local_ai_course_assistant\starter_manager::get_global_starters();
@@ -115,6 +123,10 @@ $ragcourseenabled = ($ragcourseraw === false) || (bool)$ragcourseraw;
 
 // English lock setting.
 $englishlockenabled = (bool)get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid);
+
+// Voice Tab per-course override ('', '1', or '0').
+$voicetabcourseraw = get_config('local_ai_course_assistant', 'sola_voicetab_course_' . $courseid);
+$voicetabglobal = (bool)get_config('local_ai_course_assistant', 'voice_tab_enabled');
 
 // Build provider options.
 $providers = [
@@ -340,6 +352,34 @@ echo html_writer::div(
                     </div>
                     <small class="form-text text-muted">
                         When enabled, SOLA will respond in English even if the student writes in another language. The student's language preference in their settings panel will be overridden.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="mb-0">Voice Tab</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Control the Voice Tab (settings panel voice options) for this course. By default it inherits the global setting (currently <strong><?php echo $voicetabglobal ? 'enabled' : 'disabled'; ?></strong>).</p>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label">Voice Tab</label>
+                <div class="col-sm-9">
+                    <select class="form-control" name="voice_tab" id="voice_tab">
+                        <option value="" <?php if ($voicetabcourseraw === false || $voicetabcourseraw === '') { echo 'selected'; } ?>>
+                            Inherit global (<?php echo $voicetabglobal ? 'enabled' : 'disabled'; ?>)
+                        </option>
+                        <option value="1" <?php if ($voicetabcourseraw === '1') { echo 'selected'; } ?>>
+                            Force on
+                        </option>
+                        <option value="0" <?php if ($voicetabcourseraw === '0') { echo 'selected'; } ?>>
+                            Force off
+                        </option>
+                    </select>
+                    <small class="form-text text-muted">
+                        Override the global Voice Tab setting for this course only.
                     </small>
                 </div>
             </div>
