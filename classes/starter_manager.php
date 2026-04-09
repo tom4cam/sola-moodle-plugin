@@ -64,7 +64,7 @@ class starter_manager {
         return [
             [
                 'key'         => 'help-page',
-                'name'        => 'Help With This',
+                'name'        => 'Explain This Page',
                 'description' => 'Explains key concepts from the current lesson page',
                 'prompt'      => 'Help me understand {page}. What are the key concepts, and can you explain them with examples?',
                 'icon'        => 'book',
@@ -76,7 +76,7 @@ class starter_manager {
             ],
             [
                 'key'         => 'quiz',
-                'name'        => 'Quiz Me On This',
+                'name'        => 'Quiz Me',
                 'description' => 'Generates a practice quiz on the current material',
                 'prompt'      => '',
                 'icon'        => 'lightning',

@@ -496,8 +496,8 @@ define([], function() {
     /** @type {Object} Starter prompt translations keyed by ISO 639-1 code */
     const STARTER_PROMPTS = {
         'en': {
-            helpPage: 'Help me understand this page',
-            quiz: 'Give me a practice quiz',
+            helpPage: 'Explain This Page',
+            quiz: 'Quiz Me',
             studyPlan: 'Help me create a study plan',
             askAnything: 'I have a question',
             reviewPractice: 'Review and practice key concepts'
