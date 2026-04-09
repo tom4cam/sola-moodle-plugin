@@ -125,11 +125,34 @@ class hook_callbacks {
         $cansiteconfig = has_capability('local/ai_course_assistant:manage', $coursecontext);
         $coursesettingsurl = new \moodle_url('/local/ai_course_assistant/course_settings.php', ['courseid' => $courseid]);
 
-        // Build quiz topics from visible course sections.
+        // Build quiz topics from visible course sections, filtering out
+        // non-content sections (enrollment, feedback, certificates, etc.).
         $modinfo = get_fast_modinfo($courseid);
         $quizsections = [];
+        $excludepatterns = [
+            '/\benroll/i', '/\benrol/i', '/\bregistr/i',
+            '/\bcertificate/i', '/\bfinal\s*exam/i',
+            '/\bfeedback\s*(survey|form)?/i', '/\bsurvey/i',
+            '/\bcompletion/i', '/\bupon\s*successful/i',
+            '/\bcourse\s*evaluation/i', '/\borientation/i',
+            '/\bsyllabus/i', '/\bgetting\s*started/i',
+        ];
         foreach ($modinfo->get_section_info_all() as $s) {
-            if ($s->visible && ($name = get_section_name($courseid, $s)) && $name !== 'General') {
+            if (!$s->visible) {
+                continue;
+            }
+            $name = get_section_name($courseid, $s);
+            if (empty($name) || $name === 'General') {
+                continue;
+            }
+            $skip = false;
+            foreach ($excludepatterns as $pattern) {
+                if (preg_match($pattern, $name)) {
+                    $skip = true;
+                    break;
+                }
+            }
+            if (!$skip) {
                 $quizsections[] = ['name' => $name];
             }
         }
