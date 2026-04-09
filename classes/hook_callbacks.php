@@ -313,6 +313,7 @@ class hook_callbacks {
             'llmoptionsjson'     => json_encode($llmoptions),
             'hasstarterdata'     => $hasstarterdata,
             'voicetabenabled'    => self::is_voice_tab_enabled($courseid),
+            'englishlock'        => (bool)get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid),
         ];
 
         // CDN mode: serve JS/CSS from external CDN instead of Moodle's AMD loader.

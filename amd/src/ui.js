@@ -3176,6 +3176,17 @@ define([
             pendingLang = langSelect.value || null;
             pendingLangName = pendingLang ? (config.langs[pendingLang] || {}).name : 'English';
         });
+
+        // English Lock: disable the language selector if locked by admin.
+        if (root && root.dataset.englishLock === '1') {
+            langSelect.disabled = true;
+            langSelect.value = '';
+            var lockNote = document.createElement('p');
+            lockNote.className = 'aica-settings-panel__empty-note';
+            lockNote.textContent = 'Language is locked to English by your administrator.';
+            langSection.appendChild(lockNote);
+        }
+
         langSection.appendChild(langSelect);
         content.appendChild(langSection);
 

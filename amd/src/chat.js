@@ -1258,6 +1258,14 @@ define([
      * Auto-set language from browser on first visit; update label on subsequent visits.
      */
     const initLanguage = function() {
+        // English Lock: if active, force English and skip auto-detection.
+        var rootEl = document.getElementById('local-ai-course-assistant');
+        if (rootEl && rootEl.dataset.englishLock === '1') {
+            Speech.setLang('en');
+            UI.setLangLabel('English (Locked)');
+            return;
+        }
+
         const stored = Speech.getLang();
 
         if (stored) {
@@ -1335,6 +1343,50 @@ define([
     };
 
     /**
+     * Update UI text elements when language changes.
+     * Translates placeholder text and shows a brief notification.
+     *
+     * @param {string|null} langCode ISO 639-1 code, or null for English
+     */
+    const updateUiTextsForLang = function(langCode) {
+        var rootEl = document.getElementById('local-ai-course-assistant');
+        if (!rootEl) {
+            return;
+        }
+
+        // Update input placeholder.
+        var input = rootEl.querySelector('.local-ai-course-assistant__input');
+        if (input) {
+            var placeholders = {
+                'es': 'Escribe tu pregunta...',
+                'fr': 'Tapez votre question...',
+                'de': 'Schreiben Sie Ihre Frage...',
+                'pt': 'Digite sua pergunta...',
+                'it': 'Scrivi la tua domanda...',
+                'ja': '\u8CEA\u554F\u3092\u5165\u529B...',
+                'ko': '\uC9C8\uBB38\uC744 \uC785\uB825\uD558\uC138\uC694...',
+                'zh': '\u8F93\u5165\u4F60\u7684\u95EE\u9898...',
+                'ar': '...\u0627\u0643\u062A\u0628 \u0633\u0624\u0627\u0644\u0643',
+                'hi': '\u0905\u092A\u0928\u093E \u092A\u094D\u0930\u0936\u094D\u0928 \u0932\u093F\u0916\u0947\u0902...',
+                'ru': '\u041D\u0430\u043F\u0438\u0448\u0438\u0442\u0435 \u0441\u0432\u043E\u0439 \u0432\u043E\u043F\u0440\u043E\u0441...',
+                'tr': 'Sorunuzu yaz\u0131n...',
+                'nl': 'Typ je vraag...',
+                'sv': 'Skriv din fr\u00E5ga...',
+                'pl': 'Wpisz swoje pytanie...',
+            };
+            var code2 = (langCode || 'en').substring(0, 2);
+            input.placeholder = placeholders[code2] || 'Type your question...';
+        }
+
+        // Show a brief notification about language change.
+        if (langCode && langCode !== 'en') {
+            var langInfo = Speech.getLangInfo(langCode);
+            var langName = langInfo ? langInfo.name : langCode;
+            UI.showNotification('Language set to ' + langName + '. New messages will be in ' + langName + '.', 'info');
+        }
+    };
+
+    /**
      * Bind all event handlers.
      */
     const bindEvents = function() {
@@ -1402,9 +1454,14 @@ define([
             });
         }
 
-        // Language chip â€” opens compact language picker.
+        // Language chip -- opens compact language picker.
         if (els.langBtn) {
             els.langBtn.addEventListener('click', function() {
+                var lockRoot = document.getElementById('local-ai-course-assistant');
+                if (lockRoot && lockRoot.dataset.englishLock === '1') {
+                    UI.showNotification('Language is locked to English for this course.', 'info');
+                    return;
+                }
                 UI.showLangPicker(
                     Speech.SUPPORTED_LANGS,
                     Speech.getLang(),
@@ -1416,6 +1473,8 @@ define([
                         }
                         UI.setLangLabel(name);
                         updateStarterTexts(code);
+                        // Update UI text elements for the new language.
+                        updateUiTextsForLang(code);
                     }
                 );
             });
@@ -1957,6 +2016,11 @@ define([
                 },
                 {
                     onLangSelect: function(code, name) {
+                        var lockRoot = document.getElementById('local-ai-course-assistant');
+                        if (lockRoot && lockRoot.dataset.englishLock === '1') {
+                            UI.showNotification('Language is locked to English for this course.', 'info');
+                            return;
+                        }
                         if (code) {
                             Speech.setLang(code);
                         } else {
@@ -1964,6 +2028,8 @@ define([
                         }
                         UI.setLangLabel(name);
                         updateStarterTexts(code);
+                        // Update UI text elements for the new language.
+                        updateUiTextsForLang(code);
                     },
                     onAvatarSelect: function(avatarId, avatarUrl) {
                         Repo.saveAvatarPreference(avatarId).then(function() {
