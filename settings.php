@@ -81,7 +81,8 @@ if ($hassiteconfig) {
                 ["integrity_heading", "Integrity"],
                 ["survey_heading", "Surveys"],
                 ["practice_heading", "Practice Scoring"],
-                ["usertesting_heading", "Usability Testing"]
+                ["usertesting_heading", "Usability Testing"],
+                ["performance_heading", "Performance"]
             ];
 
             // Find all heading elements and group settings between them.
@@ -939,6 +940,31 @@ if ($hassiteconfig) {
         'Edit Testing Tasks',
         '<a href="' . (new moodle_url('/local/ai_course_assistant/usertesting_admin.php'))->out() .
         '" class="btn btn-sm btn-outline-primary">Open Task Editor</a>'
+    ));
+
+    // --- Performance Settings ---
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/performance_heading',
+        'Performance',
+        'Control the amount of course content included in the AI prompt. Lower values mean faster responses but less context for the AI.'
+    ));
+
+    // Max content per resource (chars).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/max_content_per_resource',
+        'Max Content Per Resource (chars)',
+        'Maximum characters of content extracted from each page or book chapter. Lower values reduce prompt size and speed up responses.',
+        '1500',
+        PARAM_INT
+    ));
+
+    // Max total content (chars).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/max_total_content',
+        'Max Total Content (chars)',
+        'Maximum total characters of course content included in the system prompt. Lower values reduce prompt size and speed up responses.',
+        '15000',
+        PARAM_INT
     ));
 
     $ADMIN->add('localplugins', $settings);

@@ -354,8 +354,8 @@ class context_builder {
         global $DB;
 
         // Per-resource character cap and total cap.
-        $maxperresource = 1500;
-        $maxtotal       = 15000;
+        $maxperresource = (int)(get_config('local_ai_course_assistant', 'max_content_per_resource') ?: 1500);
+        $maxtotal       = (int)(get_config('local_ai_course_assistant', 'max_total_content') ?: 15000);
         $total          = 0;
         $sections       = [];
 
