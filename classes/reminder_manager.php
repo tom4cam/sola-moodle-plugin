@@ -253,7 +253,8 @@ class reminder_manager {
      * @return bool Success.
      */
     public static function send_whatsapp_reminder(\stdClass $reminder, string $message): bool {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->libdir . '/filelib.php'); // For \curl.
 
         $apiurl = get_config('local_ai_course_assistant', 'whatsapp_api_url');
         $apitoken = get_config('local_ai_course_assistant', 'whatsapp_api_token');
@@ -370,6 +371,8 @@ class reminder_manager {
      * @return array ['success' => bool, 'httpcode' => int, 'response' => string, 'error' => string]
      */
     private static function send_twilio_whatsapp_message(array $config, string $destination, string $body): array {
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php'); // For \curl.
         $accountsid = self::extract_twilio_account_sid($config['apiurl']);
         if ($accountsid === '') {
             return [

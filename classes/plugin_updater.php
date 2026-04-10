@@ -49,6 +49,8 @@ class plugin_updater {
      *                     or null on failure.
      */
     public static function check_for_update(): ?object {
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php'); // For \curl.
         $token = get_config('local_ai_course_assistant', 'github_token');
 
         $headers = [
@@ -116,6 +118,7 @@ class plugin_updater {
      */
     public static function download_release(string $zipurl): string {
         global $CFG;
+        require_once($CFG->libdir . '/filelib.php'); // For \curl.
 
         // Security: only download from github.com.
         if (strpos($zipurl, 'https://github.com/') !== 0

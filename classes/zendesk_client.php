@@ -54,7 +54,8 @@ class zendesk_client {
         string $question,
         string $conversationsummary
     ): ?string {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->libdir . '/filelib.php'); // For \curl.
 
         if (!self::is_enabled()) {
             return null;

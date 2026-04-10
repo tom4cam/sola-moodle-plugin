@@ -94,6 +94,8 @@ abstract class base_provider implements provider_interface {
      * @throws \moodle_exception On HTTP errors.
      */
     protected function http_post(string $url, array $headers, string $body): string {
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php'); // For \curl.
         $curl = new \curl();
         $curl->setopt([
             'CURLOPT_HTTPHEADER' => $headers,
