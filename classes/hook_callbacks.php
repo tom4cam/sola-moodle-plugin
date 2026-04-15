@@ -68,6 +68,10 @@ class hook_callbacks {
             return;
         }
 
+        // Later logic always needs the full course record, even when learning
+        // objectives are discovered from page content and the summary fallback is skipped.
+        $course = get_course($courseid);
+
         $userrole = context_builder::detect_role($courseid, $USER->id);
 
         // Quiz hide: optionally suppress widget on all quiz pages (stricter than quizLocked).
@@ -215,7 +219,6 @@ class hook_callbacks {
         }
         // Fallback: if no learning outcome pages found, parse course summary.
         if (empty($learningobjectives)) {
-            $course = get_course($courseid);
             if (!empty($course->summary)) {
                 $plaintext = strip_tags($course->summary);
                 foreach (preg_split('/[\r\n]+/', $plaintext) as $line) {
