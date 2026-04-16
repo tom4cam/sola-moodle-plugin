@@ -17,6 +17,7 @@ Usage:
     python3 deploy_dev.py                 # deploys to dev.sylr.org only
     python3 deploy_dev.py --target 405    # deploys to dev405.sylr.org only
     python3 deploy_dev.py --target all    # deploys to all 4 dev sites
+    python3 deploy_dev.py --seed-bus101   # restore BUS101 fixture to dev (idempotent)
 """
 
 import argparse
@@ -31,6 +32,8 @@ import time
 INSTANCE_ID = "i-04c58928fad484d97"
 S3_BUCKET = "archive-course"
 S3_KEY = "ai_course_assistant_deploy.tar.gz"
+FIXTURE_S3_KEY = "dev-fixtures/bus101.mbz"
+FIXTURE_SHORTNAME = "BUS101"
 
 # Deploy targets: name -> (hostname, remote moodle dir).
 # Plugin dir is always <moodle_dir>/local/ai_course_assistant.
@@ -144,8 +147,79 @@ def deploy_to_target(name, hostname, moodle_dir):
         for line in result["stdout"].strip().split("\n"):
             print(f"    {line}")
 
+    smoke_test_bus101(hostname, moodle_dir)
+
     print(f"  Deployed to https://{hostname}")
     return True
+
+
+def course_exists(moodle_dir, shortname):
+    """Return True if a course with the given shortname exists on the target."""
+    php = (
+        "define('CLI_SCRIPT', true); "
+        f"require('{moodle_dir}/config.php'); "
+        f"echo \\$DB->record_exists('course', ['shortname' => '{shortname}']) ? 'YES' : 'NO';"
+    )
+    result = ssm_send([f"sudo -u www-data php -r \"{php}\""], timeout=30)
+    return bool(result and "YES" in (result.get("stdout") or ""))
+
+
+def smoke_test_bus101(hostname, moodle_dir):
+    """Hit the BUS101 course page to catch hook-level regressions like v3.4.7.
+
+    Skips silently if BUS101 has not been seeded yet. Only logs failures.
+    """
+    if not course_exists(moodle_dir, FIXTURE_SHORTNAME):
+        return
+    url = f"https://{hostname}/course/view.php?name={FIXTURE_SHORTNAME}"
+    check = (
+        f"code=$(curl -sk -o /tmp/bus101_smoke.html -w '%{{http_code}}' '{url}'); "
+        "if [ \"$code\" != \"200\" ]; then echo \"BAD HTTP $code\"; exit 1; fi; "
+        "if grep -qiE 'dml_missing_record|exception|error/|debug info' /tmp/bus101_smoke.html; then "
+        "echo 'BAD error markers in response'; exit 1; fi; "
+        "echo OK"
+    )
+    result = ssm_send([check], timeout=30)
+    out = (result.get("stdout") or "").strip() if result else ""
+    status = (result or {}).get("status")
+    if status == "Success" and out.endswith("OK"):
+        print(f"    BUS101 smoke: OK")
+    else:
+        print(f"    BUS101 smoke: FAILED ({out or status})")
+
+
+def seed_bus101(name, hostname, moodle_dir):
+    """Restore the BUS101 fixture backup. Idempotent: skips if already present."""
+    print(f"\n--- Seeding BUS101 on {hostname} ({moodle_dir}) ---")
+
+    if course_exists(moodle_dir, FIXTURE_SHORTNAME):
+        print(f"  BUS101 already present, skipping")
+        return True
+
+    fixture_path = f"/tmp/bus101_{name}.mbz"
+    seed_commands = [
+        "set -e",
+        f"aws s3 cp s3://{S3_BUCKET}/{FIXTURE_S3_KEY} {fixture_path}",
+        f"sudo chown www-data:www-data {fixture_path}",
+        (
+            f"sudo -u www-data php {moodle_dir}/admin/cli/restore_backup.php "
+            f"--file={fixture_path} --categoryid=1 2>&1 | tail -40"
+        ),
+        f"rm -f {fixture_path}",
+    ]
+    result = ssm_send(seed_commands, timeout=600)
+    if not result or result["status"] != "Success":
+        print(f"  ERROR: {result}")
+        return False
+    for line in (result.get("stdout") or "").split("\n"):
+        if line.strip():
+            print(f"    {line}")
+
+    if course_exists(moodle_dir, FIXTURE_SHORTNAME):
+        print(f"  BUS101 seeded on {hostname}")
+        return True
+    print(f"  ERROR: restore completed but course {FIXTURE_SHORTNAME} not found")
+    return False
 
 
 def parse_args():
@@ -154,6 +228,11 @@ def parse_args():
         "--target",
         default="dev",
         help="Target Moodle (dev, 405, 500, 501, or 'all' for all four). Default: dev",
+    )
+    parser.add_argument(
+        "--seed-bus101",
+        action="store_true",
+        help="Restore the BUS101 fixture backup on the target(s) instead of deploying the plugin. Idempotent.",
     )
     return parser.parse_args()
 
@@ -169,8 +248,9 @@ def main():
         print(f"Unknown target '{args.target}'. Choices: {', '.join(TARGETS.keys())}, all")
         sys.exit(2)
 
+    mode = "seed BUS101" if args.seed_bus101 else "deploy"
     print("=" * 60)
-    print(f"SOLA dev deploy (AWS SSM + rsync)  →  {', '.join(selected)}")
+    print(f"SOLA dev {mode} (AWS SSM + rsync)  →  {', '.join(selected)}")
     print("=" * 60)
 
     # Step 1: Verify AWS CLI is available and configured.
@@ -180,6 +260,20 @@ def main():
         print("  ERROR: AWS CLI not configured. Run 'aws configure' first.")
         sys.exit(1)
     print(f"  Authenticated as: {r.stdout.strip()}")
+
+    if args.seed_bus101:
+        failures = []
+        for name in selected:
+            hostname, moodle_dir = TARGETS[name]
+            if not seed_bus101(name, hostname, moodle_dir):
+                failures.append(hostname)
+        print("\n" + "=" * 60)
+        if failures:
+            print(f"Seed finished with {len(failures)} failure(s): {', '.join(failures)}")
+            sys.exit(1)
+        print(f"Seed complete: {', '.join(TARGETS[n][0] for n in selected)}")
+        print("=" * 60)
+        return
 
     # Step 2: Create tarball excluding bloat.
     print("\nStep 2: Creating plugin tarball...")
