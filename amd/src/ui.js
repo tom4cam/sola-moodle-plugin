@@ -605,6 +605,23 @@ define([
                 }
             });
         }
+
+        // Auto-open on first visit per course. Global admin setting
+        // (data-autoopen="1") opts the site in. localStorage key marks
+        // the course as "already auto-opened once" so it does not
+        // re-open on every subsequent page load in the same course.
+        if (root.dataset.autoopen === '1') {
+            var courseId = root.dataset.courseid || '';
+            var firstVisitKey = 'aica_autoopened_course_' + courseId;
+            var alreadyOpened = false;
+            try { alreadyOpened = localStorage.getItem(firstVisitKey) === '1'; } catch (e) { /**/ }
+            if (courseId && !alreadyOpened) {
+                try { localStorage.setItem(firstVisitKey, '1'); } catch (e) { /**/ }
+                // Defer one frame so layout, drag offsets, and focus traps
+                // are fully wired before we open.
+                requestAnimationFrame(function() { toggleDrawer(); });
+            }
+        }
     };
 
     /**

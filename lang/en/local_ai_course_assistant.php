@@ -53,6 +53,8 @@ $string['ai_course_assistant:manage'] = 'Manage AI tutor chat settings (Administ
 // Settings.
 $string['settings:enabled'] = 'Enable AI Course Assistant';
 $string['settings:enabled_desc'] = 'Enable or disable the AI Course Assistant widget on course pages.';
+$string['settings:auto_open'] = 'Auto-open on first visit';
+$string['settings:auto_open_desc'] = 'When enabled, the SOLA drawer opens automatically the first time a student lands on each course. Subsequent page loads in the same course do not auto-open (tracked per course in the browser via localStorage). Applies to mobile too.';
 $string['settings:provider'] = 'AI Provider';
 $string['settings:provider_desc'] = 'Select the AI provider to use for chat completions.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';

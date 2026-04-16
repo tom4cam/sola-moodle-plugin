@@ -386,6 +386,7 @@ class hook_callbacks {
             'avatarcolor'        => get_config('local_ai_course_assistant', 'avatar_color') ?: '#152233',
             'avatarfill'         => get_config('local_ai_course_assistant', 'avatar_fill') ?: '#ffffff',
             'displaymode'        => $displaymode,
+            'autoopen'           => (bool) get_config('local_ai_course_assistant', 'auto_open'),
             'displayname'        => get_config('local_ai_course_assistant', 'display_name') ?: 'Saylor Online Learning Assistant',
             'institution'        => get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University',
             'institutionshort'   => get_config('local_ai_course_assistant', 'institution_short_name') ?: 'Saylor U',
