@@ -242,6 +242,15 @@
                     </svg>
                 </button>
                 {{/contextdebugvisible}}
+                <button class="local-ai-course-assistant__btn-help"
+                        title="Help"
+                        aria-label="Help guide"
+                        type="button">
+                    {{! Question mark / help icon }}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+                    </svg>
+                </button>
                 <button class="local-ai-course-assistant__btn-clear"
                         title="{{#str}}chat:clear, local_ai_course_assistant{{/str}}"
                         aria-label="{{#str}}chat:clear, local_ai_course_assistant{{/str}}"
@@ -275,6 +284,27 @@
 
         {{! Focus sentinel — receives focus when drawer opens, prevents mobile keyboard pop-up }}
     <span class="aica-focus-sentinel" tabindex="-1" aria-hidden="true"></span>
+
+    {{! Help guide panel — toggled by the ? button in the header }}
+    <div class="aica-help-panel" hidden style="position:absolute;inset:0;z-index:10;background:#fff;overflow-y:auto;padding:16px 20px;font-size:14px;line-height:1.6">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <h4 style="margin:0;font-size:16px">How to use {{shortname_label}}</h4>
+            <button class="aica-help-panel__close" type="button" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px" aria-label="Close help">&times;</button>
+        </div>
+        <p><strong>{{displayname}}</strong> is your AI learning assistant for this course. It reads the course content and helps you study, practice, and understand the material.</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">Getting started</h5>
+        <p>Click any conversation starter to begin, or type your own question. {{shortname_label}} answers based on the page you are on.</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">Practice quizzes</h5>
+        <p>Click <strong>Quiz Me</strong> to get multiple-choice questions from the course content. You will see explanations after each answer and a score summary at the end.</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">Study plans</h5>
+        <p>Click <strong>Study Plan</strong> to create a personalised week-by-week plan. Tell {{shortname_label}} your goal, how many hours you can study, and your deadline. You can opt into email reminders.</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">Voice</h5>
+        <p>Use the mic icon to speak your question, or switch to the Voice tab for a live two-way conversation.</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">Languages</h5>
+        <p>Click the gear icon and change the language. {{shortname_label}} supports 46 languages. All labels and responses switch instantly.</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">Your data</h5>
+        <p>Your conversations are private to you and the institution. Click the eraser icon to permanently delete your conversation for this course. No one needs to approve it.</p>
+    </div>
 
     {{! Language banner — shown by JS when browser language is detected }}
         <div class="local-ai-course-assistant__lang-banner" aria-hidden="true">

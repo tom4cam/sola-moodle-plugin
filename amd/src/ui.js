@@ -627,10 +627,39 @@ define([
             try { alreadyOpened = localStorage.getItem(firstVisitKey) === '1'; } catch (e) { /**/ }
             if (courseId && !alreadyOpened) {
                 try { localStorage.setItem(firstVisitKey, '1'); } catch (e) { /**/ }
-                // Defer one frame so layout, drag offsets, and focus traps
-                // are fully wired before we open.
                 requestAnimationFrame(function() { toggleDrawer(); });
             }
+        }
+
+        // Help panel toggle.
+        var helpBtn = root.querySelector('.local-ai-course-assistant__btn-help');
+        var helpPanel = root.querySelector('.aica-help-panel');
+        var helpCloseBtn = root.querySelector('.aica-help-panel__close');
+        if (helpBtn && helpPanel) {
+            helpBtn.addEventListener('click', function() {
+                helpPanel.hidden = !helpPanel.hidden;
+            });
+            if (helpCloseBtn) {
+                helpCloseBtn.addEventListener('click', function() {
+                    helpPanel.hidden = true;
+                });
+            }
+        }
+
+        // Persistent welcome message: inject the admin-configured chat
+        // greeting as the first assistant message bubble so it is always
+        // visible, including on return visits. Does not save to DB and
+        // does not count against the conversation cap.
+        var greeting = (root.dataset.chatGreeting || '').trim();
+        var firstname = root.dataset.firstname || '';
+        var coursename = root.dataset.coursename || '';
+        if (greeting && messagesContainer) {
+            greeting = greeting.replace('{{firstname}}', firstname).replace('{{coursename}}', coursename);
+            var welcomeDiv = document.createElement('div');
+            welcomeDiv.className = 'local-ai-course-assistant__message local-ai-course-assistant__message--assistant';
+            welcomeDiv.setAttribute('data-welcome', '1');
+            welcomeDiv.innerHTML = '<div class="local-ai-course-assistant__message-content">' + greeting + '</div>';
+            messagesContainer.insertBefore(welcomeDiv, messagesContainer.firstChild);
         }
     };
 
@@ -2155,6 +2184,9 @@ define([
             sendBtn: sendBtn,
             closeBtn: root.querySelector('.local-ai-course-assistant__btn-close'),
             clearBtn: root.querySelector('.local-ai-course-assistant__btn-clear'),
+            helpBtn: root.querySelector('.local-ai-course-assistant__btn-help'),
+            helpPanel: root.querySelector('.aica-help-panel'),
+            helpCloseBtn: root.querySelector('.aica-help-panel__close'),
             copyBtn: root.querySelector('.local-ai-course-assistant__btn-copy'),
             micBtn: micBtn,
             langBtn: langBtn,

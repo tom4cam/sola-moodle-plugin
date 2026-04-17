@@ -40,9 +40,10 @@ class ollama_provider extends openai_compatible_provider {
     }
 
     protected function get_headers(): array {
-        // Ollama typically doesn't require authentication.
-        return [
-            'Content-Type: application/json',
-        ];
+        $headers = ['Content-Type: application/json'];
+        if (!empty($this->apikey)) {
+            $headers[] = 'Authorization: Bearer ' . $this->apikey;
+        }
+        return $headers;
     }
 }
