@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'メモ';
 // History panel.
 $string['chat:history_title'] = 'メモと会話履歴';
 $string['task:send_inactivity_reminders'] = '週次の非アクティビティリマインダーメールを送信する';
-$string['task:run_meta_ai_query'] = 'スケジュールされた Meta-AI 分析クエリを実行';
+$string['task:run_meta_ai_query'] = 'スケジュールされた AI Analysis 分析クエリを実行';
 $string['messageprovider:study_notes'] = '学習セッションノート';
 
 // CDN settings.

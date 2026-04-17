@@ -45,7 +45,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:timecreated'] = 'Az üz
 $string['ai_course_assistant:use'] = 'AI tutor csevegés használata';
 $string['ai_course_assistant:viewanalytics'] = 'AI tutor csevegés analitika megtekintése';
 $string['ai_course_assistant:manage'] = 'AI tutor csevegés beállítások kezelése (Adminisztrátor szerep)';
-$string['task:run_meta_ai_query'] = 'Ütemezett Meta-AI elemzési lekérdezés futtatása';
+$string['task:run_meta_ai_query'] = 'Ütemezett AI Analysis elemzési lekérdezés futtatása';
 
 // Settings.
 $string['settings:enabled'] = 'AI Kurzus Asszisztens engedélyezése';

@@ -165,17 +165,22 @@ $providers = [
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('coursesettings:title', 'local_ai_course_assistant'));
 
-// Link back to global settings.
+// Navigation bar.
+$courseurl = new moodle_url('/course/view.php', ['id' => $courseid]);
 $courseanalyticsurl = new moodle_url('/local/ai_course_assistant/analytics.php', ['courseid' => $courseid]);
 echo html_writer::div(
-    html_writer::link($globalsettingsurl,
+    html_writer::link($courseurl,
+        '&larr; Back to Course',
+        ['class' => 'btn btn-sm btn-outline-secondary'])
+    . ' '
+    . html_writer::link($globalsettingsurl,
         get_string('coursesettings:global_settings_link', 'local_ai_course_assistant'),
-        ['class' => 'btn btn-sm btn-outline-secondary mb-3'])
+        ['class' => 'btn btn-sm btn-outline-secondary'])
     . ' '
     . html_writer::link($courseanalyticsurl,
-        'View Course Analytics',
-        ['class' => 'btn btn-sm btn-outline-secondary mb-3']),
-    'mb-2'
+        'Course Analytics',
+        ['class' => 'btn btn-sm btn-outline-secondary']),
+    'mb-3 d-flex flex-wrap" style="gap:8px'
 );
 
 ?>
@@ -339,11 +344,23 @@ echo html_writer::div(
                     <textarea class="form-control" id="systemprompt" name="systemprompt" rows="6"
                               placeholder="<?php echo get_string('coursesettings:using_global', 'local_ai_course_assistant'); ?>"
                               ><?php echo s($current ? $current->systemprompt : ''); ?></textarea>
-                    <small class="form-text text-muted">
-                        <?php echo get_string('settings:systemprompt_desc', 'local_ai_course_assistant'); ?>
-                    </small>
+                    <div class="d-flex align-items-center mt-1" style="gap:8px">
+                        <small class="form-text text-muted mb-0">
+                            Leave blank to use the global default. Or customize for this course only.
+                        </small>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-prompt" title="Replace with the global default template">
+                            Reset to default
+                        </button>
+                    </div>
                 </div>
             </div>
+            <script>
+            document.getElementById('btn-reset-prompt').addEventListener('click', function() {
+                if (confirm('Replace the system prompt with the global default template? Any course-specific edits will be lost.')) {
+                    document.getElementById('systemprompt').value = <?php echo json_encode($globalcfg['systemprompt']); ?>;
+                }
+            });
+            </script>
         </div>
     </div>
 

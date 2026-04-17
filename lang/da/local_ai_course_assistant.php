@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Noter';
 // History panel.
 $string['chat:history_title'] = 'Noter og samtalehistorik';
 $string['task:send_inactivity_reminders'] = 'Send ugentlige påmindelses-e-mails ved inaktivitet';
-$string['task:run_meta_ai_query'] = 'Kør planlagt Meta-AI analyseforespørgsel';
+$string['task:run_meta_ai_query'] = 'Kør planlagt AI Analysis analyseforespørgsel';
 $string['messageprovider:study_notes'] = 'Studiesessionsnotater';
 
 // CDN settings.

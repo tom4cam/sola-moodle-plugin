@@ -197,11 +197,15 @@ if ($hassiteconfig) {
         PARAM_FLOAT
     ));
 
+    $defaultprompt = get_string('settings:systemprompt_default', 'local_ai_course_assistant');
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/systemprompt',
         get_string('settings:systemprompt', 'local_ai_course_assistant'),
-        get_string('settings:systemprompt_desc', 'local_ai_course_assistant'),
-        get_string('settings:systemprompt_default', 'local_ai_course_assistant')
+        get_string('settings:systemprompt_desc', 'local_ai_course_assistant')
+        . '<br><button type="button" class="btn btn-sm btn-outline-secondary mt-1" '
+        . 'onclick="document.getElementById(\'id_s_local_ai_course_assistant_systemprompt\').value='
+        . 'atob(\'' . base64_encode($defaultprompt) . '\');">Reset to default template</button>',
+        ''
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -265,7 +269,7 @@ if ($hassiteconfig) {
         'Analytics Dashboard',
         '<a href="' . $analyticsurl->out() . '" class="btn btn-sm btn-outline-secondary">'
         . 'View Analytics Dashboard &rarr;</a>'
-        . '<p class="text-muted mt-1" style="font-size:13px;">Cross-course usage analytics, enable/disable AI per course, student feedback, and Meta-AI Chat.</p>'
+        . '<p class="text-muted mt-1" style="font-size:13px;">Cross-course usage analytics, enable/disable AI per course, student feedback, and AI Analysis Chat.</p>'
     ));
 
     // ── Section: Content & RAG ──────────────────────────────────────────────
@@ -858,17 +862,17 @@ if ($hassiteconfig) {
         ''
     ));
 
-    // Meta-AI Scheduled Reports.
+    // AI Analysis Scheduled Reports.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/metaai_cron_heading',
-        'Meta-AI Scheduled Reports',
+        'AI Analysis Scheduled Reports',
         'Configure automated AI analysis of anonymized student conversation data. Reports are emailed on the selected schedule.'
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/metaai_cron_enabled',
         'Enable scheduled reports',
-        'Run a recurring Meta-AI query and email the anonymized results.',
+        'Run a recurring AI Analysis query and email the anonymized results.',
         0
     ));
 
@@ -906,6 +910,14 @@ if ($hassiteconfig) {
         'Report recipient email',
         'Email address to receive the report. Leave blank to send to the site admin.',
         ''
+    ));
+
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/metaai_cron_format',
+        'Report format',
+        'How the report is delivered. "Text in email body" sends the AI response as plain text in the email. "CSV attachment" sends a CSV file with the query, response, and metadata as an email attachment (subject to Gmail attachment size limits).',
+        'text',
+        ['text' => 'Text in email body', 'csv' => 'CSV attachment']
     ));
 
     // Analytics export (Redash).

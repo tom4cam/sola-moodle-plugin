@@ -371,7 +371,7 @@ $string['chat:history_title'] = 'Заметки и история разгово
 $string['task:send_inactivity_reminders'] = 'Отправлять еженедельные напоминания по электронной почте о неактивности';
 $string['messageprovider:study_notes'] = 'Заметки учебной сессии';
 $string['task:send_inactivity_reminders'] = 'Отправлять еженедельные напоминания о неактивности';
-$string['task:run_meta_ai_query'] = 'Запустить запланированный запрос аналитики Meta-AI';
+$string['task:run_meta_ai_query'] = 'Запустить запланированный запрос аналитики AI Analysis';
 $string['messageprovider:study_notes'] = 'Заметки учебной сессии';
 
 // CDN settings.

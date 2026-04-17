@@ -45,7 +45,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:timecreated'] = 'Час
 $string['ai_course_assistant:use'] = 'Використання чату AI-тьютора';
 $string['ai_course_assistant:viewanalytics'] = 'Перегляд аналітики AI-тьютора';
 $string['ai_course_assistant:manage'] = 'Керування налаштуваннями AI-тьютора (роль Адміністратора)';
-$string['task:run_meta_ai_query'] = 'Запустити заплановий запит аналітики Meta-AI';
+$string['task:run_meta_ai_query'] = 'Запустити заплановий запит аналітики AI Analysis';
 
 // Settings.
 $string['settings:enabled'] = 'Увімкнути AI Асистент Курсу';

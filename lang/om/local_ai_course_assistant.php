@@ -202,7 +202,7 @@ $string['unsubscribe:invalid'] = 'Hidhata ba\'uu hin fayyanne ykn yeroo darbee.'
 $string['unsubscribe:resubscribe'] = 'Yaada kee jijjiirtee? Haasawa barsiisaa AI gidduu yaadachiisuuwwan irra deebi\'ii dandeessa.';
 // Scheduled task.
 $string['task:send_reminders'] = 'Yaadachiisuuwwan barumsa barsiisaa AI ergi';
-$string['task:run_meta_ai_query'] = 'Gaaffii xiinxala Meta-AI karoorfame hojjedhu';
+$string['task:run_meta_ai_query'] = 'Gaaffii xiinxala AI Analysis karoorfame hojjedhu';
 // Privacy - additional tables.
 $string['privacy:metadata:local_ai_course_assistant_plans'] = 'Karoora barumsa barattoota ol kaa\'a.';
 $string['privacy:metadata:local_ai_course_assistant_plans:userid'] = 'ID fayyadamaa karoora barumsa qabu.';

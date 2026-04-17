@@ -379,7 +379,7 @@ $string['chat:history_title'] = 'Bayanai da Tarihin Tattaunawa';
 $string['task:send_inactivity_reminders'] = 'Aika saƙonnin tunatarwa na mako-mako saboda rashin aiki';
 $string['messageprovider:study_notes'] = 'Bayanan zaman karatu';
 $string['task:send_inactivity_reminders'] = 'Aika saƙonnin tunatarwa na mako-mako saboda rashin aiki';
-$string['task:run_meta_ai_query'] = 'Gudanar da binciken nazarin Meta-AI da aka tsara';
+$string['task:run_meta_ai_query'] = 'Gudanar da binciken nazarin AI Analysis da aka tsara';
 $string['messageprovider:study_notes'] = 'Bayanan zaman karatu';
 
 // CDN settings.

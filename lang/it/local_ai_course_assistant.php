@@ -45,7 +45,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:timecreated'] = 'L\'ora
 $string['ai_course_assistant:use'] = 'Utilizzare la chat del tutor AI';
 $string['ai_course_assistant:viewanalytics'] = 'Visualizzare le analisi del tutor AI';
 $string['ai_course_assistant:manage'] = 'Gestire le impostazioni del tutor AI (Ruolo Amministratore)';
-$string['task:run_meta_ai_query'] = 'Esegui la query di analisi Meta-AI pianificata';
+$string['task:run_meta_ai_query'] = 'Esegui la query di analisi AI Analysis pianificata';
 
 // Settings.
 $string['settings:enabled'] = 'Abilita Assistente AI per il Corso';

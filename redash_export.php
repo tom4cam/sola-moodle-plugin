@@ -262,7 +262,7 @@ try {
     $surveydata = [];
 }
 
-// Meta-AI analytics: anonymized stats and transcript excerpt for Redash dashboards.
+// AI Analysis analytics: anonymized stats and transcript excerpt for Redash dashboards.
 $metaai = [
     'summary' => \local_ai_course_assistant\meta_ai_data_builder::build_stats_summary($courseid, $since),
     'transcript_excerpt' => \local_ai_course_assistant\meta_ai_data_builder::build_transcript($courseid, $since, 50000),

@@ -20,7 +20,7 @@ use local_ai_course_assistant\meta_ai_data_builder;
 use local_ai_course_assistant\provider\base_provider;
 
 /**
- * Scheduled task that runs a Meta-AI analytics query and emails
+ * Scheduled task that runs a AI Analysis analytics query and emails
  * the anonymized result to the configured admin address.
  *
  * @package    local_ai_course_assistant
@@ -35,19 +35,19 @@ class run_meta_ai_query extends \core\task\scheduled_task {
 
     public function execute(): void {
         if (!get_config('local_ai_course_assistant', 'metaai_cron_enabled')) {
-            mtrace('  Meta-AI cron: disabled, skipping.');
+            mtrace('  AI Analysis cron: disabled, skipping.');
             return;
         }
 
         $frequency = get_config('local_ai_course_assistant', 'metaai_cron_frequency') ?: 'weekly';
         if (!$this->should_run_today($frequency)) {
-            mtrace("  Meta-AI cron: frequency={$frequency}, not scheduled for today, skipping.");
+            mtrace("  AI Analysis cron: frequency={$frequency}, not scheduled for today, skipping.");
             return;
         }
 
         $query = get_config('local_ai_course_assistant', 'metaai_cron_query');
         if (empty($query)) {
-            mtrace('  Meta-AI cron: no query configured, skipping.');
+            mtrace('  AI Analysis cron: no query configured, skipping.');
             return;
         }
 
@@ -63,12 +63,12 @@ class run_meta_ai_query extends \core\task\scheduled_task {
         $rangedays = $this->frequency_to_days($frequency);
         $since = time() - ($rangedays * 86400);
 
-        mtrace("  Meta-AI cron: building transcript (last {$rangedays} days)...");
+        mtrace("  AI Analysis cron: building transcript (last {$rangedays} days)...");
         $systemprompt = meta_ai_data_builder::build_system_prompt(0, $since);
 
         $messages = [['role' => 'user', 'content' => $query]];
 
-        mtrace("  Meta-AI cron: calling LLM (provider={$providerid}, model={$model})...");
+        mtrace("  AI Analysis cron: calling LLM (provider={$providerid}, model={$model})...");
         try {
             global $CFG;
             require_once($CFG->dirroot . '/lib/filelib.php');
@@ -81,13 +81,14 @@ class run_meta_ai_query extends \core\task\scheduled_task {
 
             $response = $llm->chat_completion($systemprompt, $messages);
         } catch (\Throwable $e) {
-            mtrace('  Meta-AI cron ERROR: ' . $e->getMessage());
+            mtrace('  AI Analysis cron ERROR: ' . $e->getMessage());
             return;
         }
 
-        mtrace('  Meta-AI cron: sending email to ' . $email . '...');
-        $this->send_report($email, $query, $response, $frequency);
-        mtrace('  Meta-AI cron: done.');
+        $format = get_config('local_ai_course_assistant', 'metaai_cron_format') ?: 'text';
+        mtrace("  AI Analysis cron: sending {$format} report to {$email}...");
+        $this->send_report($email, $query, $response, $frequency, $format);
+        mtrace('  AI Analysis cron: done.');
     }
 
     private function should_run_today(string $frequency): bool {
@@ -114,27 +115,46 @@ class run_meta_ai_query extends \core\task\scheduled_task {
         }
     }
 
-    private function send_report(string $email, string $query, string $response, string $frequency): void {
+    private function send_report(string $email, string $query, string $response, string $frequency, string $format = 'text'): void {
         $admin = get_admin();
         $recipient = \core_user::get_user_by_email($email);
         if (!$recipient) {
             $recipient = $admin;
         }
 
-        $subject = 'SOLA Meta-AI Report (' . ucfirst($frequency) . ')';
-        $body = "Meta-AI Analytics Report\n"
-            . "========================\n\n"
-            . "Frequency: " . ucfirst($frequency) . "\n"
-            . "Date: " . userdate(time(), '%Y-%m-%d %H:%M') . "\n"
-            . "Query: " . $query . "\n\n"
-            . "Response\n"
-            . "--------\n\n"
-            . $response . "\n\n"
-            . "---\n"
-            . "All student data in this report is anonymized. Student names have been "
+        $subject = 'SOLA AI Analysis Report (' . ucfirst($frequency) . ')';
+        $disclaimer = "All student data in this report is anonymized. Student names have been "
             . "replaced with pseudonyms (e.g., Student 4217). Do not attempt to identify "
-            . "real students from this data.\n";
+            . "real students from this data.";
 
-        email_to_user($recipient, $admin, $subject, $body);
+        if ($format === 'csv') {
+            global $CFG;
+            $csvpath = $CFG->tempdir . '/sola_report_' . time() . '.csv';
+            $fp = fopen($csvpath, 'w');
+            fputcsv($fp, ['Field', 'Value']);
+            fputcsv($fp, ['Report Type', 'SOLA AI Analysis']);
+            fputcsv($fp, ['Frequency', ucfirst($frequency)]);
+            fputcsv($fp, ['Date', userdate(time(), '%Y-%m-%d %H:%M')]);
+            fputcsv($fp, ['Query', $query]);
+            fputcsv($fp, ['Response', $response]);
+            fputcsv($fp, ['Disclaimer', $disclaimer]);
+            fclose($fp);
+
+            $body = "Your SOLA AI Analysis report is attached as a CSV file.\n\n" . $disclaimer;
+            email_to_user($recipient, $admin, $subject, $body, '', $csvpath, 'sola_ai_analysis_report.csv');
+            @unlink($csvpath);
+        } else {
+            $body = "AI Analysis Report\n"
+                . "========================\n\n"
+                . "Frequency: " . ucfirst($frequency) . "\n"
+                . "Date: " . userdate(time(), '%Y-%m-%d %H:%M') . "\n"
+                . "Query: " . $query . "\n\n"
+                . "Response\n"
+                . "--------\n\n"
+                . $response . "\n\n"
+                . "---\n" . $disclaimer . "\n";
+
+            email_to_user($recipient, $admin, $subject, $body);
+        }
     }
 }

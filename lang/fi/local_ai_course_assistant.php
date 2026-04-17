@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Muistiinpanot';
 // History panel.
 $string['chat:history_title'] = 'Muistiinpanot ja keskusteluhistoria';
 $string['task:send_inactivity_reminders'] = 'Lähetä viikoittaiset muistutussähköpostit toimettomuudesta';
-$string['task:run_meta_ai_query'] = 'Suorita ajoitettu Meta-AI-analytiikkakysely';
+$string['task:run_meta_ai_query'] = 'Suorita ajoitettu AI Analysis-analytiikkakysely';
 $string['messageprovider:study_notes'] = 'Opiskeluistunnon muistiinpanot';
 
 // CDN settings.

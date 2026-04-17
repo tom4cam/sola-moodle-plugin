@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Notatki';
 // History panel.
 $string['chat:history_title'] = 'Notatki i historia rozmowy';
 $string['task:send_inactivity_reminders'] = 'Wyślij tygodniowe e-maile z przypomnieniem o nieaktywności';
-$string['task:run_meta_ai_query'] = 'Uruchom zaplanowane zapytanie analityczne Meta-AI';
+$string['task:run_meta_ai_query'] = 'Uruchom zaplanowane zapytanie analityczne AI Analysis';
 $string['messageprovider:study_notes'] = 'Notatki z sesji nauki';
 
 // CDN settings.

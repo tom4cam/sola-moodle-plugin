@@ -371,7 +371,7 @@ $string['chat:history_title'] = 'नोट्स र कुराकानीक
 $string['task:send_inactivity_reminders'] = 'साप्ताहिक निष्क्रियता सम्झाउने इमेलहरू पठाउनुहोस्';
 $string['messageprovider:study_notes'] = 'अध्ययन सत्र टिप्पणीहरू';
 $string['task:send_inactivity_reminders'] = 'साप्ताहिक निष्क्रियता सम्झाउने इमेलहरू पठाउनुहोस्';
-$string['task:run_meta_ai_query'] = 'तालिकाबद्ध Meta-AI विश्लेषण क्वेरी चलाउनुहोस्';
+$string['task:run_meta_ai_query'] = 'तालिकाबद्ध AI Analysis विश्लेषण क्वेरी चलाउनुहोस्';
 $string['messageprovider:study_notes'] = 'अध्ययन सत्र टिप्पणीहरू';
 
 // CDN settings.

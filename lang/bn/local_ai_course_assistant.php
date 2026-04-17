@@ -348,7 +348,7 @@ $string['chat:history_title'] = 'নোট এবং কথোপকথনের
 $string['task:send_inactivity_reminders'] = 'সাপ্তাহিক নিষ্ক্রিয়তা স্মরণ ইমেল পাঠান';
 $string['messageprovider:study_notes'] = 'অধ্যয়ন সেশন নোট';
 $string['task:send_inactivity_reminders'] = 'সাপ্তাহিক নিষ্ক্রিয়তা অনুস্মারক ইমেল পাঠান';
-$string['task:run_meta_ai_query'] = 'নির্ধারিত Meta-AI বিশ্লেষণ প্রশ্ন চালান';
+$string['task:run_meta_ai_query'] = 'নির্ধারিত AI Analysis বিশ্লেষণ প্রশ্ন চালান';
 $string['messageprovider:study_notes'] = 'অধ্যয়ন সেশন নোট';
 
 // CDN settings.

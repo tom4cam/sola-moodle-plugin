@@ -47,6 +47,7 @@
     <div class="mb-3 d-flex flex-wrap align-items-center" style="gap:8px">
         <a href="{{settings_url}}" class="btn btn-sm btn-outline-secondary">&larr; Plugin Settings</a>
         <a href="{{token_analytics_url}}" class="btn btn-sm btn-outline-secondary">&#36; Token Usage &amp; Cost</a>
+        <a href="{{export_csv_url}}" class="btn btn-sm btn-outline-secondary" title="Download analytics as CSV">&#8615; Export CSV</a>
         <div style="margin-left:auto;display:flex;gap:8px">
             <form method="post" action="{{form_action}}" style="display:inline">
                 <input type="hidden" name="sesskey" value="{{sesskey}}">
@@ -108,42 +109,42 @@
         </div>
     </div>
 
-    {{! ═══ Meta-AI Chat ═══ }}
+    {{! ═══ AI Analysis Chat ═══ }}
     {{#has_meta_ai_providers}}
-    <div class="card mb-4" id="meta-ai-chat-card">
+    <div class="card mb-4" id="ai-analysis-chat-card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Meta-AI Chat <small class="text-muted" style="font-size:12px">(query anonymized student data)</small></h5>
-            <button class="btn btn-sm btn-outline-secondary" type="button" data-toggle="collapse" data-target="#meta-ai-body" aria-expanded="false" aria-controls="meta-ai-body">Expand</button>
+            <h5 class="mb-0">AI Analysis Chat <small class="text-muted" style="font-size:12px">(query anonymized student data)</small></h5>
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-toggle="collapse" data-target="#ai-analysis-body" aria-expanded="false" aria-controls="ai-analysis-body">Expand</button>
         </div>
-        <div class="collapse" id="meta-ai-body">
+        <div class="collapse" id="ai-analysis-body">
             <div class="card-body">
                 <div class="d-flex flex-wrap align-items-end mb-2" style="gap:8px">
                     <div>
-                        <label for="meta-ai-provider" class="small text-muted mb-0">Provider</label>
-                        <select id="meta-ai-provider" class="form-control form-control-sm" style="width:180px">
+                        <label for="ai-analysis-provider" class="small text-muted mb-0">Provider</label>
+                        <select id="ai-analysis-provider" class="form-control form-control-sm" style="width:180px">
                             {{#meta_ai_providers}}
                             <option value="{{id}}" data-models="{{models_json}}">{{label}}</option>
                             {{/meta_ai_providers}}
                         </select>
                     </div>
                     <div>
-                        <label for="meta-ai-model" class="small text-muted mb-0">Model</label>
-                        <select id="meta-ai-model" class="form-control form-control-sm" style="width:220px"></select>
+                        <label for="ai-analysis-model" class="small text-muted mb-0">Model</label>
+                        <select id="ai-analysis-model" class="form-control form-control-sm" style="width:220px"></select>
                     </div>
                 </div>
-                <div id="meta-ai-messages" style="max-height:400px;overflow-y:auto;border:1px solid #dee2e6;border-radius:6px;padding:12px;margin-bottom:12px;background:#f8f9fa;font-size:14px">
+                <div id="ai-analysis-messages" style="max-height:400px;overflow-y:auto;border:1px solid #dee2e6;border-radius:6px;padding:12px;margin-bottom:12px;background:#f8f9fa;font-size:14px">
                     <p class="text-muted mb-0" style="font-size:13px">Ask a question about student conversations. All data sent to the AI is anonymized. Examples: "What are the most common topics students ask about?" or "Summarize feedback themes from the last 30 days."</p>
                 </div>
                 <div class="input-group">
-                    <input type="text" id="meta-ai-input" class="form-control" placeholder="Ask about student conversations...">
+                    <input type="text" id="ai-analysis-input" class="form-control" placeholder="Ask about student conversations...">
                     <div class="input-group-append">
-                        <button class="btn btn-primary" id="meta-ai-send" type="button">Send</button>
+                        <button class="btn btn-primary" id="ai-analysis-send" type="button">Send</button>
                     </div>
                 </div>
-                <input type="hidden" id="meta-ai-sse-url" value="{{meta_ai_sse_url}}">
-                <input type="hidden" id="meta-ai-sesskey" value="{{sesskey}}">
-                <input type="hidden" id="meta-ai-courseid" value="{{courseid_param}}">
-                <input type="hidden" id="meta-ai-range" value="{{range}}">
+                <input type="hidden" id="ai-analysis-sse-url" value="{{meta_ai_sse_url}}">
+                <input type="hidden" id="ai-analysis-sesskey" value="{{sesskey}}">
+                <input type="hidden" id="ai-analysis-courseid" value="{{courseid_param}}">
+                <input type="hidden" id="ai-analysis-range" value="{{range}}">
             </div>
         </div>
     </div>
@@ -1049,19 +1050,19 @@
 {{/course.has_data}}
 {{/has_course_selected}}
 
-{{! ═══ Meta-AI Chat JS ═══ }}
+{{! ═══ AI Analysis Chat JS ═══ }}
 {{#has_meta_ai_providers}}
 {{#js}}
 (function() {
-    var providerSelect = document.getElementById('meta-ai-provider');
-    var modelSelect = document.getElementById('meta-ai-model');
-    var messagesDiv = document.getElementById('meta-ai-messages');
-    var inputField = document.getElementById('meta-ai-input');
-    var sendBtn = document.getElementById('meta-ai-send');
-    var sseUrl = document.getElementById('meta-ai-sse-url');
-    var sesskey = document.getElementById('meta-ai-sesskey');
-    var courseidEl = document.getElementById('meta-ai-courseid');
-    var rangeEl = document.getElementById('meta-ai-range');
+    var providerSelect = document.getElementById('ai-analysis-provider');
+    var modelSelect = document.getElementById('ai-analysis-model');
+    var messagesDiv = document.getElementById('ai-analysis-messages');
+    var inputField = document.getElementById('ai-analysis-input');
+    var sendBtn = document.getElementById('ai-analysis-send');
+    var sseUrl = document.getElementById('ai-analysis-sse-url');
+    var sesskey = document.getElementById('ai-analysis-sesskey');
+    var courseidEl = document.getElementById('ai-analysis-courseid');
+    var rangeEl = document.getElementById('ai-analysis-range');
 
     if (!providerSelect || !modelSelect || !messagesDiv || !inputField || !sendBtn) return;
 

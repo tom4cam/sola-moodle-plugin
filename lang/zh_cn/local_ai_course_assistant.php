@@ -371,7 +371,7 @@ $string['chat:history_title'] = '笔记与对话历史';
 $string['task:send_inactivity_reminders'] = '发送每周不活跃提醒邮件';
 $string['messageprovider:study_notes'] = '学习会话笔记';
 $string['task:send_inactivity_reminders'] = '发送每周不活跃提醒邮件';
-$string['task:run_meta_ai_query'] = '运行预定的 Meta-AI 分析查询';
+$string['task:run_meta_ai_query'] = '运行预定的 AI Analysis 分析查询';
 $string['messageprovider:study_notes'] = '学习课程笔记';
 
 // CDN settings.

@@ -458,13 +458,20 @@ $templatedata = [
     'analytics_base_url' => (new moodle_url('/local/ai_course_assistant/analytics.php',
         ['range' => $range]))->out(false),
 
+    // CSV export (uses the Redash endpoint with the configured API key).
+    'export_csv_url' => (new moodle_url('/local/ai_course_assistant/redash_export.php', [
+        'apikey' => get_config('local_ai_course_assistant', 'redash_api_key') ?: '',
+        'courseid' => $courseid,
+        'since' => $since,
+    ]))->out(false),
+
     // Anonymization toggle.
     'show_real_names' => $show_real_names,
 
     // Student mode.
     'student_mode' => !empty($_SESSION['sola_student_mode']),
 
-    // Meta-AI Chat.
+    // AI Analysis Chat.
     'meta_ai_sse_url' => (new moodle_url('/local/ai_course_assistant/meta_ai_sse.php'))->out(false),
     'meta_ai_providers' => (function () {
         $providers = [];

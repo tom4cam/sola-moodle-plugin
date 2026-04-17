@@ -371,7 +371,7 @@ $string['chat:history_title'] = 'Ghi chú và lịch sử hội thoại';
 $string['task:send_inactivity_reminders'] = 'Gửi email nhắc nhở hàng tuần về việc không hoạt động';
 $string['messageprovider:study_notes'] = 'Ghi chú phiên học tập';
 $string['task:send_inactivity_reminders'] = 'Gửi email nhắc nhở hàng tuần về việc không hoạt động';
-$string['task:run_meta_ai_query'] = 'Chạy truy vấn phân tích Meta-AI đã lên lịch';
+$string['task:run_meta_ai_query'] = 'Chạy truy vấn phân tích AI Analysis đã lên lịch';
 $string['messageprovider:study_notes'] = 'Ghi chú phiên học tập';
 
 // CDN settings.

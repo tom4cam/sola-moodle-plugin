@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Notizen';
 // History panel.
 $string['chat:history_title'] = 'Notizen und Gesprächsverlauf';
 $string['task:send_inactivity_reminders'] = 'Wöchentliche Erinnerungs-E-Mails bei Inaktivität senden';
-$string['task:run_meta_ai_query'] = 'Geplante Meta-AI-Analyseabfrage ausführen';
+$string['task:run_meta_ai_query'] = 'Geplante AI Analysis-Analyseabfrage ausführen';
 $string['messageprovider:study_notes'] = 'Lernsitzungsnotizen';
 
 // CDN settings.

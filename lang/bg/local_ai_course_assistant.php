@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Бележки';
 // History panel.
 $string['chat:history_title'] = 'Бележки и история на разговора';
 $string['task:send_inactivity_reminders'] = 'Изпращане на седмични имейли за напомняне при неактивност';
-$string['task:run_meta_ai_query'] = 'Изпълнение на планирана заявка за Meta-AI анализ';
+$string['task:run_meta_ai_query'] = 'Изпълнение на планирана заявка за AI Analysis анализ';
 $string['messageprovider:study_notes'] = 'Бележки от учебна сесия';
 
 // CDN settings.

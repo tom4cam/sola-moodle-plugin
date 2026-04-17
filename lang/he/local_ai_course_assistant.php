@@ -45,7 +45,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:timecreated'] = 'הזמ
 $string['ai_course_assistant:use'] = 'שימוש בצ\'אט מורה AI';
 $string['ai_course_assistant:viewanalytics'] = 'צפייה בניתוח נתוני מורה AI';
 $string['ai_course_assistant:manage'] = 'ניהול הגדרות מורה AI (תפקיד מנהל)';
-$string['task:run_meta_ai_query'] = 'הפעל שאילתת ניתוח Meta-AI מתוזמנת';
+$string['task:run_meta_ai_query'] = 'הפעל שאילתת ניתוח AI Analysis מתוזמנת';
 
 // Settings.
 $string['settings:enabled'] = 'הפעלת עוזר קורס AI';

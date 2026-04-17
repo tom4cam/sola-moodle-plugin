@@ -371,7 +371,7 @@ $string['chat:history_title'] = 'Maelezo na Historia ya Mazungumzo';
 $string['task:send_inactivity_reminders'] = 'Tuma barua pepe za ukumbusho wa kila wiki kwa kutokuwa na shughuli';
 $string['messageprovider:study_notes'] = 'Maelezo ya kipindi cha masomo';
 $string['task:send_inactivity_reminders'] = 'Tuma barua pepe za ukumbusho wa kutofanya kazi kila wiki';
-$string['task:run_meta_ai_query'] = 'Endesha swali la uchambuzi wa Meta-AI lililopangwa';
+$string['task:run_meta_ai_query'] = 'Endesha swali la uchambuzi wa AI Analysis lililopangwa';
 $string['messageprovider:study_notes'] = 'Maelezo ya kipindi cha masomo';
 
 // CDN settings.

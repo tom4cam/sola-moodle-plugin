@@ -17,7 +17,7 @@
 namespace local_ai_course_assistant;
 
 /**
- * Builds anonymized transcript context for the Meta-AI Chat and cron reports.
+ * Builds anonymized transcript context for the AI Analysis Chat and cron reports.
  *
  * @package    local_ai_course_assistant
  * @copyright  2025 AI Course Assistant

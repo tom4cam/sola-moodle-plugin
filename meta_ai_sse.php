@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Meta-AI Chat SSE endpoint for the analytics dashboard.
+ * AI Analysis Chat SSE endpoint for the analytics dashboard.
  *
  * Admin-only. Streams an LLM response based on anonymized student
  * conversation transcripts. Uses the same SSE protocol as sse.php

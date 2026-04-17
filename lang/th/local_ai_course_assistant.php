@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'บันทึก';
 // History panel.
 $string['chat:history_title'] = 'บันทึกและประวัติการสนทนา';
 $string['task:send_inactivity_reminders'] = 'ส่งอีเมลแจ้งเตือนการไม่ใช้งานรายสัปดาห์';
-$string['task:run_meta_ai_query'] = 'รันการค้นหาวิเคราะห์ Meta-AI ตามกำหนดเวลา';
+$string['task:run_meta_ai_query'] = 'รันการค้นหาวิเคราะห์ AI Analysis ตามกำหนดเวลา';
 $string['messageprovider:study_notes'] = 'บันทึกเซสชันการเรียน';
 
 // CDN settings.

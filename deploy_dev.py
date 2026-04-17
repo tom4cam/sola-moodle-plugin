@@ -154,11 +154,13 @@ def deploy_to_target(name, hostname, moodle_dir):
 
 
 def course_exists(moodle_dir, shortname):
-    """Return True if a course with the given shortname exists on the target."""
+    """Return True if a course whose shortname starts with the given prefix exists."""
     php = (
         "define('CLI_SCRIPT', true); "
         f"require('{moodle_dir}/config.php'); "
-        f"echo \\$DB->record_exists('course', ['shortname' => '{shortname}']) ? 'YES' : 'NO';"
+        f"\\$n = \\$DB->count_records_select('course', "
+        f"\\\"shortname LIKE '{shortname}%'\\\"); "
+        "echo \\$n > 0 ? 'YES' : 'NO';"
     )
     result = ssm_send([f"sudo -u www-data php -r \"{php}\""], timeout=30)
     return bool(result and "YES" in (result.get("stdout") or ""))

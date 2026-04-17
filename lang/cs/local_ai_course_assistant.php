@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Poznámky';
 // History panel.
 $string['chat:history_title'] = 'Poznámky a historie konverzace';
 $string['task:send_inactivity_reminders'] = 'Odeslat týdenní e-maily s připomínkou při nečinnosti';
-$string['task:run_meta_ai_query'] = 'Spustit naplánovaný dotaz Meta-AI analytiky';
+$string['task:run_meta_ai_query'] = 'Spustit naplánovaný dotaz AI Analysis analytiky';
 $string['messageprovider:study_notes'] = 'Poznámky ze studijní relace';
 
 // CDN settings.

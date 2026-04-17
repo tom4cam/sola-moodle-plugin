@@ -379,7 +379,7 @@ $string['chat:history_title'] = 'Catatan dan Riwayat Percakapan';
 $string['task:send_inactivity_reminders'] = 'Kirim email pengingat ketidakaktifan mingguan';
 $string['messageprovider:study_notes'] = 'Catatan sesi belajar';
 $string['task:send_inactivity_reminders'] = 'Kirim email pengingat ketidakaktifan mingguan';
-$string['task:run_meta_ai_query'] = 'Jalankan kueri analitik Meta-AI terjadwal';
+$string['task:run_meta_ai_query'] = 'Jalankan kueri analitik AI Analysis terjadwal';
 $string['messageprovider:study_notes'] = 'Catatan sesi belajar';
 
 // CDN settings.

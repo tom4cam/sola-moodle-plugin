@@ -365,7 +365,7 @@ $string['chat:history_title'] = 'Ndetu na Akụkọ Mkparịta Ụka';
 $string['task:send_inactivity_reminders'] = 'Ziga ozi email ncheta nke izu nke izu maka enweghị ọrụ';
 $string['messageprovider:study_notes'] = 'Ndetu oge ọmụmụ ihe';
 $string['task:send_inactivity_reminders'] = 'Ziga ozi email ncheta nke izu maka enweghị ọrụ';
-$string['task:run_meta_ai_query'] = 'Gbaa ajụjụ nyocha Meta-AI a haziri';
+$string['task:run_meta_ai_query'] = 'Gbaa ajụjụ nyocha AI Analysis a haziri';
 $string['messageprovider:study_notes'] = 'Ndetu oge ọmụmụ ihe';
 
 // CDN settings.

@@ -371,7 +371,7 @@ $string['chat:history_title'] = 'Notas e histórico de conversa';
 $string['task:send_inactivity_reminders'] = 'Enviar e-mails semanais de lembrete de inatividade';
 $string['messageprovider:study_notes'] = 'Notas da sessão de estudo';
 $string['task:send_inactivity_reminders'] = 'Enviar e-mails de lembrete semanal de inatividade';
-$string['task:run_meta_ai_query'] = 'Executar consulta de análise Meta-AI agendada';
+$string['task:run_meta_ai_query'] = 'Executar consulta de análise AI Analysis agendada';
 $string['messageprovider:study_notes'] = 'Notas da sessão de estudo';
 
 // CDN settings.
