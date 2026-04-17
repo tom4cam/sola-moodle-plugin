@@ -371,3 +371,310 @@ $string['chat:llm_model_select'] = 'Επιλογή μοντέλου LLM';
 $string['chat:footer_usertesting'] = 'Δοκιμή ευχρηστίας';
 $string['chat:footer_feedback'] = 'Σχόλια';
 $string['chat:voice_panel_title'] = 'Μίλα με {$a} (Πειραματικό)';
+
+// Additional translated strings.
+$string['analytics:active_students'] = 'Active students';
+$string['analytics:all_time'] = 'All time';
+$string['analytics:avg_messages_per_student'] = 'Avg messages per student';
+$string['analytics:avg_response_length'] = 'Avg response length';
+$string['analytics:avg_tokens'] = 'Avg tokens / response';
+$string['analytics:common_prompts'] = 'Common Prompt Patterns';
+$string['analytics:common_prompts_desc'] = 'Frequently recurring question patterns from students. Review these to identify systemic gaps in course content.';
+$string['analytics:daily_messages'] = 'Daily message volume';
+$string['analytics:escalation_count'] = 'Escalated to support';
+$string['analytics:export'] = 'Export data';
+$string['analytics:frequency'] = 'Frequency';
+$string['analytics:hotspots'] = 'Course Hotspots';
+$string['analytics:hotspots_desc'] = 'Course sections most frequently referenced in student questions. Higher counts may indicate areas where students need more support.';
+$string['analytics:last_30_days'] = 'Last 30 days';
+$string['analytics:last_7_days'] = 'Last 7 days';
+$string['analytics:mention_count'] = 'Mentions';
+$string['analytics:no_data'] = 'No analytics data available yet. Data will appear once students begin using the AI tutor.';
+$string['analytics:offtopic_rate'] = 'Off-topic rate';
+$string['analytics:overview'] = 'Overview';
+$string['analytics:prompt_pattern'] = 'Pattern';
+$string['analytics:provider'] = 'Provider';
+$string['analytics:provider_comparison'] = 'AI Provider Comparison';
+$string['analytics:provider_comparison_desc'] = 'Compare performance across AI providers used in this course.';
+$string['analytics:recent_activity'] = 'Recent Activity';
+$string['analytics:response_count'] = 'Responses';
+$string['analytics:section'] = 'Section';
+$string['analytics:studyplan_adoption'] = 'Students with study plans';
+$string['analytics:timerange'] = 'Time range';
+$string['analytics:title'] = 'AI Tutor Analytics';
+$string['analytics:total_conversations'] = 'Total conversations';
+$string['analytics:total_messages'] = 'Total messages';
+$string['analytics:total_tokens'] = 'Total tokens';
+$string['analytics:usage_trends'] = 'Usage Trends';
+$string['error'] = '{$a}';
+$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
+$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
+$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
+$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
+$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
+$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
+$string['insights:error'] = 'Could not generate insights.';
+$string['insights:generate'] = 'Generate AI Insights';
+$string['insights:generating'] = 'Analyzing data… this may take a moment.';
+$string['insights:no_data'] = 'No feedback, survey, or usability testing data available to analyze yet. Insights will be available once users submit feedback or complete surveys.';
+$string['insights:title'] = 'AI Insights';
+$string['integrity:desc'] = 'Automated daily health checks that verify PHP syntax, JS builds, lang files, database tables, and more. Email alerts are sent only when issues are found.';
+$string['integrity:email'] = 'Report Email Address(es)';
+$string['integrity:email_desc'] = 'Email address(es) for failure reports. Separate multiple addresses with commas. Leave blank to notify the primary site admin.';
+$string['integrity:enabled'] = 'Enable Daily Integrity Checks';
+$string['integrity:enabled_desc'] = 'Run automated plugin health checks daily at 3 AM server time.';
+$string['integrity:run_now'] = 'Run Checks Now';
+$string['integrity:title'] = 'Integrity Checks';
+$string['integrity:view_results'] = 'View Integrity Results';
+$string['messageprovider:integrity_report'] = 'SOLA integrity check failure report';
+$string['messageprovider:study_notes'] = 'Study session notes';
+$string['privacy:metadata:local_ai_course_assistant_audit'] = 'Stores audit log entries for compliance tracking.';
+$string['privacy:metadata:local_ai_course_assistant_audit:action'] = 'The action that was performed.';
+$string['privacy:metadata:local_ai_course_assistant_audit:courseid'] = 'The course context of the action.';
+$string['privacy:metadata:local_ai_course_assistant_audit:details'] = 'Additional details about the action.';
+$string['privacy:metadata:local_ai_course_assistant_audit:ipaddress'] = 'The IP address of the user.';
+$string['privacy:metadata:local_ai_course_assistant_audit:timecreated'] = 'The time the action was logged.';
+$string['privacy:metadata:local_ai_course_assistant_audit:useragent'] = 'The browser user agent string.';
+$string['privacy:metadata:local_ai_course_assistant_audit:userid'] = 'The ID of the user whose action was logged.';
+$string['privacy:metadata:local_ai_course_assistant_feedback'] = 'Stores user feedback and ratings.';
+$string['privacy:metadata:local_ai_course_assistant_feedback:browser'] = 'The browser used when submitting feedback.';
+$string['privacy:metadata:local_ai_course_assistant_feedback:comment'] = 'The feedback comment text.';
+$string['privacy:metadata:local_ai_course_assistant_feedback:courseid'] = 'The course the feedback relates to.';
+$string['privacy:metadata:local_ai_course_assistant_feedback:device'] = 'The device type used when submitting feedback.';
+$string['privacy:metadata:local_ai_course_assistant_feedback:os'] = 'The operating system used when submitting feedback.';
+$string['privacy:metadata:local_ai_course_assistant_feedback:page_url'] = 'The page URL where feedback was submitted.';
+$string['privacy:metadata:local_ai_course_assistant_feedback:rating'] = 'The numeric rating given.';
+$string['privacy:metadata:local_ai_course_assistant_feedback:screen_size'] = 'The screen size when submitting feedback.';
+$string['privacy:metadata:local_ai_course_assistant_feedback:timecreated'] = 'The time the feedback was submitted.';
+$string['privacy:metadata:local_ai_course_assistant_feedback:user_agent'] = 'The browser user agent string.';
+$string['privacy:metadata:local_ai_course_assistant_feedback:userid'] = 'The ID of the user who submitted feedback.';
+$string['privacy:metadata:local_ai_course_assistant_msgs:completion_tokens'] = 'The number of completion tokens generated.';
+$string['privacy:metadata:local_ai_course_assistant_msgs:model_name'] = 'The AI model used for the response.';
+$string['privacy:metadata:local_ai_course_assistant_msgs:prompt_tokens'] = 'The number of prompt tokens used.';
+$string['privacy:metadata:local_ai_course_assistant_msgs:provider'] = 'The AI provider used for the response.';
+$string['privacy:metadata:local_ai_course_assistant_plans'] = 'Stores student study plans.';
+$string['privacy:metadata:local_ai_course_assistant_plans:courseid'] = 'The course the study plan belongs to.';
+$string['privacy:metadata:local_ai_course_assistant_plans:hours_per_week'] = 'Hours per week the student plans to study.';
+$string['privacy:metadata:local_ai_course_assistant_plans:plan_data'] = 'The study plan details in JSON format.';
+$string['privacy:metadata:local_ai_course_assistant_plans:userid'] = 'The ID of the user who owns the study plan.';
+$string['privacy:metadata:local_ai_course_assistant_practice_scores'] = 'Stores practice session scores and AI feedback.';
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:ai_feedback'] = 'AI-generated feedback on the practice session.';
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:courseid'] = 'The course the practice session belongs to.';
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:overall_score'] = 'The overall score achieved.';
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:scores'] = 'Per-criterion scores in JSON format.';
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:session_type'] = 'The type of practice session (conversation or pronunciation).';
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:timecreated'] = 'The time the score was recorded.';
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:userid'] = 'The ID of the user who completed the practice.';
+$string['privacy:metadata:local_ai_course_assistant_reminders'] = 'Stores study reminder preferences and subscriptions.';
+$string['privacy:metadata:local_ai_course_assistant_reminders:channel'] = 'The reminder channel (email or whatsapp).';
+$string['privacy:metadata:local_ai_course_assistant_reminders:country_code'] = 'The user\'s country code for regulatory compliance.';
+$string['privacy:metadata:local_ai_course_assistant_reminders:destination'] = 'The email address or phone number for reminders.';
+$string['privacy:metadata:local_ai_course_assistant_reminders:userid'] = 'The ID of the user subscribed to reminders.';
+$string['privacy:metadata:local_ai_course_assistant_survey_resp'] = 'Stores survey responses from students.';
+$string['privacy:metadata:local_ai_course_assistant_survey_resp:answer'] = 'The answer text or selection.';
+$string['privacy:metadata:local_ai_course_assistant_survey_resp:courseid'] = 'The course the survey relates to.';
+$string['privacy:metadata:local_ai_course_assistant_survey_resp:question_index'] = 'The index of the question answered.';
+$string['privacy:metadata:local_ai_course_assistant_survey_resp:timecreated'] = 'The time the response was submitted.';
+$string['privacy:metadata:local_ai_course_assistant_survey_resp:userid'] = 'The ID of the user who responded.';
+$string['privacy:metadata:local_ai_course_assistant_ut_resp'] = 'Stores usability testing responses.';
+$string['privacy:metadata:local_ai_course_assistant_ut_resp:answer'] = 'The free-text response for the task.';
+$string['privacy:metadata:local_ai_course_assistant_ut_resp:courseid'] = 'The course the usability test relates to.';
+$string['privacy:metadata:local_ai_course_assistant_ut_resp:rating'] = 'The numeric rating given for the task.';
+$string['privacy:metadata:local_ai_course_assistant_ut_resp:task_index'] = 'The index of the task completed.';
+$string['privacy:metadata:local_ai_course_assistant_ut_resp:timecreated'] = 'The time the response was submitted.';
+$string['privacy:metadata:local_ai_course_assistant_ut_resp:userid'] = 'The ID of the user who completed the test.';
+$string['ragadmin:back_to_settings'] = 'Back to plugin settings';
+$string['ragadmin:col_actions'] = 'Actions';
+$string['ragadmin:col_chunks'] = 'Chunks';
+$string['ragadmin:col_course'] = 'Course';
+$string['ragadmin:col_embedded'] = 'Embedded';
+$string['ragadmin:col_lastindexed'] = 'Last indexed';
+$string['ragadmin:deleteindex'] = 'Clear index';
+$string['ragadmin:deleteindex_confirm'] = 'Delete all indexed chunks for this course? The AI tutor will fall back to full content stuffing until the course is re-indexed.';
+$string['ragadmin:deleteindex_done'] = 'Course index cleared.';
+$string['ragadmin:index_status'] = 'Per-course index status';
+$string['ragadmin:never'] = 'Never';
+$string['ragadmin:no_courses'] = 'No indexed courses and no active courses found.';
+$string['ragadmin:rag_disabled_notice'] = 'RAG is currently disabled. Enable it in the plugin settings to activate semantic search. You can still pre-index courses below so the index is ready when you enable RAG.';
+$string['ragadmin:reindex'] = 'Reindex';
+$string['ragadmin:reindexall'] = 'Reindex all active courses';
+$string['ragadmin:reindexall_confirm'] = 'This will call the embedding API for all new/changed content across all active courses. Continue?';
+$string['ragadmin:reindexall_desc'] = 'Runs incremental indexing on all courses with active enrolments. Only new or changed content is re-embedded.';
+$string['ragadmin:reindexall_done'] = 'Reindexing complete: {$a->courses} course(s) processed — {$a->indexed} chunks indexed, {$a->skipped} skipped, {$a->errors} error(s).';
+$string['ragadmin:reindexcourse_done'] = 'Course reindexed: {$a->indexed} chunks indexed, {$a->skipped} skipped, {$a->errors} error(s).';
+$string['ragadmin:stat_active_courses'] = 'Active courses';
+$string['ragadmin:stat_courses_indexed'] = 'Courses indexed';
+$string['ragadmin:stat_embedded_chunks'] = 'Embedded chunks';
+$string['ragadmin:stat_total_chunks'] = 'Total chunks';
+$string['ragadmin:title'] = 'RAG Index Status & Reindex';
+$string['ragadmin:view_status'] = 'View RAG index status / reindex';
+$string['redash_api_key'] = 'Redash API Key';
+$string['redash_api_key_desc'] = 'API key for external analytics platforms like Redash. Provides read-only access to usage data, feedback, and cost analytics. Leave blank to disable the export endpoint.';
+$string['redash_heading'] = 'Analytics Export';
+$string['redash_heading_desc'] = 'Configure API key access for external analytics platforms like Redash. The export endpoint provides read-only JSON access to usage data, feedback, and cost analytics.';
+$string['reminder:email_body'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Your study plan suggests {$a->hours_per_week} hours per week for this course.
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
+$string['reminder:email_subject'] = 'Study Reminder: {$a}';
+$string['reminder:study_tip_prefix'] = 'Today\'s study focus: ';
+$string['reminder:whatsapp_body'] = 'Study Reminder for {$a->coursename}: {$a->message} (Opt out: {$a->unsubscribe_url})';
+$string['remoteconfigurl'] = 'Remote config URL';
+$string['remoteconfigurl_desc'] = 'URL to a JSON file containing remotely-managed SOLA configuration (system prompt, instruction blocks, model default). Must be HTTPS. Leave blank to use the default GitHub URL. Local admin settings always take priority over remote config values.';
+$string['rubric:done'] = 'Ολοκληρώθηκε';
+$string['rubric:encourage_high'] = 'Εξαιρετικά! Συνεχίστε!';
+$string['rubric:encourage_low'] = 'Καλή αρχή! Η τακτική εξάσκηση θα βοηθήσει.';
+$string['rubric:encourage_mid'] = 'Καλή προσπάθεια! Συνεχίστε.';
+$string['rubric:overall'] = 'Συνολικά';
+$string['rubric:practice_again'] = 'Εξασκηθείτε ξανά';
+$string['rubric:score_title_conversation'] = 'Βαθμολογία συνομιλίας';
+$string['rubric:score_title_pronunciation'] = 'Βαθμολογία προφοράς';
+$string['rubric:scoring'] = 'Αξιολόγηση...';
+$string['settings:avatar_saylor'] = '{$a} Logo (Default)';
+$string['settings:embed_apibaseurl'] = 'Embedding API Base URL';
+$string['settings:embed_apibaseurl_desc'] = 'Base URL for the embedding API. Leave blank for OpenAI default. For Ollama: http://localhost:11434/api';
+$string['settings:embed_apikey'] = 'Embedding API Key';
+$string['settings:embed_apikey_desc'] = 'API key for the embedding provider. Can be different from the chat API key. Not required for Ollama.';
+$string['settings:embed_dimensions'] = 'Embedding Dimensions';
+$string['settings:embed_dimensions_desc'] = 'Number of dimensions in the embedding vector. Must match your model output. OpenAI text-embedding-3-small: 1536. nomic-embed-text: 768.';
+$string['settings:embed_model'] = 'Embedding Model';
+$string['settings:embed_model_desc'] = 'Model to use for generating embeddings. OpenAI default: text-embedding-3-small. Ollama example: nomic-embed-text.';
+$string['settings:embed_provider'] = 'Embedding Provider';
+$string['settings:embed_provider_desc'] = 'The API provider used to generate text embeddings for RAG indexing and retrieval.';
+$string['settings:embed_provider_ollama'] = 'Ollama (local, e.g. nomic-embed-text)';
+$string['settings:embed_provider_openai'] = 'OpenAI (text-embedding-3-small)';
+$string['settings:faq_content'] = 'FAQ Content';
+$string['settings:faq_content_desc'] = 'Enter FAQ entries (one per line in the format: Q: question | A: answer). These will be provided to the AI to answer common support questions.';
+$string['settings:faq_heading'] = 'FAQ & Support';
+$string['settings:faq_heading_desc'] = 'Configure the centralized FAQ and Zendesk support ticket integration.';
+$string['settings:institution_name'] = 'Institution Name';
+$string['settings:institution_name_desc'] = 'The name of the institution displayed in the system prompt, avatar labels, and demo content. Change this when rebranding.';
+$string['settings:model_desc_dynamic'] = 'Leave blank to use the provider\'s default model automatically. Each provider has a built-in default that stays current (e.g. gpt-4o for OpenAI, claude-sonnet-4 for Claude, mistral-large-latest for Mistral). Only enter a model name if you want to override the default. If a model is misspelled or deprecated, SOLA will automatically fall back to the provider\'s default.';
+$string['settings:offtopic_action'] = 'Off-topic Action';
+$string['settings:offtopic_action_desc'] = 'What to do when the off-topic limit is reached.';
+$string['settings:offtopic_action_end'] = 'Temporarily lock access';
+$string['settings:offtopic_action_warn'] = 'Warn and redirect';
+$string['settings:offtopic_enabled'] = 'Enable Off-topic Detection';
+$string['settings:offtopic_enabled_desc'] = 'Instruct the AI to detect and redirect off-topic conversations.';
+$string['settings:offtopic_heading'] = 'Off-topic Detection';
+$string['settings:offtopic_heading_desc'] = 'Configure how the chat handles off-topic conversations.';
+$string['settings:offtopic_lockout_duration'] = 'Lockout Duration (minutes)';
+$string['settings:offtopic_lockout_duration_desc'] = 'How long (in minutes) a student loses access to the AI tutor after exceeding the off-topic limit. Default: 30 minutes.';
+$string['settings:offtopic_max'] = 'Max Off-topic Messages';
+$string['settings:offtopic_max_desc'] = 'Number of consecutive off-topic messages before taking action.';
+$string['settings:rag_chunksize'] = 'Chunk Size (words)';
+$string['settings:rag_chunksize_desc'] = 'Target number of words per content chunk when indexing course material. Smaller chunks are more precise; larger chunks provide more context.';
+$string['settings:rag_enabled'] = 'Enable RAG (Semantic Search)';
+$string['settings:rag_enabled_desc'] = 'When enabled, the AI tutor uses semantic search to retrieve relevant course content for each query instead of stuffing all content into the system prompt.';
+$string['settings:rag_heading'] = 'RAG / Semantic Search';
+$string['settings:rag_heading_desc'] = 'Retrieval-Augmented Generation: index course content as embeddings and retrieve only the most relevant chunks at query time. Reduces token usage and supports all content types. Requires an embedding API.';
+$string['settings:rag_topk'] = 'Top-K Chunks';
+$string['settings:rag_topk_desc'] = 'Number of most relevant chunks to retrieve per user query and inject into the system prompt.';
+$string['settings:reminders_email_enabled'] = 'Enable Email Reminders';
+$string['settings:reminders_email_enabled_desc'] = 'Allow students to opt in to study reminders via email.';
+$string['settings:reminders_whatsapp_enabled'] = 'Enable WhatsApp Reminders';
+$string['settings:reminders_whatsapp_enabled_desc'] = 'Allow students to opt in to study reminders via WhatsApp (requires WhatsApp API configuration).';
+$string['settings:studyplan_enabled'] = 'Enable Study Planning';
+$string['settings:studyplan_enabled_desc'] = 'Allow the AI tutor to help students create personalized study plans based on their available time.';
+$string['settings:studyplan_heading'] = 'Study Planning & Reminders';
+$string['settings:studyplan_heading_desc'] = 'Configure study planning features and reminder notifications.';
+$string['settings:systemprompt_default'] = 'You are SOLA (Online Learning Assistant), an AI learning coach for {{institution}} students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
+
+## Role
+Provide supportive, course-aligned academic help that encourages learning, practice, motivation, and responsible AI use. You complement faculty-designed courses but do not replace instructors.
+
+## Core Rules
+- Ground all academic responses in approved course materials or institutional information.
+- Do not invent content or go beyond course scope.
+- Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
+- When generating practice questions, draw them directly from the course material.
+
+## Course Structure
+{{coursetopics}}
+
+## Course Content
+The following is the actual text of the course pages and materials. This is your primary knowledge source for this course.
+
+{{coursecontent}}
+
+## What SOLA Can Help With
+- Explain concepts and summarize lessons
+- Give examples and practice questions
+- Suggest study strategies
+- Encourage persistence and progress
+
+## What SOLA Will Not Do
+- Make academic or policy decisions
+- Provide medical, legal, or mental health counseling
+- Assist with academic dishonesty or bypassing learning
+
+## Tone and Style
+Communicate in a friendly, caring, encouraging, witty, and motivating way. Be concise, supportive, and respectful.
+
+## Safety
+Do not engage in abusive, hateful, discriminatory, or inappropriate conversations. Set firm but kind boundaries and redirect to productive topics.';
+$string['settings:whatsapp_api_token'] = 'WhatsApp API Token';
+$string['settings:whatsapp_api_token_desc'] = 'Authentication token for the WhatsApp API.';
+$string['settings:whatsapp_api_url'] = 'WhatsApp API URL';
+$string['settings:whatsapp_api_url_desc'] = 'The API endpoint for sending WhatsApp messages (e.g. Twilio, MessageBird). Must accept POST with JSON body containing "to", "from", and "body" fields.';
+$string['settings:whatsapp_blocked_countries'] = 'WhatsApp Blocked Countries';
+$string['settings:whatsapp_blocked_countries_desc'] = 'Comma-separated ISO 3166-1 alpha-2 country codes where WhatsApp reminders are not allowed due to local regulations (e.g. "CN,IR,KP").';
+$string['settings:whatsapp_from_number'] = 'WhatsApp Sender Number';
+$string['settings:whatsapp_from_number_desc'] = 'The phone number to send WhatsApp messages from (with country code, e.g. +14155238886).';
+$string['settings:zendesk_email'] = 'Zendesk API Email';
+$string['settings:zendesk_email_desc'] = 'Email address of the Zendesk user for API authentication (with /token suffix).';
+$string['settings:zendesk_enabled'] = 'Enable Zendesk Escalation';
+$string['settings:zendesk_enabled_desc'] = 'When the AI cannot resolve a support question, automatically create a Zendesk ticket with a conversation summary.';
+$string['settings:zendesk_subdomain'] = 'Zendesk Subdomain';
+$string['settings:zendesk_subdomain_desc'] = 'Your Zendesk subdomain (e.g. "mycompany" for mycompany.zendesk.com).';
+$string['settings:zendesk_token'] = 'Zendesk API Token';
+$string['settings:zendesk_token_desc'] = 'API token for Zendesk authentication.';
+$string['task:index_course_content'] = 'Index course content for RAG semantic search';
+$string['task:run_integrity_checks'] = 'Run daily SOLA plugin integrity checks';
+$string['task:send_inactivity_reminders'] = 'Send weekly inactivity reminder emails';
+$string['task:send_reminders'] = 'Send AI tutor study reminders';
+$string['unsubscribe:already'] = 'You have already been unsubscribed from these reminders.';
+$string['unsubscribe:invalid'] = 'Invalid or expired unsubscribe link.';
+$string['unsubscribe:resubscribe'] = 'Changed your mind? You can re-enable reminders through the AI tutor chat.';
+$string['unsubscribe:success'] = 'You have been successfully unsubscribed from study reminders for this course.';
+$string['unsubscribe:title'] = 'Unsubscribe from Study Reminders';
+$string['update:available'] = 'Update Available';
+$string['update:back_to_settings'] = 'Back to Settings';
+$string['update:changelog'] = 'Release Notes';
+$string['update:check'] = 'Check for Updates';
+$string['update:confirm'] = 'Install this update? A backup of the current version will be created automatically.';
+$string['update:current_version'] = 'Installed Version';
+$string['update:desc'] = 'Check for and install SOLA plugin updates directly from GitHub releases.';
+$string['update:download_failed'] = 'Failed to download the update. Please try again or install manually.';
+$string['update:github_error'] = 'Could not reach GitHub. Check your connection or add a GitHub token in settings.';
+$string['update:github_token'] = 'GitHub Token (optional)';
+$string['update:github_token_desc'] = 'Personal access token for accessing private GitHub repositories. Leave blank for public repos.';
+$string['update:install'] = 'Install Update';
+$string['update:latest_version'] = 'Latest Available';
+$string['update:title'] = 'Plugin Updates';
+$string['update:up_to_date'] = 'Up to Date';
+$string['usersettings:confirm_delete_all'] = 'Are you sure you want to permanently delete ALL your AI tutor data across all courses? This action cannot be undone.';
+$string['usersettings:confirm_delete_course'] = 'Are you sure you want to permanently delete all your AI tutor data for the course "{$a}"? This action cannot be undone.';
+$string['usersettings:data_deleted'] = 'Your data has been deleted.';
+$string['usersettings:delete_all_button'] = 'Delete All My Data';
+$string['usersettings:delete_all_title'] = 'Delete All Your Data';
+$string['usersettings:delete_all_warning'] = 'This will permanently delete all your AI tutor conversations across all courses. This action cannot be undone.';
+$string['usersettings:delete_course_data'] = 'Delete course data';
+$string['usersettings:intro'] = 'Manage your AI tutor chat data and privacy settings';
+$string['usersettings:last_activity'] = 'Last activity';
+$string['usersettings:messages'] = 'Messages';
+$string['usersettings:no_data'] = 'You haven\'t used the AI tutor yet. Your usage data will appear here once you start chatting.';
+$string['usersettings:privacy_info'] = 'Your conversations with the AI tutor are stored to provide you with continuous support throughout your course. You have full control over this data and can delete it at any time.';
+$string['usersettings:title'] = 'AI Course Assistant - Your Data';
+$string['usersettings:total_conversations'] = 'Conversations';
+$string['usersettings:total_messages'] = 'Total messages';
+$string['usersettings:usage_stats'] = 'Your Usage Statistics';
