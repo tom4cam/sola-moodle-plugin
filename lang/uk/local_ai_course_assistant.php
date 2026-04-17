@@ -57,7 +57,7 @@ $string['settings:default_course_mode_all'] = 'Увімкнено на всіх 
 $string['settings:auto_open'] = 'Автоматичне відкриття при першому відвідуванні';
 $string['settings:auto_open_desc'] = 'Коли увімкнено, шухляда SOLA відкривається автоматично під час першого відвідування студентом кожного курсу. Подальші завантаження сторінок у тому ж курсі не відкривають шухляду повторно — стан відстежується для кожного курсу в браузері студента через localStorage. Застосовується на комп\'ютері та мобільному пристрої. Можна перевизначити для кожного курсу на сторінці Course AI Settings.';
 $string['settings:comparison_providers'] = 'Постачальники для порівняння (вибір LLM)';
-$string['settings:comparison_providers_desc'] = 'Додайте додаткових провайдерів AI до вбудованого перемикача LLM у віджеті, щоб адміністратори могли порівнювати відповіді різних провайдерів. Один рядок на провайдера у форматі: provider_id|api_key|model1,model2. Основний провайдер, налаштований вище, завжди включається автоматично. Лише адміністратори з правами керування бачать перемикач; студенти його ніколи не бачать. Приклад:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Дійсні provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
+$string['settings:comparison_providers_desc'] = 'Додайте додаткових провайдерів AI до вбудованого перемикача LLM у віджеті, щоб адміністратори могли порівнювати відповіді різних провайдерів. Один рядок на провайдера у форматі: provider_id|api_key|model1,model2. Основний провайдер, налаштований вище, завжди включається автоматично. Лише адміністратори з правами керування бачать перемикач; студенти його ніколи не бачать. Приклад:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Дійсні provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Постачальник AI';
 $string['settings:provider_desc'] = 'Виберіть постачальника AI для завершень чату. Виберіть "Moodle AI (core_ai subsystem)", щоб маршрутизувати запити через вбудовану конфігурацію AI Moodle за адресою Site admin > AI; поля API-ключа, моделі та базової URL-адреси нижче ігноруються в цьому режимі. Стрімінг, використання інструментів та prompt caching недоступні через core_ai — відповіді доставляються як один фрагмент. Використовуйте прямого постачальника для найкращого досвіду учня.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -349,7 +349,6 @@ $string['analytics:thanks_feedback'] = 'Дякуємо за ваш відгук'
 
 // LLM provider names.
 $string['settings:provider_mistral'] = 'Mistral AI';
-$string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
 

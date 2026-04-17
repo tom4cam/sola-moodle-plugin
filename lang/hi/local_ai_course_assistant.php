@@ -57,7 +57,7 @@ $string['settings:default_course_mode_all'] = 'सभी कोर्स पर 
 $string['settings:auto_open'] = 'पहली विज़िट पर स्वतः खोलें';
 $string['settings:auto_open_desc'] = 'सक्षम होने पर, जब कोई छात्र पहली बार किसी कोर्स पर पहुंचता है तो SOLA ड्रॉअर स्वतः खुल जाता है। उसी कोर्स में बाद के पेज लोड पर ड्रॉअर पुनः नहीं खुलता — स्थिति को छात्र के ब्राउज़र में localStorage के माध्यम से प्रति कोर्स ट्रैक किया जाता है। डेस्कटॉप और मोबाइल पर लागू होता है। Course AI Settings पेज से प्रति कोर्स ओवरराइड किया जा सकता है।';
 $string['settings:comparison_providers'] = 'तुलना प्रदाता (LLM पिकर)';
-$string['settings:comparison_providers_desc'] = 'विजेट के भीतर LLM पिकर में अतिरिक्त AI प्रदाता जोड़ें ताकि प्रशासक विभिन्न प्रदाताओं में प्रतिक्रियाओं की तुलना कर सकें। प्रत्येक पंक्ति में एक प्रदाता इस प्रारूप में: provider_id|api_key|model1,model2। ऊपर कॉन्फ़िगर किया गया प्राथमिक प्रदाता हमेशा स्वचालित रूप से शामिल होता है। केवल प्रबंधन क्षमता वाले प्रशासक पिकर देखते हैं; छात्र इसे कभी नहीं देखते। उदाहरण:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>मान्य provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
+$string['settings:comparison_providers_desc'] = 'विजेट के भीतर LLM पिकर में अतिरिक्त AI प्रदाता जोड़ें ताकि प्रशासक विभिन्न प्रदाताओं में प्रतिक्रियाओं की तुलना कर सकें। प्रत्येक पंक्ति में एक प्रदाता इस प्रारूप में: provider_id|api_key|model1,model2। ऊपर कॉन्फ़िगर किया गया प्राथमिक प्रदाता हमेशा स्वचालित रूप से शामिल होता है। केवल प्रबंधन क्षमता वाले प्रशासक पिकर देखते हैं; छात्र इसे कभी नहीं देखते। उदाहरण:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>मान्य provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'AI प्रदाता';
 $string['settings:provider_desc'] = 'चैट पूर्णताओं के लिए उपयोग करने के लिए AI प्रदाता चुनें। Moodle के अंतर्निहित AI कॉन्फ़िगरेशन के माध्यम से Site admin > AI पर अनुरोधों को रूट करने के लिए "Moodle AI (core_ai subsystem)" चुनें; उस मोड में नीचे दिए गए API कुंजी, मॉडल और बेस URL फ़ील्ड को अनदेखा कर दिया जाता है। Streaming, tool use और prompt caching core_ai के माध्यम से उपलब्ध नहीं हैं — प्रतिक्रियाएं एकल भाग के रूप में दी जाती हैं। सर्वोत्तम छात्र अनुभव के लिए एक प्रत्यक्ष प्रदाता का उपयोग करें।';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -416,7 +416,6 @@ $string['analytics:thanks_feedback'] = 'आपकी प्रतिक्रि
 
 // LLM provider names.
 $string['settings:provider_mistral'] = 'Mistral AI';
-$string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
 

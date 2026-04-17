@@ -52,7 +52,7 @@ $string['settings:default_course_mode_all'] = 'Aktivert på alle kurs';
 $string['settings:auto_open'] = 'Åpne automatisk ved første besøk';
 $string['settings:auto_open_desc'] = 'Når aktivert åpnes SOLA-skuffen automatisk første gang en student kommer til hvert kurs. Etterfølgende sideinnlastinger i samme kurs åpner ikke skuffen på nytt — tilstanden spores per kurs i studentens nettleser via localStorage. Gjelder på datamaskin og mobil. Kan overstyres per kurs fra Course AI Settings-siden.';
 $string['settings:comparison_providers'] = 'Sammenligningsleverandører (LLM-velger)';
-$string['settings:comparison_providers_desc'] = 'Legg til ekstra AI-leverandører i den innebygde LLM-velgeren slik at administratorer kan sammenligne svar på tvers av leverandører. Én linje per leverandør i formatet: provider_id|api_key|model1,model2. Den primære leverandøren konfigurert ovenfor er alltid inkludert automatisk. Kun administratorer med administrasjonstilgang ser velgeren; studenter ser den aldri. Eksempel:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Gyldige provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
+$string['settings:comparison_providers_desc'] = 'Legg til ekstra AI-leverandører i den innebygde LLM-velgeren slik at administratorer kan sammenligne svar på tvers av leverandører. Én linje per leverandør i formatet: provider_id|api_key|model1,model2. Den primære leverandøren konfigurert ovenfor er alltid inkludert automatisk. Kun administratorer med administrasjonstilgang ser velgeren; studenter ser den aldri. Eksempel:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Gyldige provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'AI-leverandør';
 $string['settings:provider_desc'] = 'Velg AI-leverandøren som skal brukes til chat-fullføringer. Velg "Moodle AI (core_ai subsystem)" for å rute forespørsler gjennom Moodles innebygde AI-konfigurasjon på Site admin > AI; API-nøkkel, modell og basis-URL-feltene nedenfor ignoreres i den modusen. Streaming, verktøybruk og prompt caching er ikke tilgjengelig via core_ai — svar leveres som en enkelt del. Bruk en direkte leverandør for best studentopplevelse.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -385,7 +385,6 @@ $string['analytics:thanks_feedback'] = 'Takk for tilbakemeldingen';
 
 // LLM provider names.
 $string['settings:provider_mistral'] = 'Mistral AI';
-$string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
 

@@ -52,7 +52,7 @@ $string['settings:default_course_mode_all'] = 'Käytössä kaikilla kursseilla';
 $string['settings:auto_open'] = 'Avaa automaattisesti ensimmäisellä käynnillä';
 $string['settings:auto_open_desc'] = 'Kun käytössä, SOLA-laatikko avautuu automaattisesti, kun opiskelija saapuu kullekin kurssille ensimmäistä kertaa. Saman kurssin myöhemmät sivulataukset eivät avaa laatikkoa uudelleen — tila tallennetaan kurssikohtaisesti opiskelijan selaimeen localStorage-tallennuksella. Koskee tietokoneita ja mobiililaitteita. Voidaan ohittaa kurssikohtaisesti Course AI Settings -sivulta.';
 $string['settings:comparison_providers'] = 'Vertailuntarjoajat (LLM-valitsin)';
-$string['settings:comparison_providers_desc'] = 'Lisää ylimääräisiä AI-tarjoajia widgetin sisäiseen LLM-valitsimeen, jotta ylläpitäjät voivat vertailla vastauksia eri tarjoajien välillä. Yksi rivi per tarjoaja muodossa: provider_id|api_key|model1,model2. Yllä määritetty ensisijainen tarjoaja sisältyy aina automaattisesti. Vain ylläpitäjät, joilla on hallintaoikeus, näkevät valitsimen; opiskelijat eivät koskaan näe sitä. Esimerkki:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Kelvolliset provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
+$string['settings:comparison_providers_desc'] = 'Lisää ylimääräisiä AI-tarjoajia widgetin sisäiseen LLM-valitsimeen, jotta ylläpitäjät voivat vertailla vastauksia eri tarjoajien välillä. Yksi rivi per tarjoaja muodossa: provider_id|api_key|model1,model2. Yllä määritetty ensisijainen tarjoaja sisältyy aina automaattisesti. Vain ylläpitäjät, joilla on hallintaoikeus, näkevät valitsimen; opiskelijat eivät koskaan näe sitä. Esimerkki:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Kelvolliset provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'AI-palveluntarjoaja';
 $string['settings:provider_desc'] = 'Valitse chat-vastausten AI-palveluntarjoaja. Valitse "Moodle AI (core_ai subsystem)" reitittääksesi pyynnöt Moodlen sisäänrakennetun AI-asetuksen kautta kohdassa Site admin > AI; API-avain, malli ja perus-URL -kentät alla ohitetaan tässä tilassa. Streaming, työkalujen käyttö ja prompt caching eivät ole käytettävissä core_ai:n kautta — vastaukset toimitetaan yhtenä palasena. Käytä suoraa palveluntarjoajaa parhaan opiskelijakokemuksen saamiseksi.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -385,7 +385,6 @@ $string['analytics:thanks_feedback'] = 'Kiitos palautteestasi';
 
 // LLM provider names.
 $string['settings:provider_mistral'] = 'Mistral AI';
-$string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
 

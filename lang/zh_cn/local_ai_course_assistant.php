@@ -57,7 +57,7 @@ $string['settings:default_course_mode_all'] = '在所有课程上启用';
 $string['settings:auto_open'] = '首次访问时自动打开';
 $string['settings:auto_open_desc'] = '启用后,学生首次进入每门课程时,SOLA抽屉会自动打开。同一课程中后续的页面加载不会再次打开抽屉 — 状态通过localStorage按课程在学生的浏览器中跟踪。适用于桌面和移动端。可以从Course AI Settings页面按课程覆盖此设置。';
 $string['settings:comparison_providers'] = '对比供应商 (LLM 选择器)';
-$string['settings:comparison_providers_desc'] = '在小组件内的 LLM 选择器中添加额外的 AI 供应商，以便管理员可以跨供应商比较回复。每行一个供应商，格式为: provider_id|api_key|model1,model2。上面配置的主要供应商始终自动包含在内。只有具有管理权限的管理员才能看到选择器；学生永远看不到。示例:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>有效的 provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
+$string['settings:comparison_providers_desc'] = '在小组件内的 LLM 选择器中添加额外的 AI 供应商，以便管理员可以跨供应商比较回复。每行一个供应商，格式为: provider_id|api_key|model1,model2。上面配置的主要供应商始终自动包含在内。只有具有管理权限的管理员才能看到选择器；学生永远看不到。示例:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>有效的 provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'AI 提供商';
 $string['settings:provider_desc'] = '选择用于聊天补全的AI提供商。选择"Moodle AI (core_ai subsystem)"通过Moodle的内置AI配置（Site admin > AI）路由请求；在该模式下，下面的API密钥、模型和基础URL字段将被忽略。通过core_ai无法使用Streaming、工具使用和prompt caching——响应作为单个块交付。为获得最佳学生体验，请使用直接提供商。';
 $string['settings:provider_claude'] = 'Claude（Anthropic）';
@@ -408,7 +408,6 @@ $string['analytics:thanks_feedback'] = '感谢您的反馈';
 
 // LLM provider names.
 $string['settings:provider_mistral'] = 'Mistral AI';
-$string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
 

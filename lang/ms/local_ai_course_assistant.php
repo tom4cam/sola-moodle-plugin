@@ -57,7 +57,7 @@ $string['settings:default_course_mode_all'] = 'Diaktifkan pada semua kursus';
 $string['settings:auto_open'] = 'Buka automatik pada lawatan pertama';
 $string['settings:auto_open_desc'] = 'Apabila diaktifkan, laci SOLA terbuka secara automatik kali pertama pelajar melawat setiap kursus. Muatan halaman seterusnya dalam kursus yang sama tidak membuka semula laci — keadaan dijejaki bagi setiap kursus dalam pelayar pelajar melalui localStorage. Terpakai pada desktop dan mudah alih. Boleh ditindih bagi setiap kursus dari halaman Course AI Settings.';
 $string['settings:comparison_providers'] = 'Pembekal perbandingan (pemilih LLM)';
-$string['settings:comparison_providers_desc'] = 'Tambah penyedia AI tambahan ke pemilih LLM dalam widget supaya pentadbir boleh membandingkan respons merentasi penyedia. Satu baris bagi setiap penyedia dalam format: provider_id|api_key|model1,model2. Penyedia utama yang dikonfigurasi di atas sentiasa disertakan secara automatik. Hanya pentadbir dengan keupayaan pengurusan melihat pemilih; pelajar tidak pernah melihatnya. Contoh:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs yang sah: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
+$string['settings:comparison_providers_desc'] = 'Tambah penyedia AI tambahan ke pemilih LLM dalam widget supaya pentadbir boleh membandingkan respons merentasi penyedia. Satu baris bagi setiap penyedia dalam format: provider_id|api_key|model1,model2. Penyedia utama yang dikonfigurasi di atas sentiasa disertakan secara automatik. Hanya pentadbir dengan keupayaan pengurusan melihat pemilih; pelajar tidak pernah melihatnya. Contoh:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs yang sah: openai, claude, deepseek, gemini, ollama, minimax, mistral, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Pembekal AI';
 $string['settings:provider_desc'] = 'Pilih pembekal AI yang akan digunakan untuk penyiapan sembang. Pilih "Moodle AI (core_ai subsystem)" untuk menghalakan permintaan melalui konfigurasi AI terbina dalam Moodle di Site admin > AI; medan kunci API, model dan URL asas di bawah diabaikan dalam mod itu. Streaming, penggunaan alat, dan prompt caching tidak tersedia melalui core_ai — respons dihantar sebagai satu ketulan. Gunakan pembekal langsung untuk pengalaman pelajar terbaik.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -408,7 +408,6 @@ $string['analytics:thanks_feedback'] = 'Terima kasih atas maklum balas anda';
 
 // LLM provider names.
 $string['settings:provider_mistral'] = 'Mistral AI';
-$string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
 

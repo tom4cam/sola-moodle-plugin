@@ -55,7 +55,7 @@ $string['settings:default_course_mode_all'] = 'Akwadoro na nkuzi niile';
 $string['settings:auto_open'] = 'Mepee onwe ya na nleta mbụ';
 $string['settings:auto_open_desc'] = 'Mgbe agbanyere ya, drawer SOLA na-emepe onwe ya na nke mbụ nwa akwụkwọ rutere n\'ihe ọ bụla. Ibu peeji na-esote n\'otu ihe ọmụmụ anaghị emepe drawer ọzọ — ọnọdụ ka a na-eso ya na nchọgharị nwa akwụkwọ site na localStorage. Na-emetụta na desktop na mobile. Enwere ike ịgbanwere ya site na ibe Course AI Settings.';
 $string['settings:comparison_providers'] = 'Ndị na-enye ọsọ ntụnyere (nhọrọ LLM)';
-$string['settings:comparison_providers_desc'] = 'Tinye ndị na-enye AI ọzọ na nhọrọ LLM dị n\'ime widget ka ndị nchịkwa nwee ike iji tụnyere azịza n\'etiti ndị na-enye. Otu ahịrị maka onye na-enye ọ bụla na usoro: provider_id|api_key|model1,model2. Onye na-enye bụ isi a haziri n\'elu na-abụ n\'ime ya na akpaghị aka mgbe niile. Naanị ndị nchịkwa nwere ikike ijikwa na-ahụ nhọrọ ahụ; ụmụ akwụkwọ anaghị ahụ ya. Ọmụmaatụ:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs ziri ezi: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
+$string['settings:comparison_providers_desc'] = 'Tinye ndị na-enye AI ọzọ na nhọrọ LLM dị n\'ime widget ka ndị nchịkwa nwee ike iji tụnyere azịza n\'etiti ndị na-enye. Otu ahịrị maka onye na-enye ọ bụla na usoro: provider_id|api_key|model1,model2. Onye na-enye bụ isi a haziri n\'elu na-abụ n\'ime ya na akpaghị aka mgbe niile. Naanị ndị nchịkwa nwere ikike ijikwa na-ahụ nhọrọ ahụ; ụmụ akwụkwọ anaghị ahụ ya. Ọmụmaatụ:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs ziri ezi: openai, claude, deepseek, gemini, ollama, minimax, mistral, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Onye Nnye AI';
 $string['settings:provider_desc'] = 'Họrọ onye na-enye AI iji maka imecha mkparịta ụka. Họrọ "Moodle AI (core_ai subsystem)" iji hazie arịrịọ site na nhazi AI e wuru n\'ime Moodle na Site admin > AI; a na-eleghara ubi igodo API, ụdị, na isi URL dị n\'okpuru anya n\'ọnọdụ ahụ. Streaming, iji ngwaọrụ, na prompt caching adịghị site na core_ai — a na-ebuga azịza dịka ibe otu. Jiri onye na-enye ozugbo maka ahụmịhe kacha mma nke nwa akwụkwọ.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -402,7 +402,6 @@ $string['analytics:thanks_feedback'] = 'Daalụ maka nzaghachi gị';
 
 // LLM provider names.
 $string['settings:provider_mistral'] = 'Mistral AI';
-$string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
 

@@ -55,7 +55,7 @@ $string['settings:default_course_mode_all'] = 'Koorsii hunda irratti bananii jir
 $string['settings:auto_open'] = 'Daawwannaa jalqabaa irratti ofumaan banuu';
 $string['settings:auto_open_desc'] = 'Yeroo dandeessifame, kuusaan SOLA yeroo barataan tokko koorsii hunda irra yeroo jalqabaaf qaqqabu ofumaan bana. Fe\'iinsi fuula itti aanaan koorsii walfakkaataa keessatti kuusaa irra hin banu — haalli barbaadame koorsii tokkoon tokkoon barataa biraawuzariin keessatti localStorage tiin to\'atama. Deeskitooppii fi mobaayilii irratti hojiirra oola. Koorsii tokkoon tokkoon fuula Course AI Settings irraa jijjiiramuu danda\'a.';
 $string['settings:comparison_providers'] = 'Kennitoota walbira (LLM filannoo)';
-$string['settings:comparison_providers_desc'] = 'Kennitoota AI dabalataa gara filannoo LLM widget keessatti dabaluun bulchiinsonni akka deebii kennitoota gidduu walbiran. Sarara tokko kennituuf tokko bifa kanaan: provider_id|api_key|model1,model2. Kennitichi jalqabaa olitti qindaa\'e ofumaan of-dabalama. Bulchiinsonni dandeettii bulchuu qaban qofti filannoo argu; barattoonni gonkumaa hin argan. Fakkenya:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs sirrii: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
+$string['settings:comparison_providers_desc'] = 'Kennitoota AI dabalataa gara filannoo LLM widget keessatti dabaluun bulchiinsonni akka deebii kennitoota gidduu walbiran. Sarara tokko kennituuf tokko bifa kanaan: provider_id|api_key|model1,model2. Kennitichi jalqabaa olitti qindaa\'e ofumaan of-dabalama. Bulchiinsonni dandeettii bulchuu qaban qofti filannoo argu; barattoonni gonkumaa hin argan. Fakkenya:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs sirrii: openai, claude, deepseek, gemini, ollama, minimax, mistral, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Dhiyeessaa AI';
 $string['settings:provider_desc'] = 'Dhiheessaa AI marii xumuruuf filadhu. Kadhannoo qindaa\'ina AI ijaarame Moodle keessatti Site admin > AI irraan akka qajeelfamu "Moodle AI (core_ai subsystem)" filadhu; haala kana keessatti API key, moodela fi URL buuura armaan gadii hin itti gaafatamu. Streaming, itti fayyadama meeshaa fi prompt caching core_ai irraan hin argaman — deebiin akka qaama tokkootti kennama. Muuxannoo barataa gaarii argachuuf dhiheessaa kallattii fayyadami.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -389,7 +389,6 @@ $string['analytics:thanks_feedback'] = 'Yaada keessaniif galatoomaa';
 
 // LLM provider names.
 $string['settings:provider_mistral'] = 'Mistral AI';
-$string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
 
