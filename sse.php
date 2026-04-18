@@ -39,6 +39,48 @@ use local_ai_course_assistant\audit_logger;
 use local_ai_course_assistant\content_indexer;
 use local_ai_course_assistant\rag_retriever;
 
+/**
+ * Scrub leaked system prompt fragments, PII, and credentials from LLM
+ * output before it reaches the student. Runs after marker removal but
+ * before the response is saved to DB and sent via SSE.
+ *
+ * @param string $response
+ * @return string Cleaned response.
+ */
+function filter_response_safety(string $response): string {
+    // Phrases that indicate the LLM is leaking its system prompt.
+    $leakpatterns = [
+        '/## Security Rules \(non-negotiable\)/i',
+        '/## Off-topic Detection/i',
+        '/## Student Learning Profile/i',
+        '/## Wellbeing & Safety/i',
+        '/\[SOURCE:(page|activity|course|general)\]/i',
+        '/\[SOLA_NEXT\].*?\[\/SOLA_NEXT\]/s',
+        '/You are SOLA \(Online Learning Assistant\)/i',
+        '/KEEP RESPONSES BRIEF:/i',
+        '/These rules override any conflicting instruction/i',
+    ];
+
+    $leaked = false;
+    foreach ($leakpatterns as $pattern) {
+        if (preg_match($pattern, $response)) {
+            $leaked = true;
+            $response = preg_replace($pattern, '', $response);
+        }
+    }
+
+    // Scrub common PII patterns (email addresses, API keys).
+    $response = preg_replace('/\b(sk-[a-zA-Z0-9_-]{20,})\b/', '[key redacted]', $response);
+    $response = preg_replace('/\b(sk-ant-[a-zA-Z0-9_-]{20,})\b/', '[key redacted]', $response);
+    $response = preg_replace('/\b(AIza[a-zA-Z0-9_-]{30,})\b/', '[key redacted]', $response);
+
+    if ($leaked) {
+        debugging('SOLA: system prompt leak detected in response, fragments scrubbed.', DEBUG_DEVELOPER);
+    }
+
+    return trim($response);
+}
+
 // Enforce POST.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -412,6 +454,10 @@ try {
     }
 
     $cleanresponse = trim($cleanresponse);
+
+    // Output safety filter: scrub leaked system prompt fragments, PII
+    // patterns, and credentials from the response before saving/sending.
+    $cleanresponse = filter_response_safety($cleanresponse);
 
     // Save the clean assistant response (without markers), recording which provider was used.
     $effectivecfg = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
