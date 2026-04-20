@@ -54,36 +54,35 @@ class get_realtime_token extends external_api {
         self::validate_context($coursecontext);
         require_capability('local/ai_course_assistant:use', $coursecontext);
 
-        // Get API key: prefer dedicated realtime key, fall back to main key when provider=openai.
-        $apikey = get_config('local_ai_course_assistant', 'realtime_apikey');
-        if (empty($apikey)) {
-            $provider = get_config('local_ai_course_assistant', 'provider');
-            if ($provider === 'openai') {
-                $apikey = get_config('local_ai_course_assistant', 'apikey');
-            }
-        }
-
-        if (empty($apikey)) {
+        // Resolve active Realtime provider via the voice_providers registry.
+        $cfg = \local_ai_course_assistant\voice_registry::resolve(
+            \local_ai_course_assistant\voice_registry::CAPABILITY_REALTIME);
+        if ($cfg === null) {
             throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                'No OpenAI API key configured for voice mode.');
+                'No voice provider configured for Realtime.');
         }
 
-        $voice = get_config('local_ai_course_assistant', 'realtime_voice') ?: 'shimmer';
+        // xAI Realtime: authenticate the WebSocket directly with the API key
+        // (no ephemeral token flow is exposed yet). We still return a "token"
+        // for the client to use with Bearer auth on the WebSocket subprotocol.
+        if ($cfg['provider'] === 'xai') {
+            return [
+                'token'    => $cfg['apikey'],
+                'voice'    => $cfg['voice'],
+                'provider' => 'xai',
+                'endpoint' => $cfg['endpoint'],
+            ];
+        }
 
-        // Use native PHP curl to avoid Moodle wrapper Content-Type issues with JSON bodies.
-        // /v1/realtime/client_secrets is the GA endpoint — produces a GA ephemeral token
-        // that works with the GA WebSocket (wss://api.openai.com/v1/realtime).
-        // /v1/realtime/sessions produces BETA secrets which are incompatible with the GA WS.
-        // Voice and instructions are sent via session.update after the WebSocket connects.
+        // OpenAI: mint an ephemeral client secret so the key never reaches the browser.
         $body = '{}';
-
         $ch = curl_init('https://api.openai.com/v1/realtime/client_secrets');
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $body,
             CURLOPT_HTTPHEADER     => [
-                'Authorization: Bearer ' . $apikey,
+                'Authorization: Bearer ' . $cfg['apikey'],
                 'Content-Type: application/json',
                 'Content-Length: ' . strlen($body),
             ],
@@ -102,17 +101,17 @@ class get_realtime_token extends external_api {
         }
 
         $data = json_decode($response, true);
-        // GA client_secrets endpoint nests the token under client_secret.value.
         $token = $data['client_secret']['value'] ?? ($data['value'] ?? '');
-
         if (empty($token)) {
             throw new \moodle_exception('error', 'local_ai_course_assistant', '',
                 'Unexpected response from OpenAI Realtime API: ' . substr($response, 0, 200));
         }
 
         return [
-            'token' => $token,
-            'voice' => $voice,
+            'token'    => $token,
+            'voice'    => $cfg['voice'],
+            'provider' => 'openai',
+            'endpoint' => $cfg['endpoint'],
         ];
     }
 
@@ -123,8 +122,10 @@ class get_realtime_token extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            'token' => new external_value(PARAM_RAW, 'Ephemeral session token'),
-            'voice' => new external_value(PARAM_ALPHANUMEXT, 'Voice identifier'),
+            'token'    => new external_value(PARAM_RAW, 'Ephemeral session token (or raw API key for providers without ephemeral support)'),
+            'voice'    => new external_value(PARAM_ALPHANUMEXT, 'Voice identifier'),
+            'provider' => new external_value(PARAM_ALPHANUMEXT, 'Provider id (openai|xai)'),
+            'endpoint' => new external_value(PARAM_URL, 'WebSocket endpoint URL'),
         ]);
     }
 }

@@ -42,45 +42,48 @@ if ($courseid > 0) {
 }
 require_capability('local/ai_course_assistant:use', $context);
 
-// TTS requires any OpenAI API key — realtime key takes priority, then main key if provider=openai.
-// Does NOT require realtime to be enabled or OpenAI to be the chat provider.
-$apikey = get_config('local_ai_course_assistant', 'realtime_apikey');
-if (empty($apikey)) {
-    $provider = get_config('local_ai_course_assistant', 'provider');
-    $mainapikey = get_config('local_ai_course_assistant', 'apikey');
-    if ($provider === 'openai' && !empty($mainapikey)) {
-        $apikey = $mainapikey;
-    }
-}
-if (empty($apikey)) {
+// Resolve active TTS provider via the voice_providers registry.
+$cfg = \local_ai_course_assistant\voice_registry::resolve(
+    \local_ai_course_assistant\voice_registry::CAPABILITY_TTS);
+if ($cfg === null) {
     http_response_code(503);
     echo json_encode(['error' => get_string('error_no_tts_key', 'local_ai_course_assistant')]);
     exit;
 }
 
-// Student's saved voice preference takes priority over the site default.
 $voiceparam = optional_param('voice', '', PARAM_ALPHA);
-$voice = $voiceparam ?: (get_config('local_ai_course_assistant', 'realtime_voice') ?: 'shimmer');
+$voice = $voiceparam !== '' ? $voiceparam : $cfg['voice'];
 
 // Truncate text to avoid excessive API costs.
 $text = mb_substr(trim($text), 0, 4096);
 
-// Use native PHP curl to guarantee the JSON body is sent with the correct Content-Type.
-// Moodle's \curl wrapper can corrupt JSON POST bodies.
-$body = json_encode([
-    'model'  => 'tts-1',
-    'voice'  => $voice,
-    'input'  => $text,
-    'format' => 'mp3',
-]);
+// Build provider-specific request body.
+if ($cfg['provider'] === 'xai') {
+    // xAI TTS: {text, voice_id, language}. Returns raw audio.
+    $body = json_encode([
+        'text'     => $text,
+        'voice_id' => $voice,
+        'language' => optional_param('lang', 'en', PARAM_ALPHA) ?: 'en',
+    ]);
+    $model = 'grok-tts';
+} else {
+    // OpenAI TTS: {model, voice, input, format}. Returns raw audio.
+    $body = json_encode([
+        'model'  => 'tts-1',
+        'voice'  => $voice,
+        'input'  => $text,
+        'format' => 'mp3',
+    ]);
+    $model = 'tts-1';
+}
 
-$ch = curl_init('https://api.openai.com/v1/audio/speech');
+$ch = curl_init($cfg['endpoint']);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_POST           => true,
     CURLOPT_POSTFIELDS     => $body,
     CURLOPT_HTTPHEADER     => [
-        'Authorization: Bearer ' . $apikey,
+        'Authorization: Bearer ' . $cfg['apikey'],
         'Content-Type: application/json',
         'Content-Length: ' . strlen($body),
     ],
@@ -112,10 +115,10 @@ try {
             'system',
             '[TTS]',
             0,
-            'openai_tts',
+            $cfg['provider'] . '_tts',
             $approxtokens,
             0,
-            'tts-1'
+            $model
         );
     }
 } catch (\Throwable $e) {

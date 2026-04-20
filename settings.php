@@ -646,12 +646,17 @@ if ($hassiteconfig) {
     ));
 
     $realtimevoices = [
-        'shimmer' => 'Shimmer',
-        'alloy'   => 'Alloy',
-        'echo'    => 'Echo',
-        'fable'   => 'Fable',
-        'onyx'    => 'Onyx',
-        'nova'    => 'Nova',
+        'shimmer' => 'Shimmer (OpenAI)',
+        'alloy'   => 'Alloy (OpenAI)',
+        'echo'    => 'Echo (OpenAI)',
+        'fable'   => 'Fable (OpenAI)',
+        'onyx'    => 'Onyx (OpenAI)',
+        'nova'    => 'Nova (OpenAI)',
+        'eve'     => 'Eve (xAI / Grok)',
+        'ara'     => 'Ara (xAI / Grok)',
+        'leo'     => 'Leo (xAI / Grok)',
+        'rex'     => 'Rex (xAI / Grok)',
+        'sal'     => 'Sal (xAI / Grok)',
     ];
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/realtime_voice',
@@ -659,6 +664,51 @@ if ($hassiteconfig) {
         get_string('settings:realtime_voice_desc', 'local_ai_course_assistant'),
         'shimmer',
         $realtimevoices
+    ));
+
+    // Voice providers registry (multi-row). Defines one or more voice API
+    // endpoints (OpenAI, xAI Grok) with per-provider API keys and default
+    // voices. Three active-provider selects below pick which registered label
+    // drives Realtime, TTS, and STT.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/voice_providers_heading',
+        'Voice providers (Realtime, TTS, STT)',
+        'Configure one or more voice API providers. Use the dropdowns below to choose which registered provider drives each capability. '
+        . 'If no rows are defined, the legacy single-key fallback (Realtime API key above, or primary OpenAI key) is used.'
+    ));
+
+    $settings->add(new \local_ai_course_assistant\admin_setting_voice_providers(
+        'local_ai_course_assistant/voice_providers',
+        'Voice providers',
+        'Add one row per voice API. Provider IDs: openai, xai. The Label is a friendly name you use to pick the active provider for each capability below. Realtime voice and TTS voice can be left blank to use the provider default (shimmer for OpenAI, eve for xAI).'
+    ));
+
+    $activechoices = ['' => '(use first configured or legacy fallback)'];
+    foreach (\local_ai_course_assistant\voice_registry::parse_rows() as $row) {
+        $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
+        $activechoices[$label] = $label . ' (' . $row['provider'] . ')';
+    }
+
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/voice_active_realtime',
+        'Active Realtime provider',
+        'Which configured voice provider handles Realtime Voice Agent sessions.',
+        '',
+        $activechoices
+    ));
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/voice_active_tts',
+        'Active TTS provider',
+        'Which configured voice provider handles text-to-speech playback of AI responses.',
+        '',
+        $activechoices
+    ));
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/voice_active_stt',
+        'Active STT provider',
+        'Which configured voice provider handles speech-to-text transcription of student audio.',
+        '',
+        $activechoices
     ));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -840,12 +890,36 @@ if ($hassiteconfig) {
         $num = str_pad($i, 2, '0', STR_PAD_LEFT);
         $avatarchoices["avatar_{$num}"] = "Avatar {$i}";
     }
+    // Append admin-uploaded custom avatars to the selectable list. The filearea
+    // is managed by the admin_setting_configstoredfile widget below; any file
+    // uploaded there becomes a selectable default.
+    require_once(__DIR__ . '/lib.php');
+    foreach (local_ai_course_assistant_get_custom_avatars() as $av) {
+        $avatarchoices[$av['key']] = 'Custom: ' . $av['label'];
+    }
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/avatar',
         get_string('settings:avatar', 'local_ai_course_assistant'),
         get_string('settings:avatar_desc', 'local_ai_course_assistant'),
         'avatar_01',
         $avatarchoices
+    ));
+
+    // Admin-uploaded custom avatars. Files saved to the customavatars filearea
+    // are served via local_ai_course_assistant_pluginfile() and appear in the
+    // dropdown above so admins can set any uploaded image as the default.
+    $settings->add(new admin_setting_configstoredfile(
+        'local_ai_course_assistant/customavatars',
+        'Custom avatars',
+        'Upload square PNG or SVG images here to add them to the avatar dropdown above. Each uploaded file becomes a selectable default (prefixed "Custom:"). Remove a file from this list to remove it from the dropdown. Tip: 256×256 PNG works well for Retina displays.',
+        'customavatars',
+        0,
+        [
+            'subdirs' => 0,
+            'maxfiles' => 20,
+            'accepted_types' => ['web_image'],
+            'context' => context_system::instance(),
+        ]
     ));
 
     $settings->add(new admin_setting_configcolourpicker(

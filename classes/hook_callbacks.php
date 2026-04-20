@@ -173,8 +173,21 @@ class hook_callbacks {
         $useravatar = \get_user_preferences('local_ai_course_assistant_avatar', null);
         $avatar = $useravatar ?: (get_config('local_ai_course_assistant', 'avatar') ?: 'avatar_01');
 
-        // Build avatar URL.
-        $avatarurl = $OUTPUT->image_url("avatars/{$avatar}", 'local_ai_course_assistant')->out(false);
+        // Pull admin-uploaded custom avatars first so we can resolve custom:* URLs
+        // and include them in the per-user picker.
+        require_once($CFG->dirroot . '/local/ai_course_assistant/lib.php');
+        $customavatars = local_ai_course_assistant_get_custom_avatars();
+        $custommap = [];
+        foreach ($customavatars as $ca) {
+            $custommap[$ca['key']] = $ca['url'];
+        }
+
+        // Build avatar URL: custom:* maps to an uploaded file; built-ins use pix/avatars.
+        if (isset($custommap[$avatar])) {
+            $avatarurl = $custommap[$avatar];
+        } else {
+            $avatarurl = $OUTPUT->image_url("avatars/{$avatar}", 'local_ai_course_assistant')->out(false);
+        }
 
         // Build list of all available avatars as JSON for the picker.
         $availableavatars = [];
@@ -183,6 +196,12 @@ class hook_callbacks {
             $availableavatars[] = [
                 'id'  => $id,
                 'url' => $OUTPUT->image_url("avatars/{$id}", 'local_ai_course_assistant')->out(false),
+            ];
+        }
+        foreach ($customavatars as $ca) {
+            $availableavatars[] = [
+                'id'  => $ca['key'],
+                'url' => $ca['url'],
             ];
         }
 

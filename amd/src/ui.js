@@ -929,13 +929,15 @@ define([
 
             if (isN) {
                 // Drag upward increases height (widget anchored at bottom).
-                const newH = Math.max(300, Math.min(window.innerHeight * 0.9,
+                // Min 400px keeps the message list, composer, and header all readable.
+                const newH = Math.max(400, Math.min(window.innerHeight * 0.95,
                     startH + (startY - e.clientY)));
                 drawer.style.height = newH + 'px';
             }
             if (isW) {
                 // Drag leftward increases width (widget anchored at right).
-                const newW = Math.max(260, Math.min(window.innerWidth * 0.9,
+                // Min 320px is wide enough for comfortable message wrapping and the composer.
+                const newW = Math.max(320, Math.min(window.innerWidth * 0.95,
                     startW + (startX - e.clientX)));
                 drawer.style.width = newW + 'px';
             }

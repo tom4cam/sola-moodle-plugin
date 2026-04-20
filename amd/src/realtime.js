@@ -490,15 +490,18 @@ define([], function() {
     };
 
     /**
-     * Connect to the OpenAI Realtime API and start a voice session.
+     * Connect to a Realtime Voice API and start a voice session.
      *
-     * @param {string}   token        Ephemeral session token
+     * Supports OpenAI (ephemeral client secret) and xAI Grok (direct bearer).
+     *
+     * @param {string}   token        Session token / API key
      * @param {string}   instructions System instructions for the session
-     * @param {string}   voice        Voice identifier (e.g. 'shimmer')
+     * @param {string}   voice        Voice identifier (e.g. 'shimmer', 'eve')
      * @param {Object}   callbacks    {onTranscript, onStateChange, onError}
      * @param {HTMLElement|null} overlayEl  Overlay root element for CSS var
      * @param {AudioContext|null} audioCtxIn Pre-created AudioContext (required for iOS/WKWebView
      *                                       where AudioContext must be created in a user gesture)
+     * @param {MediaStream|null} micStreamParam Pre-captured mic stream.
      */
     var connect = function(token, instructions, voice, callbacks, overlayEl, audioCtxIn, micStreamParam) {
         onTranscriptCb  = callbacks.onTranscript   || null;
@@ -512,12 +515,13 @@ define([], function() {
 
         setState('connecting');
 
-        // GA Realtime API: omit the 'openai-beta.realtime-v1' subprotocol —
-        // it is only valid for the beta API and causes a version mismatch with GA client secrets.
-        ws = new WebSocket(
-            'wss://api.openai.com/v1/realtime?model=gpt-realtime-mini',
-            ['realtime', 'openai-insecure-api-key.' + token]
-        );
+        // Provider/endpoint come in via callbacks for backwards compatibility
+        // (older callers that only passed onTranscript/onStateChange keep working).
+        var provider = callbacks.provider || 'openai';
+        var endpoint = callbacks.endpoint ||
+            'wss://api.openai.com/v1/realtime?model=gpt-realtime-mini';
+        // Both providers share the OpenAI Realtime WebSocket subprotocol pattern.
+        ws = new WebSocket(endpoint, ['realtime', 'openai-insecure-api-key.' + token]);
 
         ws.addEventListener('open', function() {
             // Use caller-provided AudioContext if available (iOS/WKWebView user-gesture requirement).

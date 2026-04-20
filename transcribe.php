@@ -49,18 +49,12 @@ if (empty($_FILES['audio']['tmp_name']) || !is_uploaded_file($_FILES['audio']['t
     exit;
 }
 
-// Resolve API key — same priority as tts.php.
-$apikey = get_config('local_ai_course_assistant', 'realtime_apikey');
-if (empty($apikey)) {
-    $provider   = get_config('local_ai_course_assistant', 'provider');
-    $mainapikey = get_config('local_ai_course_assistant', 'apikey');
-    if ($provider === 'openai' && !empty($mainapikey)) {
-        $apikey = $mainapikey;
-    }
-}
-if (empty($apikey)) {
+// Resolve active STT provider via the voice_providers registry.
+$cfg = \local_ai_course_assistant\voice_registry::resolve(
+    \local_ai_course_assistant\voice_registry::CAPABILITY_STT);
+if ($cfg === null) {
     http_response_code(503);
-    echo json_encode(['error' => 'No OpenAI API key configured for transcription.']);
+    echo json_encode(['error' => 'No voice provider configured for transcription.']);
     exit;
 }
 
@@ -82,21 +76,31 @@ $ext_map = [
 $ext      = $ext_map[$mimetype] ?? 'webm';
 $filename = 'audio.' . $ext;
 
-$post = [
-    'file'  => new CURLFile($tmpfile, $mimetype, $filename),
-    'model' => 'whisper-1',
-];
-if (!empty($lang)) {
-    $post['language'] = $lang;
+if ($cfg['provider'] === 'xai') {
+    // xAI STT accepts a multipart upload with the audio file.
+    $post = ['file' => new CURLFile($tmpfile, $mimetype, $filename)];
+    if (!empty($lang)) {
+        $post['language'] = $lang;
+    }
+    $model = 'grok-stt';
+} else {
+    $post = [
+        'file'  => new CURLFile($tmpfile, $mimetype, $filename),
+        'model' => 'whisper-1',
+    ];
+    if (!empty($lang)) {
+        $post['language'] = $lang;
+    }
+    $model = 'whisper-1';
 }
 
-$ch = curl_init('https://api.openai.com/v1/audio/transcriptions');
+$ch = curl_init($cfg['endpoint']);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_POST           => true,
     CURLOPT_POSTFIELDS     => $post,
     CURLOPT_HTTPHEADER     => [
-        'Authorization: Bearer ' . $apikey,
+        'Authorization: Bearer ' . $cfg['apikey'],
     ],
     CURLOPT_TIMEOUT        => 30,
 ]);
@@ -129,8 +133,8 @@ try {
     if ($conv) {
         \local_ai_course_assistant\conversation_manager::add_message(
             $conv->id, $USER->id, $courseid > 0 ? $courseid : SITEID,
-            'system', '[Whisper Transcription]',
-            0, 'openai_whisper', $approxtokens, 0, 'whisper-1'
+            'system', '[STT Transcription]',
+            0, $cfg['provider'] . '_stt', $approxtokens, 0, $model
         );
     }
 } catch (\Throwable $e) {

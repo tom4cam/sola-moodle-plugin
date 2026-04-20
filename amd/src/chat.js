@@ -2686,6 +2686,8 @@ define([
                     instructions,
                     voice,
                     {
+                        provider: result.provider,
+                        endpoint: result.endpoint,
                         onTranscript: function(role, text) {
                             if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
                                 return;
@@ -4668,26 +4670,23 @@ define([
      * Handle clear history.
      */
     const handleClear = function() {
+        // "Clear screen" wipes the visible drawer only — stored chat history
+        // in the DB is preserved so instructors retain the full transcript for
+        // analytics and student learning profiles.
         Str.get_string('chat:clear_confirm', 'local_ai_course_assistant').then(function(confirmMsg) {
             if (!window.confirm(confirmMsg)) { // eslint-disable-line no-alert
                 return;
             }
-
-            Repo.clearHistory(courseId).then(function() {
-                UI.clearMessages();
-                setConversationHistory([]);
-                showGreeting();
-            }).catch(function() {
-                // Silently fail.
-            });
+            UI.clearMessages();
+            setConversationHistory([]);
+            showGreeting();
         }).catch(function() {
-            // Fallback if string fetch fails.
-            if (!window.confirm('Clear chat history?')) { // eslint-disable-line no-alert
+            if (!window.confirm('Clear the visible messages?')) { // eslint-disable-line no-alert
                 return;
             }
-            Repo.clearHistory(courseId).catch(function() {
-                // Silently fail.
-            });
+            UI.clearMessages();
+            setConversationHistory([]);
+            showGreeting();
         });
     };
 
