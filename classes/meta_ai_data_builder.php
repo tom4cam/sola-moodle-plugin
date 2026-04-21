@@ -17,7 +17,7 @@
 namespace local_ai_course_assistant;
 
 /**
- * Builds anonymized, enriched context for the AI Analysis Chat and cron reports.
+ * Builds anonymized, enriched context for the Learning Radar and cron reports.
  *
  * Includes conversation transcripts with provider/model metadata, aggregate
  * statistics (feedback, token costs, provider comparison, daily usage),
@@ -83,6 +83,21 @@ PROMPT;
 
         // Transcripts with provider metadata (largest block, goes last).
         $parts[] = "\n\n## Conversation Transcripts\n\n" . self::build_transcript($courseids, $since, $filterprovider, $maxchars);
+
+        // Follow-up suggestion instruction: after every answer, emit a
+        // [SOLA_NEXT] block with 4 admin-facing follow-up queries. Client-side
+        // parser strips the block and renders the suggestions as clickable
+        // chips under the response. Mirrors the student-chat SOLA_NEXT
+        // pattern from context_builder.
+        $parts[] = "\n\n## Follow-up suggestions (required)\n\n"
+            . "After your answer (on its own line at the very end), emit exactly one block in this format:\n\n"
+            . "[SOLA_NEXT]suggestion 1||suggestion 2||suggestion 3||suggestion 4[/SOLA_NEXT]\n\n"
+            . "Each suggestion must be a short (4 to 10 word) follow-up question an admin might "
+            . "ask next to go deeper on the current answer. Prefer concrete drill-downs over generic ones. "
+            . "Examples: 'Compare Claude vs OpenAI satisfaction this month', 'Which 3 topics drive the most off-topic flags?', "
+            . "'Show students whose profile shifted this week', 'Export the rating-negative conversations as CSV'. "
+            . "Use exactly 4 suggestions separated by ||. The [SOLA_NEXT]...[/SOLA_NEXT] block is hidden from the admin "
+            . "and rendered as clickable chips, so do not include it in any visible summary you provide.";
 
         return implode('', $parts);
     }

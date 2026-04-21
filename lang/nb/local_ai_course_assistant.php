@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Norwegian Bokmål.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Notater';
 // History panel.
 $string['chat:history_title'] = 'Notater og samtalehistorikk';
 $string['task:send_inactivity_reminders'] = 'Send ukentlige inaktivitetspåminnelser via e-post';
-$string['task:run_meta_ai_query'] = 'Kjør planlagt AI Analysis-analyseforespørsel';
+$string['task:run_meta_ai_query'] = 'Kjør planlagt Læringsradar-analyseforespørsel';
 $string['messageprovider:study_notes'] = 'Studieøktnotater';
 
 // CDN settings.

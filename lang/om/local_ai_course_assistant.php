@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Oromo (Afaan Oromoo).
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -202,7 +202,7 @@ $string['unsubscribe:invalid'] = 'Hidhata ba\'uu hin fayyanne ykn yeroo darbee.'
 $string['unsubscribe:resubscribe'] = 'Yaada kee jijjiirtee? Haasawa barsiisaa AI gidduu yaadachiisuuwwan irra deebi\'ii dandeessa.';
 // Scheduled task.
 $string['task:send_reminders'] = 'Yaadachiisuuwwan barumsa barsiisaa AI ergi';
-$string['task:run_meta_ai_query'] = 'Gaaffii xiinxala AI Analysis karoorfame hojjedhu';
+$string['task:run_meta_ai_query'] = 'Gaaffii xiinxala Learning Radar karoorfame hojjedhu';
 // Privacy - additional tables.
 $string['privacy:metadata:local_ai_course_assistant_plans'] = 'Karoora barumsa barattoota ol kaa\'a.';
 $string['privacy:metadata:local_ai_course_assistant_plans:userid'] = 'ID fayyadamaa karoora barumsa qabu.';

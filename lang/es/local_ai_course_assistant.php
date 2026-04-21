@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Spanish (es).
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -375,7 +375,7 @@ $string['chat:mode_history'] = 'Notas';
 // History panel.
 $string['chat:history_title'] = 'Notas e historial de conversación';
 $string['task:send_inactivity_reminders'] = 'Enviar correos electrónicos semanales de recordatorio por inactividad';
-$string['task:run_meta_ai_query'] = 'Ejecutar consulta programada de analíticas AI Analysis';
+$string['task:run_meta_ai_query'] = 'Ejecutar consulta programada de analíticas Radar de Aprendizaje';
 $string['messageprovider:study_notes'] = 'Notas de sesión de estudio';
 
 // CDN settings.

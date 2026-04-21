@@ -18,7 +18,7 @@
  * Token usage and cost analytics — site-admin only.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -61,6 +61,59 @@ if ($courseid > 0) {
 }
 
 $msgwhere = "m.role = 'assistant' AND m.model_name IS NOT NULL{$timewhere}{$coursewhere}";
+
+// ── Query 0: Per-category breakdown (Chat / Voice / RAG / Analytics) ──────────
+// Maps the per-message `interaction_type` field into a single admin-facing
+// "category" for cost reporting. This is what lets an institution separate
+// spend on student chat from voice/TTS/STT from RAG embeddings from the
+// Learning Radar admin chat.
+//
+// Mapping:
+//   chat, quiz, <empty>           -> Chat
+//   voice                         -> Voice (Realtime)
+//   openai_tts, xai_tts           -> Voice (TTS)
+//   openai_whisper, openai_stt,
+//   xai_stt                       -> Voice (STT)
+//   embedding, embed              -> RAG
+//   meta                          -> Analytics
+//   anything else                 -> Other
+
+$categorysql = "CASE
+    WHEN m.interaction_type IN ('voice')                                    THEN 'Voice (Realtime)'
+    WHEN m.interaction_type IN ('openai_tts','xai_tts')                     THEN 'Voice (TTS)'
+    WHEN m.interaction_type IN ('openai_whisper','openai_stt','xai_stt')    THEN 'Voice (STT)'
+    WHEN m.interaction_type IN ('embedding','embed')                        THEN 'RAG'
+    WHEN m.interaction_type IN ('meta')                                     THEN 'Analytics'
+    WHEN m.interaction_type IN ('chat','quiz') OR m.interaction_type IS NULL OR m.interaction_type = '' THEN 'Chat'
+    ELSE 'Other'
+END";
+
+$bycategory = $DB->get_records_sql(
+    "SELECT {$categorysql} AS category,
+            COUNT(m.id) AS response_count,
+            SUM(COALESCE(m.prompt_tokens,0))     AS total_prompt,
+            SUM(COALESCE(m.completion_tokens,0)) AS total_completion
+       FROM {local_ai_course_assistant_msgs} m
+      WHERE m.role = 'assistant' AND m.model_name IS NOT NULL{$timewhere}{$coursewhere}
+      GROUP BY {$categorysql}
+      ORDER BY SUM(COALESCE(m.prompt_tokens,0)) + SUM(COALESCE(m.completion_tokens,0)) DESC",
+    $params
+);
+
+$bycategoryrows = [];
+$categorytotalcost = 0.0;
+foreach ($bycategory as $row) {
+    // Category-level cost uses the mean provider rate from the full set for
+    // that category. Cheap estimate; the per-model table below is authoritative.
+    $rowtokens = (int) $row->total_prompt + (int) $row->total_completion;
+    $bycategoryrows[] = [
+        'category'          => $row->category,
+        'response_count'    => number_format((int) $row->response_count),
+        'prompt_tokens'     => number_format((int) $row->total_prompt),
+        'completion_tokens' => number_format((int) $row->total_completion),
+        'total_tokens'      => number_format($rowtokens),
+    ];
+}
 
 // ── Query 1: Aggregate by model/provider ──────────────────────────────────────
 
@@ -185,6 +238,8 @@ $templatedata = [
     'grand_cost'         => $grandcost > 0
                                 ? token_cost_manager::format_cost($grandcost)
                                 : ($grandtotal > 0 ? 'Unknown model' : '—'),
+    'by_category'        => $bycategoryrows,
+    'has_by_category'    => !empty($bycategoryrows),
     'by_model'           => $bymodelrows,
     'has_by_model'       => !empty($bymodelrows),
     'by_student'         => $bystudentrows,

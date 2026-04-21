@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Igbo.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -365,7 +365,7 @@ $string['chat:history_title'] = 'Ndetu na Akụkọ Mkparịta Ụka';
 $string['task:send_inactivity_reminders'] = 'Ziga ozi email ncheta nke izu nke izu maka enweghị ọrụ';
 $string['messageprovider:study_notes'] = 'Ndetu oge ọmụmụ ihe';
 $string['task:send_inactivity_reminders'] = 'Ziga ozi email ncheta nke izu maka enweghị ọrụ';
-$string['task:run_meta_ai_query'] = 'Gbaa ajụjụ nyocha AI Analysis a haziri';
+$string['task:run_meta_ai_query'] = 'Gbaa ajụjụ nyocha Learning Radar a haziri';
 $string['messageprovider:study_notes'] = 'Ndetu oge ọmụmụ ihe';
 
 // CDN settings.

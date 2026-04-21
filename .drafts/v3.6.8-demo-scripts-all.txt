@@ -1,0 +1,327 @@
+Subject: SOLA v3.6.8 demo scripts (student + admin + Meta-AI)
+To: tom.caswell@saylor.org
+
+Three demo scripts updated for v3.6.8. Student experience (12 min), admin settings walkthrough (10 min), and Meta-AI analytics demo (5 min).
+
+================================================================
+DEMO 1: STUDENT EXPERIENCE (12 minutes)
+================================================================
+
+Pre flight checklist:
+  * Log in as a student account on a course with SOLA enabled
+  * If demoing auto open, clear localStorage key aica_autoopened_course_{courseid} in browser DevTools first
+  * If demoing voice, confirm Voice tab and Realtime are enabled for the course
+  * Have a second device ready if demoing mobile
+  * To record a clean student view as an admin: enable Student Mode on the analytics page or append ?sola_student_mode=1 to any course URL. Exit with Ctrl+Shift+A.
+
+Scene 1: First visit (45 seconds)
+
+Arrive at the course home page for the first time.
+
+If auto open is enabled, the SOLA drawer slides in automatically.
+
+Say: "SOLA opens the first time you visit each course. It knows your name, it knows the course, and it is ready to help. If you close it, it will not pop open again on your next visit. It remembers."
+
+If auto open is not enabled, click the avatar on the right side to open.
+
+Scene 2: First conversation (60 seconds)
+
+Point to the greeting and conversation starters.
+
+Say: "SOLA greets you by name and offers quick actions tailored to what you are doing. Click one to start, or type your own question."
+
+Click "Help with this page." Wait for the streamed response.
+
+Point to the suggestion chips below the reply.
+
+Say: "After SOLA responds, it offers follow up suggestions. Click one or type your own. These are always contextual."
+
+Send one more custom question. Show the typing animation.
+
+Scene 3: Language (90 seconds)
+
+Click the gear icon in the header to open the settings panel.
+
+Say: "This is the settings panel. First section: language."
+
+Click the Language row. Show the 46 language picker.
+
+Say: "SOLA supports 46 languages for both the interface and the conversation. It auto detects what you type, but you can force a language here. Every label translates in real time. No reload."
+
+Switch to Spanish. Watch all labels swap instantly. Switch back to English.
+
+Scene 4: Avatar (90 seconds)
+
+Still in the settings panel, click the Avatar row.
+
+Say: "Pick an avatar that looks like you or one you like. Ten presets available."
+
+Click through a few. Show the toggle button avatar update immediately.
+
+Say: "Your choice saves to your Moodle profile and follows you across every course."
+
+Scene 5: Voice settings (2 minutes, skip if voice is disabled)
+
+Still in settings panel, scroll to Voice options.
+
+Say: "Three voice controls: which voice SOLA speaks with, whether it reads every reply aloud, and whether the mic icon appears in the input bar."
+
+Demo each toggle. Close the settings panel.
+
+Scene 6: Voice input (60 seconds, skip if STT is disabled)
+
+Point to the mic icon in the input bar.
+
+Say: "Tap the mic to dictate a question. SOLA detects your language automatically."
+
+Click mic, say "explain this topic in two sentences," release.
+
+Say: "The transcript fills the input box. Edit before sending or just hit send."
+
+Send the message.
+
+Scene 7: Voice tab and Realtime (2 minutes, skip if Realtime is disabled)
+
+Click the Voice tab in the bottom tab bar.
+
+Say: "This is a live spoken conversation. No typing, no pausing. SOLA listens while you speak, responds while you listen, and transcribes both sides so you can reread later."
+
+Click Start. Have a short real exchange. Click End.
+
+Point to the practice score card that appears.
+
+Say: "At the end of a voice session SOLA gives you a score card with per criterion ratings and feedback. Your teacher can turn this off if it is not relevant for your course."
+
+Return to the Chat tab.
+
+Scene 8: History and Notes (90 seconds)
+
+Click the Notes tab in the bottom tab bar.
+
+Say: "Two things live here. Saved notes, which you create by clicking the bookmark on any assistant message. And recent conversations, every exchange you have had with SOLA in this course."
+
+Show the Saved and Recent views. Scroll through a past conversation.
+
+Say: "Everything stays until you delete it. Revisit it, copy quotes, or use it to review before a quiz."
+
+Scene 9: Clear versus reset (60 seconds)
+
+Return to Chat tab. Point to the trash icon.
+
+Say: "Two buttons that look similar but do very different things."
+
+Click trash. Show the confirmation dialog.
+
+Say: "Trash deletes this course's conversation from the server. Gone for real, no undo. This is your one click privacy delete."
+
+Cancel the confirmation. Point to the home icon.
+
+Say: "Home resets the view back to conversation starters but keeps your history. Use it when you want a clean slate without losing anything."
+
+Click home. Starters reappear.
+
+Scene 10: Drag, resize, expand (60 seconds)
+
+Hover the header until the cursor changes.
+
+Say: "Drag the header to move the widget anywhere. Your position is remembered."
+
+Drag it to the left edge. Grab the left edge of the drawer.
+
+Say: "Drag the edges to resize wider or narrower."
+
+Resize. Point to the expand icon.
+
+Say: "Expand gives you a larger reading pane. Click again to collapse."
+
+Click expand, then click again.
+
+Scene 11: Close and reopen (15 seconds)
+
+Point to the X.
+
+Say: "Close hides the drawer but deletes nothing. The avatar reappears. Click any time to pick up where you left off."
+
+Close. Click avatar. Drawer returns with history intact.
+
+Scene 12: Mobile (60 seconds, optional)
+
+Switch to phone or Moodle mobile app.
+
+Say: "On mobile the drawer becomes a full screen sheet. Drag down to close. Same conversations, same avatar, same language. Pick up on your phone where you left off on your laptop."
+
+Scene 13: Wrap up (30 seconds)
+
+Return to desktop.
+
+Say: "Three things to remember. SOLA helps you understand course material, not do the work for you. Your conversations are private to you and the institution. And every setting you saw today you can change or clear any time."
+
+Pause for questions.
+
+
+================================================================
+DEMO 2: ADMIN SETTINGS WALKTHROUGH (10 minutes)
+================================================================
+
+Pre flight:
+  * Log in as site admin
+  * Go to Site admin > Plugins > Local plugins > AI Course Assistant > Settings
+
+Scene 1: Settings overview (60 seconds)
+
+Say: "This is the single settings page for SOLA. Seven sections, each reachable from the table of contents at the top."
+
+Point to the TOC: General, AI Provider and Models, Content and RAG, Safety and Moderation, Engagement, Branding and UI, Integrations and Delivery.
+
+Say: "Everything lives on one page. No hunting through submenus."
+
+Scene 2: General (90 seconds)
+
+Say: "Three core switches here."
+
+Point to Enabled checkbox.
+
+Say: "This is the global on/off. But enabling it does not blast every course. The next setting, Default for new courses, controls that."
+
+Point to Default for new courses dropdown.
+
+Say: "Set to Disabled by default if you want to roll out course by course. Teachers enable SOLA from inside their own course settings. Set to Enabled on all courses if you want site wide coverage."
+
+Point to Auto open on first visit.
+
+Say: "When checked, the SOLA drawer opens automatically the first time a student visits each course. Teachers can override per course."
+
+Scene 3: AI Provider and Models (2 minutes)
+
+Point to Provider dropdown, API key, Model.
+
+Say: "Choose your primary provider and paste the key. Leave Model blank for the provider default. This is the provider every course uses unless you override per course."
+
+Scroll to the Comparison providers table.
+
+Say: "This is the multi provider editor. Click Add Provider, choose a provider, paste a different API key, enter model names. Each row is masked so keys are not visible on screen. Admins see provider and model dropdowns in the chat widget to compare responses across providers."
+
+Click Add Provider. Show the row appear. Point to the masked key field.
+
+Scene 4: Course AI Settings (90 seconds)
+
+Say: "Let me show the per course view."
+
+Open a course. Click the gear icon in the SOLA widget header, or navigate to Course AI Settings.
+
+Point to the "SOLA on this course" toggle at the top.
+
+Say: "This is the per course enable switch. Independent of the global default."
+
+Scroll to the provider override section.
+
+Say: "Override the provider, model, temperature, or system prompt for this course only. Blank fields inherit the global setting."
+
+Point to Auto open override (inherit / force on / force off).
+
+Say: "Teachers can force auto open on for their course even if the global default is off."
+
+Scene 5: Analytics dashboard (2 minutes)
+
+Navigate to the Analytics page (link in settings or from Course AI Settings).
+
+Say: "Summary cards at the top. Enabled courses, active courses, total messages, active students."
+
+Point to Meta AI Chat panel.
+
+Say: "This is the Meta AI Chat. It queries all student conversation data with AI. Everything is anonymized. Student names show as Student 4217, Student 842, and so on."
+
+Click Expand. Select a provider. Type: "What are the most common topics students ask about?" Send.
+
+Say: "The AI sees full anonymized transcripts and answers from real data."
+
+Point to the course search bar.
+
+Say: "150 courses on this site but only 25 show by default. Search filters instantly. Checkboxes and bulk enable/disable for managing at scale."
+
+Point to Show Real Names button.
+
+Say: "Default is anonymized. Click to reveal names temporarily. Warning banner appears. Reverts when you leave."
+
+Scene 6: Student Mode (60 seconds)
+
+Point to the Student Mode button on the analytics page.
+
+Say: "Click Student Mode to see exactly what a student sees. No debug panel, no settings link, no LLM picker, no analytics icon. The system prompt treats you as a student too."
+
+Click it. Navigate to a course. Show the clean student view.
+
+Say: "Exit discretely with Ctrl+Shift+A. Useful for recordings and demos where you do not want admin controls visible."
+
+Press Ctrl+Shift+A. Admin controls reappear.
+
+Scene 7: Scheduled reports (60 seconds)
+
+Navigate back to Settings > Integrations and Delivery > Meta AI Scheduled Reports.
+
+Say: "Enable, pick a frequency, write the query you want answered, choose the provider, and enter the email. The cron task runs at 6 AM, builds anonymized transcripts, calls the LLM, and emails the result. All data in the email is anonymized."
+
+
+================================================================
+DEMO 3: META-AI ANALYTICS (5 minutes)
+================================================================
+
+Pre flight:
+  * Log in as site admin
+  * Navigate to the Analytics dashboard
+  * Ensure at least one course has conversation data
+
+Scene 1: Open Meta AI Chat (30 seconds)
+
+Point to the Meta AI Chat card below the summary cards.
+
+Say: "Meta AI Chat lets you ask questions about all student conversation data using natural language. Everything the AI sees is anonymized."
+
+Click Expand.
+
+Scene 2: Select provider (30 seconds)
+
+Point to the Provider and Model dropdowns.
+
+Say: "Choose which LLM you want to query with. The primary provider is always listed. If you have configured comparison providers in the settings, they appear here too."
+
+Select a provider and model.
+
+Scene 3: First query (90 seconds)
+
+Type: "What are the most common questions students ask across all courses?"
+
+Click Send. Watch the response stream in.
+
+Say: "The AI is reading through anonymized transcripts from every course on the site and summarizing patterns. Notice students are referenced as Student 4217, Student 842, never by real name."
+
+Scene 4: Follow up query (60 seconds)
+
+Type: "Which course has the lowest student engagement and why?"
+
+Send. Watch the response.
+
+Say: "Conversation history is maintained within the session so follow up questions have context from prior answers."
+
+Scene 5: Course specific query (60 seconds)
+
+If a course is selected in the dashboard, the Meta AI Chat scopes to that course.
+
+Say: "When you select a course above, the Meta AI Chat automatically focuses on that course's data. You can ask very specific questions."
+
+Type: "What topics do students struggle with most in this course?"
+
+Send.
+
+Scene 6: Scheduled reports (30 seconds)
+
+Say: "If you want these queries to run automatically, go to Settings > Meta AI Scheduled Reports. Set a frequency, write your query, pick a provider, and enter your email. The results arrive in your inbox every morning, week, or month with all data anonymized."
+
+================================================================
+
+Notes for the presenter:
+  * All three demos assume v3.6.8 or later.
+  * Student demo: ~12 min. Admin demo: ~10 min. Meta AI demo: ~5 min. Combined: ~27 min with transitions.
+  * Scenes marked "optional" or "skip if disabled" can be dropped to shorten.
+  * Widget does not appear on admin settings pages (v3.6.2). Intentional.
+  * Student Mode indicator: subtle 2px gradient bar (amber to orange) at the top of the drawer. Observers will not notice.

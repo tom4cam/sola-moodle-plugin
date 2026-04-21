@@ -17,7 +17,7 @@
 namespace local_ai_course_assistant;
 
 /**
- * Student identity anonymizer for analytics and AI Analysis Chat.
+ * Student identity anonymizer for analytics and Learning Radar.
  *
  * @package    local_ai_course_assistant
  * @copyright  2025 AI Course Assistant

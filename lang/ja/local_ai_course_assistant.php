@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Japanese.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'メモ';
 // History panel.
 $string['chat:history_title'] = 'メモと会話履歴';
 $string['task:send_inactivity_reminders'] = '週次の非アクティビティリマインダーメールを送信する';
-$string['task:run_meta_ai_query'] = 'スケジュールされた AI Analysis 分析クエリを実行';
+$string['task:run_meta_ai_query'] = 'スケジュールされた ラーニング レーダー 分析クエリを実行';
 $string['messageprovider:study_notes'] = '学習セッションノート';
 
 // CDN settings.

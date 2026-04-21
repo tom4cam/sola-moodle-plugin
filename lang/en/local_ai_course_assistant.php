@@ -18,7 +18,7 @@
  * Language strings for local_ai_course_assistant.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -54,14 +54,14 @@ $string['ai_course_assistant:manage'] = 'Manage AI tutor chat settings (Administ
 $string['settings:enabled'] = 'Enable AI Course Assistant';
 $string['settings:enabled_desc'] = 'Enable or disable the AI Course Assistant widget on course pages.';
 $string['settings:default_course_mode'] = 'Default for new courses';
-$string['settings:default_course_mode_desc'] = 'Controls whether SOLA appears on a course when no per-course choice has been made. New installs default to "Disabled by default" so admins can opt in course by course from the Analytics page or the Course AI Settings page.';
+$string['settings:default_course_mode_desc'] = 'Controls whether the assistant appears on a course when no per-course choice has been made. New installs default to "Disabled by default" so admins can opt in course by course from the Analytics page or the Course AI Settings page.';
 $string['settings:default_course_mode_per_course'] = 'Disabled by default (enable per course)';
 $string['settings:default_course_mode_all'] = 'Enabled on all courses';
-$string['task:run_meta_ai_query'] = 'Run scheduled AI Analysis analytics query';
+$string['task:run_meta_ai_query'] = 'Run scheduled Learning Radar analytics query';
 $string['settings:comparison_providers'] = 'Comparison providers (LLM picker)';
 $string['settings:comparison_providers_desc'] = 'Add extra AI providers to the in-widget LLM picker so admins can compare responses across providers. Use the table below to add rows. The temperature column is optional (leave blank to use the global temperature). Stored format: provider_id|api_key|model1,model2|temperature. The primary provider configured above is always included automatically. Only admins with the manage capability see the picker; students never see it. Valid provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, openrouter, xai, coreai, custom.';
 $string['settings:auto_open'] = 'Auto-open on first visit';
-$string['settings:auto_open_desc'] = 'When enabled, the SOLA drawer opens automatically the first time a student lands on each course. Subsequent page loads in the same course do not re-open the drawer — state is tracked per course in the student\'s browser via localStorage. Applies on desktop and mobile. Can be overridden per course from the Course AI Settings page.';
+$string['settings:auto_open_desc'] = 'When enabled, the assistant drawer opens automatically the first time a student lands on each course. Subsequent page loads in the same course do not re-open the drawer — state is tracked per course in the student\'s browser via localStorage. Applies on desktop and mobile. Can be overridden per course from the Course AI Settings page.';
 $string['settings:provider'] = 'Default AI Provider';
 $string['settings:provider_desc'] = 'Select the AI provider to use for chat completions. Choose "Moodle AI (core_ai subsystem)" to route requests through Moodle\'s built-in AI configuration at Site admin > AI; the API key, model, and base URL fields below are ignored in that mode. Streaming, tool use, and prompt caching are not available via core_ai — responses are delivered as a single chunk. Use a direct provider for the best student experience.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -79,7 +79,7 @@ $string['settings:apikey'] = 'API Key';
 $string['settings:apikey_desc'] = 'API key for the selected provider. Not required for Ollama.';
 $string['settings:model'] = 'Model Name';
 $string['settings:model_desc'] = 'The model to use. Default depends on provider (e.g. claude-sonnet-4-5-20250929, gpt-4o, llama3, MiniMax-Text-01).';
-$string['settings:model_desc_dynamic'] = 'Leave blank to use the provider\'s default model automatically. Each provider has a built-in default that stays current (e.g. gpt-4o for OpenAI, claude-sonnet-4 for Claude, mistral-large-latest for Mistral). Only enter a model name if you want to override the default. If a model is misspelled or deprecated, SOLA will automatically fall back to the provider\'s default.';
+$string['settings:model_desc_dynamic'] = 'Leave blank to use the provider\'s default model automatically. Each provider has a built-in default that stays current (e.g. gpt-4o for OpenAI, claude-sonnet-4 for Claude, mistral-large-latest for Mistral). Only enter a model name if you want to override the default. If a model is misspelled or deprecated, the assistant will automatically fall back to the provider\'s default.';
 $string['settings:apibaseurl'] = 'API Base URL';
 $string['settings:apibaseurl_desc'] = 'Base URL for the API. Auto-filled per provider but can be overridden. Leave blank for provider default.';
 $string['settings:systemprompt'] = 'System Prompt Template';
@@ -120,7 +120,7 @@ Communicate in a friendly, caring, encouraging, witty, and motivating way. Be co
 ## Safety
 Do not engage in abusive, hateful, discriminatory, or inappropriate conversations. Set firm but kind boundaries and redirect to productive topics.';
 $string['remoteconfigurl'] = 'Remote config URL';
-$string['remoteconfigurl_desc'] = 'URL to a JSON file containing remotely-managed SOLA configuration (system prompt, instruction blocks, model default). Must be HTTPS. Leave blank to use the default GitHub URL. Local admin settings always take priority over remote config values.';
+$string['remoteconfigurl_desc'] = 'URL to a JSON file containing remotely-managed plugin configuration (system prompt, instruction blocks, model default). Must be HTTPS. Leave blank to use the default GitHub URL. Local admin settings always take priority over remote config values.';
 $string['settings:temperature'] = 'Temperature';
 $string['settings:temperature_desc'] = 'Controls randomness. Lower values are more focused, higher values more creative. Range: 0.0 to 2.0.';
 $string['settings:maxhistory'] = 'Max Conversation History';
@@ -135,7 +135,7 @@ $string['settings:avatar_color_desc'] = 'Border color of the floating avatar but
 $string['settings:avatar_fill'] = 'Avatar Background Color';
 $string['settings:avatar_fill_desc'] = 'Fill color inside the floating avatar button (shown behind transparent avatar areas). Use a hex value, e.g. #ffffff.';
 $string['settings:display_mode'] = 'Display Mode';
-$string['settings:display_mode_desc'] = 'How SOLA appears on the page. "Widget" shows a floating avatar button with a popup chat panel. "Side drawer" shows a full-height panel that slides in from the right edge of the screen.';
+$string['settings:display_mode_desc'] = 'How the assistant appears on the page. "Widget" shows a floating avatar button with a popup chat panel. "Side drawer" shows a full-height panel that slides in from the right edge of the screen.';
 $string['settings:display_mode_widget'] = 'Widget (floating button)';
 $string['settings:display_mode_drawer'] = 'Side drawer (right edge)';
 $string['settings:position'] = 'Widget Position';
@@ -151,16 +151,16 @@ $string['analytics:viewdashboard'] = 'View analytics dashboard';
 $string['coursesettings:title'] = 'Course AI Settings';
 $string['coursesettings:enabled'] = 'Enable course overrides';
 $string['coursesettings:enabled_desc'] = 'When enabled, the settings below override the global AI provider configuration for this course only. Leave fields blank to inherit the global value.';
-$string['coursesettings:sola_enabled'] = 'SOLA on this course';
-$string['coursesettings:sola_enabled_toggle'] = 'Show the SOLA widget on this course';
-$string['coursesettings:sola_enabled_desc'] = 'Controls whether the SOLA chat widget appears on this course. The site-wide default is set in the plugin settings under General > Default for new courses.';
+$string['coursesettings:sola_enabled'] = 'Assistant on this course';
+$string['coursesettings:sola_enabled_toggle'] = 'Show the assistant widget on this course';
+$string['coursesettings:sola_enabled_desc'] = 'Controls whether the assistant chat widget appears on this course. The site-wide default is set in the plugin settings under General > Default for new courses.';
 $string['coursesettings:using_global'] = 'Using global setting';
 $string['coursesettings:saved'] = 'Course AI settings saved.';
 $string['coursesettings:ell_pronunciation']        = 'Pronunciation Practice Mode';
 $string['coursesettings:ell_pronunciation_desc']   = 'Show the "Pronunciation Practice" chip for students in this course. Uses OpenAI Realtime API for phoneme-level pronunciation feedback. Requires Voice Mode to be enabled in global plugin settings.';
 $string['coursesettings:ell_pronunciation_enable'] = 'Enable Pronunciation Practice chip for this course';
 $string['coursesettings:rag']        = 'Semantic Search (RAG)';
-$string['coursesettings:rag_desc']   = 'Enable retrieval-augmented generation for this course. When enabled, SOLA embeds and searches course content to ground its answers. Requires RAG to be enabled globally in plugin settings.';
+$string['coursesettings:rag_desc']   = 'Enable retrieval-augmented generation for this course. When enabled, the assistant embeds and searches course content to ground its answers. Requires RAG to be enabled globally in plugin settings.';
 $string['coursesettings:rag_enable'] = 'Enable RAG for this course';
 $string['coursesettings:speaking_practice']        = 'Speaking Practice';
 $string['coursesettings:speaking_practice_desc']   = 'Show the "Practice Speaking" chip for students in this course. Uses OpenAI TTS for voice responses. Requires an OpenAI API key in global plugin settings.';
@@ -193,7 +193,7 @@ $string['chat:error'] = 'Sorry, something went wrong. Please try again.';
 $string['chat:error_auth'] = 'Authentication error. Please contact your administrator.';
 $string['chat:error_ratelimit'] = 'Too many requests. Please wait a moment and try again.';
 $string['chat:error_unavailable'] = 'The AI service is temporarily unavailable. Please try again later.';
-$string['chat:error_notconfigured'] = 'SOLA has not been configured yet. Please contact your administrator.';
+$string['chat:error_notconfigured'] = 'The AI Course Assistant has not been configured yet. Please contact your administrator.';
 $string['chat:mic'] = 'Speak your question';
 $string['chat:mic_error'] = 'Microphone error. Please check your browser permissions.';
 $string['chat:mic_unsupported'] = 'Speech input is not supported in this browser.';
@@ -304,13 +304,13 @@ $string['unsubscribe:resubscribe'] = 'Changed your mind? You can re-enable remin
 $string['task:send_reminders'] = 'Send AI tutor study reminders';
 $string['task:index_course_content'] = 'Index course content for RAG semantic search';
 $string['task:send_inactivity_reminders'] = 'Send weekly inactivity reminder emails';
-$string['task:run_integrity_checks'] = 'Run daily SOLA plugin integrity checks';
+$string['task:run_integrity_checks'] = 'Run daily AI Course Assistant plugin integrity checks';
 $string['messageprovider:study_notes'] = 'Study session notes';
-$string['messageprovider:integrity_report'] = 'SOLA integrity check failure report';
+$string['messageprovider:integrity_report'] = 'AI Course Assistant integrity check failure report';
 
 // Plugin Updates.
 $string['update:title'] = 'Plugin Updates';
-$string['update:desc'] = 'Check for and install SOLA plugin updates directly from GitHub releases.';
+$string['update:desc'] = 'Check for and install plugin updates directly from GitHub releases.';
 $string['update:check'] = 'Check for Updates';
 $string['update:install'] = 'Install Update';
 $string['update:current_version'] = 'Installed Version';
@@ -327,7 +327,7 @@ $string['update:github_token_desc'] = 'Personal access token for accessing priva
 
 // CDN / Frontend Delivery settings.
 $string['settings:cdn_heading'] = 'CDN / Frontend Delivery';
-$string['settings:cdn_heading_desc'] = 'Serve SOLA frontend assets (JS/CSS) from an external CDN instead of the Moodle filesystem. This allows frontend updates without a plugin upgrade. Leave the CDN URL empty to use the local plugin files.';
+$string['settings:cdn_heading_desc'] = 'Serve frontend assets (JS/CSS) from an external CDN instead of the Moodle filesystem. This allows frontend updates without a plugin upgrade. Leave the CDN URL empty to use the local plugin files.';
 $string['settings:cdn_url'] = 'CDN Base URL';
 $string['settings:cdn_url_desc'] = 'Base URL where sola.min.js and sola.min.css are hosted. Example: https://your-org.github.io/sola-cdn. Leave empty to use local plugin files.';
 $string['settings:cdn_version'] = 'CDN Asset Version';
@@ -589,7 +589,7 @@ $string['chat:reset']                     = 'Start over';
 
 // Starter admin settings.
 $string['starters:admin_title']     = 'Conversation Starter Settings';
-$string['starters:admin_desc']      = 'Configure the conversation starter chips shown to students when they open the SOLA chat. Drag to reorder, toggle to enable/disable, or add custom starters with your own AI prompts.';
+$string['starters:admin_desc']      = 'Configure the conversation starter chips shown to students when they open the assistant chat. Drag to reorder, toggle to enable/disable, or add custom starters with your own AI prompts.';
 $string['starters:add_new']         = 'Add new starter';
 $string['starters:save']            = 'Save changes';
 $string['starters:saved']           = 'Starter configuration saved.';
@@ -620,17 +620,17 @@ $string['chat:settings_voice_admin']    = 'Voice settings are managed in the sit
 
 // Voice mode (OpenAI Realtime).
 $string['chat:voice_mode']              = 'Voice mode';
-$string['chat:voice_title']             = 'Talk with SOLA';
+$string['chat:voice_title']             = 'Talk with the assistant';
 $string['chat:voice_copy']              = 'Have a natural voice conversation with your learning assistant.';
 $string['chat:voice_ready']             = 'Ready to start';
 $string['chat:voice_start']             = 'Start conversation';
 $string['chat:voice_end']               = 'End voice session';
 $string['chat:voice_connecting']        = 'Connecting...';
 $string['chat:voice_listening']         = 'Listening...';
-$string['chat:voice_speaking']          = 'SOLA is speaking...';
+$string['chat:voice_speaking']          = 'Speaking...';
 $string['chat:voice_idle']              = 'Ready';
 $string['chat:voice_error']             = 'Voice connection failed. Please check your settings.';
-$string['chat:quiz_locked']             = 'SOLA is paused during quizzes to support academic integrity. Good luck!';
+$string['chat:quiz_locked']             = 'The assistant is paused during quizzes to support academic integrity. Good luck!';
 
 // Bottom navigation modes.
 $string['chat:mode_nav']                = 'Mode navigation';
@@ -679,33 +679,33 @@ $string['chat:voice_panel_title']       = 'Talk with {$a} (Experimental)';
 
 // Quiz hide settings.
 $string['settings:quiz_hide_heading'] = 'Quiz Page Visibility';
-$string['settings:quiz_hide_heading_desc'] = 'Control whether the SOLA widget appears on Moodle quiz pages. This is stricter than the built-in summative quiz lock, which only disables chat during graded quizzes. These settings completely hide the widget on all quiz pages.';
-$string['settings:hide_on_quiz_for_students'] = 'Hide SOLA on quiz pages for students';
-$string['settings:hide_on_quiz_for_students_desc'] = 'Completely hide the SOLA widget on all quiz pages (view, attempt, review) for students.';
-$string['settings:hide_on_quiz_for_staff'] = 'Hide SOLA on quiz pages for staff';
-$string['settings:hide_on_quiz_for_staff_desc'] = 'Completely hide the SOLA widget on all quiz pages for teachers and administrators.';
+$string['settings:quiz_hide_heading_desc'] = 'Control whether the assistant widget appears on Moodle quiz pages. This is stricter than the built-in summative quiz lock, which only disables chat during graded quizzes. These settings completely hide the widget on all quiz pages.';
+$string['settings:hide_on_quiz_for_students'] = 'Hide assistant on quiz pages for students';
+$string['settings:hide_on_quiz_for_students_desc'] = 'Completely hide the assistant widget on all quiz pages (view, attempt, review) for students.';
+$string['settings:hide_on_quiz_for_staff'] = 'Hide assistant on quiz pages for staff';
+$string['settings:hide_on_quiz_for_staff_desc'] = 'Completely hide the assistant widget on all quiz pages for teachers and administrators.';
 
 // Wellbeing & Safety settings.
 $string['settings:wellbeing_heading']      = 'Wellbeing & Safety';
-$string['settings:wellbeing_heading_desc'] = 'When enabled, SOLA detects expressions of distress or crisis and responds with empathy and globally-applicable support resources (findahelpline.com, Crisis Text Line, Befrienders Worldwide). SOLA is NOT a counselor — it acknowledges feelings, directs students to human support, and never attempts diagnosis or therapy.';
+$string['settings:wellbeing_heading_desc'] = 'When enabled, the assistant detects expressions of distress or crisis and responds with empathy and globally-applicable support resources (findahelpline.com, Crisis Text Line, Befrienders Worldwide). The assistant is NOT a counselor — it acknowledges feelings, directs students to human support, and never attempts diagnosis or therapy.';
 $string['settings:wellbeing_enabled']      = 'Enable Wellbeing Support';
-$string['settings:wellbeing_enabled_desc'] = 'When enabled, SOLA will detect signs of emotional distress and provide empathetic responses with links to global crisis resources. Disable this if your institution provides its own crisis response and does not want SOLA to surface external resources.';
+$string['settings:wellbeing_enabled_desc'] = 'When enabled, the assistant will detect signs of emotional distress and provide empathetic responses with links to global crisis resources. Disable this if your institution provides its own crisis response and does not want the assistant to surface external resources.';
 
 // Voice mode settings.
 $string['settings:realtime_heading']      = 'Voice Mode (OpenAI Realtime)';
 $string['settings:realtime_enabled']      = 'Enable Voice Mode';
-$string['settings:realtime_enabled_desc'] = 'Allows students to have real-time voice conversations with SOLA. Requires an OpenAI API key.';
+$string['settings:realtime_enabled_desc'] = 'Allows students to have real-time voice conversations with the assistant. Requires an OpenAI API key.';
 $string['settings:realtime_apikey']       = 'OpenAI API Key (Voice & TTS)';
 $string['settings:realtime_apikey_desc']  = 'Used for Voice Mode and the TTS speak button on messages. Leave blank to fall back to the main API key when provider is set to OpenAI.';
-$string['settings:realtime_voice']        = 'SOLA Voice';
+$string['settings:realtime_voice']        = 'Assistant Voice';
 $string['settings:realtime_voice_desc']   = 'Voice used for both Voice Mode and the TTS speak button (OpenAI voices: Shimmer, Alloy, Echo, Fable, Onyx, Nova).';
 
 // Mobile app.
 $string['mobile_welcome']       = 'Hi, {$a}!';
-$string['mobile_welcome_sub']   = 'I\'m SOLA, your learning assistant. How can I help you today?';
+$string['mobile_welcome_sub']   = 'I\'m your learning assistant. How can I help you today?';
 $string['mobile_placeholder']   = 'Ask a question...';
 $string['mobile_clear']         = 'Clear history';
-$string['mobile_disabled']      = 'SOLA is not available for this course.';
+$string['mobile_disabled']      = 'The assistant is not available for this course.';
 $string['mobile_chip_concepts'] = 'Key Concepts';
 $string['mobile_chip_studyplan'] = 'Study Plan';
 $string['mobile_chip_quiz']     = 'Quiz Me';
@@ -739,7 +739,7 @@ $string["demo:clear_label"] = "Clear existing demo_* users first";
 $string["demo:seed_btn"] = "Seed students and chats";
 $string["demo:view_analytics"] = "View Analytics for this course &rarr;";
 $string["demo:footer"] = "Data created here lives in the standard Moodle user / enrolment tables and the plugin's own conversation tables. The fake users all have usernames starting with <code>demo_student_</code> so they are easy to filter or remove. To remove them, run the seed step again with \"Clear existing demo_* users first\" checked.";
-$string["demo:course_fullname"] = "SOLA Testing Course (hidden)";
+$string["demo:course_fullname"] = "AI Course Assistant Testing Course (hidden)";
 $string["demo:notify_created"] = "Testing course ready: {\$a->fullname} (id {\$a->id}).";
 $string["demo:notify_create_fail"] = "Failed to create course: {\$a}";
 $string["demo:notify_seeded"] = "Seeded: {\$a->users} users, {\$a->conversations} conversations, {\$a->messages} messages, {\$a->ratings} ratings, {\$a->feedback} feedback entries.";

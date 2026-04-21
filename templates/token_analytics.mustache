@@ -112,6 +112,38 @@
         </div>
     </div>
 
+    {{! ── By category (Chat / Voice / RAG / Analytics) ───────────────────── }}
+    {{#has_by_category}}
+    <div class="aica-cost-section">
+        <div class="aica-cost-section__header">
+            <p class="aica-cost-section__title">Cost by Category</p>
+            <p class="aica-cost-section__sub">Token totals grouped by workload: student Chat, Voice (Realtime / TTS / STT), RAG embedding, Learning Radar analytics queries.</p>
+        </div>
+        <table class="aica-cost-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th style="text-align:right">Responses</th>
+                    <th style="text-align:right">Prompt tokens</th>
+                    <th style="text-align:right">Completion tokens</th>
+                    <th style="text-align:right">Total tokens</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#by_category}}
+                <tr>
+                    <td><strong>{{category}}</strong></td>
+                    <td class="num">{{response_count}}</td>
+                    <td class="num">{{prompt_tokens}}</td>
+                    <td class="num">{{completion_tokens}}</td>
+                    <td class="num">{{total_tokens}}</td>
+                </tr>
+                {{/by_category}}
+            </tbody>
+        </table>
+    </div>
+    {{/has_by_category}}
+
     {{! ── By model ────────────────────────────────────────────────────────── }}
     <div class="aica-cost-section">
         <div class="aica-cost-section__header">

@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Hebrew.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -45,7 +45,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:timecreated'] = 'הזמ
 $string['ai_course_assistant:use'] = 'שימוש בצ\'אט מורה AI';
 $string['ai_course_assistant:viewanalytics'] = 'צפייה בניתוח נתוני מורה AI';
 $string['ai_course_assistant:manage'] = 'ניהול הגדרות מורה AI (תפקיד מנהל)';
-$string['task:run_meta_ai_query'] = 'הפעל שאילתת ניתוח AI Analysis מתוזמנת';
+$string['task:run_meta_ai_query'] = 'הפעל שאילתת ניתוח מכ"ם למידה מתוזמנת';
 
 // Settings.
 $string['settings:enabled'] = 'הפעלת עוזר קורס AI';

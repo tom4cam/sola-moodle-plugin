@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Zulu (isiZulu).
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -371,7 +371,7 @@ $string['chat:history_title'] = 'Amanothi nomlando wengxoxo';
 $string['task:send_inactivity_reminders'] = 'Thumela ama-imeyili esikhumbuzo samasonto ngokungasebenzi';
 $string['messageprovider:study_notes'] = 'Amanothi esikhathi sokufunda';
 $string['task:send_inactivity_reminders'] = 'Thumela ama-imeyili esikhumbuzo sokungasebenzi njalo ngesonto';
-$string['task:run_meta_ai_query'] = 'Sebenzisa umbuzo wokuhlaziya we-AI Analysis ohleliwe';
+$string['task:run_meta_ai_query'] = 'Sebenzisa umbuzo wokuhlaziya we-Learning Radar ohleliwe';
 $string['messageprovider:study_notes'] = 'Amanothi eseshini yokufunda';
 
 // CDN settings.

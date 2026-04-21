@@ -8,6 +8,10 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 **Requires:** Moodle 4.5+ (2024100700)
 **License:** GPL v3+
 
+## Credits
+
+Originally built by Tom Caswell and David Ta at Saylor University, open-sourced under GPLv3 for any institution to deploy and brand. See [CREDITS.md](CREDITS.md) for details.
+
 ## Features
 
 ### Core Functionality
@@ -323,10 +327,11 @@ Contributions welcome! Please:
 
 ## Credits
 
-**Author:** [Your name/organization]
-**Contributors:** [List contributors]
+**Original authors:** Tom Caswell and David Ta, Saylor University
 **License:** GNU GPL v3 or later
-**Copyright:** 2025 AI Course Assistant
+**Copyright:** 2025-2026 Tom Caswell & David Ta / Saylor University
+
+See [CREDITS.md](CREDITS.md) for the full attribution.
 
 ## Acknowledgments
 

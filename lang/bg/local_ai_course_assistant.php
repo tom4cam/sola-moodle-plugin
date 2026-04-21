@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Bulgarian.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Бележки';
 // History panel.
 $string['chat:history_title'] = 'Бележки и история на разговора';
 $string['task:send_inactivity_reminders'] = 'Изпращане на седмични имейли за напомняне при неактивност';
-$string['task:run_meta_ai_query'] = 'Изпълнение на планирана заявка за AI Analysis анализ';
+$string['task:run_meta_ai_query'] = 'Изпълнение на планирана заявка за Радар за обучение анализ';
 $string['messageprovider:study_notes'] = 'Бележки от учебна сесия';
 
 // CDN settings.

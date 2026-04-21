@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Turkish.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Notlar';
 // History panel.
 $string['chat:history_title'] = 'Notlar ve Konuşma Geçmişi';
 $string['task:send_inactivity_reminders'] = 'Haftalık hareketsizlik hatırlatma e-postaları gönder';
-$string['task:run_meta_ai_query'] = 'Zamanlanmış AI Analysis analiz sorgusunu çalıştır';
+$string['task:run_meta_ai_query'] = 'Zamanlanmış Öğrenme Radarı analiz sorgusunu çalıştır';
 $string['messageprovider:study_notes'] = 'Çalışma oturumu notları';
 
 // CDN settings.

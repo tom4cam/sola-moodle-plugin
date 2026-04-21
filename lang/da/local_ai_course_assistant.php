@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Danish.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Noter';
 // History panel.
 $string['chat:history_title'] = 'Noter og samtalehistorik';
 $string['task:send_inactivity_reminders'] = 'Send ugentlige påmindelses-e-mails ved inaktivitet';
-$string['task:run_meta_ai_query'] = 'Kør planlagt AI Analysis analyseforespørgsel';
+$string['task:run_meta_ai_query'] = 'Kør planlagt Læringsradar analyseforespørgsel';
 $string['messageprovider:study_notes'] = 'Studiesessionsnotater';
 
 // CDN settings.

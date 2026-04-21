@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Simplified Chinese (zh_cn).
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -371,7 +371,7 @@ $string['chat:history_title'] = '笔记与对话历史';
 $string['task:send_inactivity_reminders'] = '发送每周不活跃提醒邮件';
 $string['messageprovider:study_notes'] = '学习会话笔记';
 $string['task:send_inactivity_reminders'] = '发送每周不活跃提醒邮件';
-$string['task:run_meta_ai_query'] = '运行预定的 AI Analysis 分析查询';
+$string['task:run_meta_ai_query'] = '运行预定的 学习雷达 分析查询';
 $string['messageprovider:study_notes'] = '学习课程笔记';
 
 // CDN settings.

@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Yoruba (Yorùbá).
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -371,7 +371,7 @@ $string['chat:history_title'] = 'Àkọsílẹ̀ àti Ìtàn Ìfọ̀rọ̀wáni
 $string['task:send_inactivity_reminders'] = 'Fi àwọn ìmẹ́lì ìránlọ́wọ́ ọ̀ṣọ̀ọ̀ṣẹ̀ ránṣẹ́ nítorí àìṣiṣẹ́';
 $string['messageprovider:study_notes'] = 'Àwọn àkọsílẹ̀ àkókò ìkẹ́kọ̀ọ́';
 $string['task:send_inactivity_reminders'] = 'Fi imeeli iranti aiṣiṣẹ ni ọsẹ-ọsẹ ranṣẹ';
-$string['task:run_meta_ai_query'] = 'Ṣe ibeere itupalẹ AI Analysis ti a ṣeto';
+$string['task:run_meta_ai_query'] = 'Ṣe ibeere itupalẹ Learning Radar ti a ṣeto';
 $string['messageprovider:study_notes'] = 'Awọn akọsilẹ akoko ikẹkọ';
 
 // CDN settings.

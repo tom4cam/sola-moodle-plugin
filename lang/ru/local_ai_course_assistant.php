@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Russian (Русский).
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -371,7 +371,7 @@ $string['chat:history_title'] = 'Заметки и история разгово
 $string['task:send_inactivity_reminders'] = 'Отправлять еженедельные напоминания по электронной почте о неактивности';
 $string['messageprovider:study_notes'] = 'Заметки учебной сессии';
 $string['task:send_inactivity_reminders'] = 'Отправлять еженедельные напоминания о неактивности';
-$string['task:run_meta_ai_query'] = 'Запустить запланированный запрос аналитики AI Analysis';
+$string['task:run_meta_ai_query'] = 'Запустить запланированный запрос аналитики Радар обучения';
 $string['messageprovider:study_notes'] = 'Заметки учебной сессии';
 
 // CDN settings.

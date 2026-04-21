@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — French.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -43,7 +43,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:timecreated'] = 'L\'heu
 $string['ai_course_assistant:use'] = 'Utiliser le chat du tuteur IA';
 $string['ai_course_assistant:viewanalytics'] = 'Consulter les analyses du chat du tuteur IA';
 $string['ai_course_assistant:manage'] = 'Gérer les paramètres du chat du tuteur IA (rôle Administrateur)';
-$string['task:run_meta_ai_query'] = 'Exécuter la requête d\'analytique AI Analysis planifiée';
+$string['task:run_meta_ai_query'] = 'Exécuter la requête d\'analytique Radar d\'Apprentissage planifiée';
 $string['settings:enabled'] = 'Activer l\'assistant de cours IA';
 $string['settings:enabled_desc'] = 'Activer ou désactiver le widget de l\'assistant de cours IA sur les pages de cours.';
 $string['settings:default_course_mode'] = 'Valeur par défaut pour les nouveaux cours';

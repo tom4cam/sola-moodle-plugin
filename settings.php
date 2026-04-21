@@ -17,11 +17,11 @@
 /**
  * Admin settings for local_ai_course_assistant.
  *
- * Settings are organized into an admin category (SOLA) with 7 settings pages
+ * Settings are organized into an admin category with 7 settings pages
  * and 7 external admin pages, visible under Site administration > Plugins > Local plugins.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -162,7 +162,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/hidden_categories',
         'Hidden course categories',
-        'Comma-separated list of course category names or IDs where SOLA should not appear. Example: "Course Development, 42". SOLA is also automatically hidden when editing mode is turned on.',
+        'Comma-separated list of course category names or IDs where the assistant should not appear. Example: "Course Development, 42". The assistant is also automatically hidden when editing mode is turned on.',
         '',
         PARAM_RAW_TRIMMED
     ));
@@ -270,7 +270,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/profile_update_interval',
         'Student Profile Update Interval',
-        'After this many student messages in a course, SOLA generates (or refreshes) a learning profile summarising the student\'s strengths, weaknesses, learning style, and interests. The profile is injected into the system prompt for personalised responses. Set to 0 to disable. Default: 10.',
+        'After this many student messages in a course, the assistant generates (or refreshes) a learning profile summarising the student\'s strengths, weaknesses, learning style, and interests. The profile is injected into the system prompt for personalised responses. Set to 0 to disable. Default: 10.',
         '10',
         PARAM_INT
     ));
@@ -318,7 +318,7 @@ if ($hassiteconfig) {
         'Analytics Dashboard',
         '<a href="' . $analyticsurl->out() . '" class="btn btn-sm btn-outline-secondary">'
         . 'View Analytics Dashboard &rarr;</a>'
-        . '<p class="text-muted mt-1" style="font-size:13px;">Cross-course usage analytics, enable/disable AI per course, student feedback, and AI Analysis Chat.</p>'
+        . '<p class="text-muted mt-1" style="font-size:13px;">Cross-course usage analytics, enable/disable AI per course, student feedback, and Learning Radar.</p>'
     ));
 
     // ── Section: Content & RAG ──────────────────────────────────────────────
@@ -489,8 +489,8 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/rag_transcript_url_pattern',
         'Transcript URL pattern',
-        'Regex that matches transcript anchor URLs. The indexer picks the nearest matching anchor (above or below) to each detected iframe and pairs them.',
-        "resources\\.saylor\\.org/transcripts/[^\"'\\s>]+"
+        'Regex that matches transcript anchor URLs. The indexer picks the nearest matching anchor (above or below) to each detected iframe and pairs them. Leave blank to disable transcript pairing.',
+        ""
     ));
 
     // Performance: caps on how much course content goes into the system prompt.
@@ -857,7 +857,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/usertesting_heading',
         'Usability Testing',
-        'In-widget usability testing with task-based evaluation. Students complete tasks inside SOLA and rate their experience. '
+        'In-widget usability testing with task-based evaluation. Students complete tasks inside the assistant and rate their experience. '
         . 'Results appear in the analytics dashboard.'
     ));
 
@@ -900,29 +900,29 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/institution_name',
         'Institution Name',
-        'Full institution name used in the system prompt, avatar labels, and AI insights (e.g. "Saylor University").',
-        'Saylor University'
+        'Full institution name used in the system prompt, avatar labels, and AI insights (e.g. "State University").',
+        'Your Institution'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/institution_short_name',
         'Institution Short Name',
-        'Abbreviated institution name for compact UI elements (e.g. "Saylor U").',
-        'Saylor U'
+        'Abbreviated institution name for compact UI elements (e.g. "State U").',
+        'Your Institution'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/display_name',
         'Assistant Display Name',
-        'Full name of the AI assistant shown in greetings and the welcome screen (e.g. "Saylor Online Learning Assistant").',
-        'Saylor Online Learning Assistant'
+        'Full name of the AI assistant shown in greetings and the welcome screen (e.g. "Online Learning Assistant").',
+        'Online Learning Assistant'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/short_name',
         'Assistant Short Name',
-        'Short name shown in the header bar and compact UI elements (e.g. "SOLA").',
-        'SOLA'
+        'Short name shown in the header bar and compact UI elements (e.g. "Assistant").',
+        'Assistant'
     ));
 
     $settings->add(new admin_setting_configtextarea(
@@ -1068,17 +1068,17 @@ if ($hassiteconfig) {
         ''
     ));
 
-    // AI Analysis Scheduled Reports.
+    // Learning Radar Scheduled Reports.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/metaai_cron_heading',
-        'AI Analysis Scheduled Reports',
-        'Configure automated AI analysis of anonymized student conversation data. Reports are emailed on the selected schedule.'
+        'Learning Radar Scheduled Reports',
+        'Configure automated Learning Radar analysis of anonymized student conversation data. Reports are emailed on the selected schedule.'
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/metaai_cron_enabled',
         'Enable scheduled reports',
-        'Run a recurring AI Analysis query and email the anonymized results.',
+        'Run a recurring Learning Radar query and email the anonymized results.',
         0
     ));
 

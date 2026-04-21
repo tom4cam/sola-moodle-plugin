@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Hausa (Hausa).
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -379,7 +379,7 @@ $string['chat:history_title'] = 'Bayanai da Tarihin Tattaunawa';
 $string['task:send_inactivity_reminders'] = 'Aika saƙonnin tunatarwa na mako-mako saboda rashin aiki';
 $string['messageprovider:study_notes'] = 'Bayanan zaman karatu';
 $string['task:send_inactivity_reminders'] = 'Aika saƙonnin tunatarwa na mako-mako saboda rashin aiki';
-$string['task:run_meta_ai_query'] = 'Gudanar da binciken nazarin AI Analysis da aka tsara';
+$string['task:run_meta_ai_query'] = 'Gudanar da binciken nazarin Learning Radar da aka tsara';
 $string['messageprovider:study_notes'] = 'Bayanan zaman karatu';
 
 // CDN settings.

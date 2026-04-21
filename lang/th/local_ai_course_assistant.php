@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Thai.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'บันทึก';
 // History panel.
 $string['chat:history_title'] = 'บันทึกและประวัติการสนทนา';
 $string['task:send_inactivity_reminders'] = 'ส่งอีเมลแจ้งเตือนการไม่ใช้งานรายสัปดาห์';
-$string['task:run_meta_ai_query'] = 'รันการค้นหาวิเคราะห์ AI Analysis ตามกำหนดเวลา';
+$string['task:run_meta_ai_query'] = 'รันการค้นหาวิเคราะห์ เรดาร์การเรียนรู้ ตามกำหนดเวลา';
 $string['messageprovider:study_notes'] = 'บันทึกเซสชันการเรียน';
 
 // CDN settings.

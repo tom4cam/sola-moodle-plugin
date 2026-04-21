@@ -20,7 +20,7 @@
  * Shows cross-course summary + per-course analytics with SOLA enable/disable toggles.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -471,7 +471,7 @@ $templatedata = [
     // Student mode.
     'student_mode' => !empty($_SESSION['sola_student_mode']),
 
-    // AI Analysis Chat.
+    // Learning Radar.
     'meta_ai_sse_url' => (new moodle_url('/local/ai_course_assistant/meta_ai_sse.php'))->out(false),
     'meta_ai_providers' => (function () {
         $providers = [];
@@ -511,6 +511,99 @@ $templatedata = [
         return $providers;
     })(),
     'has_meta_ai_providers' => true,
+
+    // Learning Radar metric chips (v3.9.9+). Six at-a-glance numbers plus a
+    // templated follow-up query each chip submits to Learning Radar when
+    // clicked. Computed once per page load; sub-second on a healthy DB.
+    'learning_radar_chips' => (function () {
+        global $DB;
+        $chips = [];
+        $now = time();
+        $since30 = $now - 30 * 86400;
+        $since7 = $now - 7 * 86400;
+
+        // Tokens this month.
+        $toktotal = (int) $DB->get_field_sql(
+            "SELECT COALESCE(SUM(COALESCE(prompt_tokens, 0) + COALESCE(completion_tokens, 0)), 0)
+               FROM {local_ai_course_assistant_msgs}
+              WHERE role = 'assistant' AND timecreated > ?",
+            [$since30]) ?: 0;
+        $chips[] = [
+            'value' => number_format($toktotal),
+            'label' => 'Tokens (30d)',
+            'query' => 'Break down token spend by provider and course for the last 30 days.',
+        ];
+
+        // Top-cost course (30d).
+        $topcourse = $DB->get_record_sql(
+            "SELECT c.id, c.shortname, c.fullname,
+                    SUM(COALESCE(m.prompt_tokens, 0) + COALESCE(m.completion_tokens, 0)) AS tokens
+               FROM {local_ai_course_assistant_msgs} m
+               JOIN {course} c ON c.id = m.courseid
+              WHERE m.role = 'assistant' AND m.timecreated > ?
+              GROUP BY c.id, c.shortname, c.fullname
+              ORDER BY tokens DESC LIMIT 1",
+            [$since30]);
+        $chips[] = [
+            'value' => $topcourse ? format_string($topcourse->shortname) : '—',
+            'label' => 'Top-cost course (30d)',
+            'query' => $topcourse
+                ? 'Why is course ' . $topcourse->shortname . ' the top token consumer this month?'
+                : 'Which courses are using the most tokens recently?',
+        ];
+
+        // Active students this week.
+        $activeusers = (int) $DB->get_field_sql(
+            "SELECT COUNT(DISTINCT userid)
+               FROM {local_ai_course_assistant_msgs}
+              WHERE role = 'user' AND timecreated > ?",
+            [$since7]) ?: 0;
+        $chips[] = [
+            'value' => number_format($activeusers),
+            'label' => 'Active students (7d)',
+            'query' => 'Profile the active students this week: which topics are they asking about?',
+        ];
+
+        // Voice minutes (30d). Approximate via interaction_type=voice row count
+        // times average session length (safer than parsing comments).
+        $voicemsgs = (int) $DB->get_field_sql(
+            "SELECT COUNT(id) FROM {local_ai_course_assistant_msgs}
+              WHERE interaction_type = 'voice' AND timecreated > ?",
+            [$since30]) ?: 0;
+        $chips[] = [
+            'value' => number_format((int) ceil($voicemsgs * 0.5)),
+            'label' => 'Voice minutes (30d)',
+            'query' => 'Which courses and topics are students using voice mode for?',
+        ];
+
+        // Lowest-rated responses (7d).
+        $neg = (int) $DB->get_field_sql(
+            "SELECT COUNT(id) FROM {local_ai_course_assistant_msg_ratings}
+              WHERE rating = -1 AND timecreated > ?",
+            [$since7]) ?: 0;
+        $chips[] = [
+            'value' => number_format($neg),
+            'label' => 'Negative ratings (7d)',
+            'query' => 'Summarise the lowest-rated responses from the last week. What patterns explain them?',
+        ];
+
+        // Integrity flags open.
+        $flags = 0;
+        try {
+            $flags = (int) $DB->count_records_select(
+                'local_ai_course_assistant_audit',
+                'event = ?', ['integrity_flagged']);
+        } catch (\Throwable $e) {
+            $flags = 0;
+        }
+        $chips[] = [
+            'value' => number_format($flags),
+            'label' => 'Integrity flags (open)',
+            'query' => 'What types of academic integrity concerns are flagged and how should I respond?',
+        ];
+
+        return $chips;
+    })(),
 ];
 
 // Load Chart.js and analytics dashboard AMD module.

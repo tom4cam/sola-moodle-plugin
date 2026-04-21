@@ -20,7 +20,7 @@ use local_ai_course_assistant\meta_ai_data_builder;
 use local_ai_course_assistant\provider\base_provider;
 
 /**
- * Scheduled task that runs a AI Analysis analytics query and emails
+ * Scheduled task that runs a Learning Radar analytics query and emails
  * the anonymized result to the configured admin address.
  *
  * @package    local_ai_course_assistant
@@ -35,19 +35,19 @@ class run_meta_ai_query extends \core\task\scheduled_task {
 
     public function execute(): void {
         if (!get_config('local_ai_course_assistant', 'metaai_cron_enabled')) {
-            mtrace('  AI Analysis cron: disabled, skipping.');
+            mtrace('  Learning Radar cron: disabled, skipping.');
             return;
         }
 
         $frequency = get_config('local_ai_course_assistant', 'metaai_cron_frequency') ?: 'weekly';
         if (!$this->should_run_today($frequency)) {
-            mtrace("  AI Analysis cron: frequency={$frequency}, not scheduled for today, skipping.");
+            mtrace("  Learning Radar cron: frequency={$frequency}, not scheduled for today, skipping.");
             return;
         }
 
         $query = get_config('local_ai_course_assistant', 'metaai_cron_query');
         if (empty($query)) {
-            mtrace('  AI Analysis cron: no query configured, skipping.');
+            mtrace('  Learning Radar cron: no query configured, skipping.');
             return;
         }
 
@@ -71,14 +71,14 @@ class run_meta_ai_query extends \core\task\scheduled_task {
             $courseids = array_filter(array_map('intval', explode(',', $scopecourses)));
         }
 
-        mtrace("  AI Analysis cron: building context (last {$rangedays} days, "
+        mtrace("  Learning Radar cron: building context (last {$rangedays} days, "
             . (empty($courseids) ? "all courses" : "courses " . implode(',', $courseids))
             . ($scopeprovider ? ", provider={$scopeprovider}" : "") . ")...");
         $systemprompt = meta_ai_data_builder::build_system_prompt($courseids, $since, $scopeprovider);
 
         $messages = [['role' => 'user', 'content' => $query]];
 
-        mtrace("  AI Analysis cron: calling LLM (provider={$providerid}, model={$model})...");
+        mtrace("  Learning Radar cron: calling LLM (provider={$providerid}, model={$model})...");
         try {
             global $CFG;
             require_once($CFG->dirroot . '/lib/filelib.php');
@@ -91,14 +91,14 @@ class run_meta_ai_query extends \core\task\scheduled_task {
 
             $response = $llm->chat_completion($systemprompt, $messages);
         } catch (\Throwable $e) {
-            mtrace('  AI Analysis cron ERROR: ' . $e->getMessage());
+            mtrace('  Learning Radar cron ERROR: ' . $e->getMessage());
             return;
         }
 
         $format = get_config('local_ai_course_assistant', 'metaai_cron_format') ?: 'text';
-        mtrace("  AI Analysis cron: sending {$format} report to {$email}...");
+        mtrace("  Learning Radar cron: sending {$format} report to {$email}...");
         $this->send_report($email, $query, $response, $frequency, $format);
-        mtrace('  AI Analysis cron: done.');
+        mtrace('  Learning Radar cron: done.');
     }
 
     private function should_run_today(string $frequency): bool {
@@ -132,7 +132,7 @@ class run_meta_ai_query extends \core\task\scheduled_task {
             $recipient = $admin;
         }
 
-        $subject = 'SOLA AI Analysis Report (' . ucfirst($frequency) . ')';
+        $subject = 'SOLA Learning Radar Report (' . ucfirst($frequency) . ')';
         $disclaimer = "All student data in this report is anonymized. Student names have been "
             . "replaced with pseudonyms (e.g., Student 4217). Do not attempt to identify "
             . "real students from this data.";
@@ -142,7 +142,7 @@ class run_meta_ai_query extends \core\task\scheduled_task {
             $csvpath = $CFG->tempdir . '/sola_report_' . time() . '.csv';
             $fp = fopen($csvpath, 'w');
             fputcsv($fp, ['Field', 'Value']);
-            fputcsv($fp, ['Report Type', 'SOLA AI Analysis']);
+            fputcsv($fp, ['Report Type', 'SOLA Learning Radar']);
             fputcsv($fp, ['Frequency', ucfirst($frequency)]);
             fputcsv($fp, ['Date', userdate(time(), '%Y-%m-%d %H:%M')]);
             fputcsv($fp, ['Query', $query]);
@@ -150,11 +150,11 @@ class run_meta_ai_query extends \core\task\scheduled_task {
             fputcsv($fp, ['Disclaimer', $disclaimer]);
             fclose($fp);
 
-            $body = "Your SOLA AI Analysis report is attached as a CSV file.\n\n" . $disclaimer;
+            $body = "Your SOLA Learning Radar report is attached as a CSV file.\n\n" . $disclaimer;
             email_to_user($recipient, $admin, $subject, $body, '', $csvpath, 'sola_ai_analysis_report.csv');
             @unlink($csvpath);
         } else {
-            $body = "AI Analysis Report\n"
+            $body = "Learning Radar Report\n"
                 . "========================\n\n"
                 . "Frequency: " . ucfirst($frequency) . "\n"
                 . "Date: " . userdate(time(), '%Y-%m-%d %H:%M') . "\n"

@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Swedish.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Anteckningar';
 // History panel.
 $string['chat:history_title'] = 'Anteckningar och konversationshistorik';
 $string['task:send_inactivity_reminders'] = 'Skicka veckovisa påminnelser om inaktivitet via e-post';
-$string['task:run_meta_ai_query'] = 'Kör schemalagd AI Analysis-analysfråga';
+$string['task:run_meta_ai_query'] = 'Kör schemalagd Lärande-radar-analysfråga';
 $string['messageprovider:study_notes'] = 'Studiesessionsanteckningar';
 
 // CDN settings.

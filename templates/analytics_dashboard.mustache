@@ -109,11 +109,25 @@
         </div>
     </div>
 
-    {{! ═══ AI Analysis Chat ═══ }}
+    {{! ═══ Learning Radar ═══ }}
     {{#has_meta_ai_providers}}
+    {{! Metric chips — at-a-glance numbers; click to submit a templated query to Learning Radar. v3.9.8+. }}
+    {{#learning_radar_chips.0}}
+    <div class="learning-radar-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        {{#learning_radar_chips}}
+        <button type="button"
+                class="learning-radar-chip btn btn-sm btn-outline-secondary"
+                data-query="{{query}}"
+                style="text-align:left;padding:8px 12px;background:#fff;border:1px solid #dee2e6;border-radius:6px;min-width:160px;cursor:pointer">
+            <div style="font-size:20px;font-weight:600;color:#212529;line-height:1.1">{{value}}</div>
+            <div style="font-size:11px;color:#6c757d;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px">{{label}}</div>
+        </button>
+        {{/learning_radar_chips}}
+    </div>
+    {{/learning_radar_chips.0}}
     <div class="card mb-4" id="ai-analysis-chat-card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">AI Analysis Chat <small class="text-muted" style="font-size:12px">(query anonymized student data)</small></h5>
+            <h5 class="mb-0">Learning Radar <small class="text-muted" style="font-size:12px">(query anonymized student data)</small></h5>
             <button class="btn btn-sm btn-outline-secondary" type="button" data-toggle="collapse" data-target="#ai-analysis-body" aria-expanded="false" aria-controls="ai-analysis-body">Expand</button>
         </div>
         <div class="collapse" id="ai-analysis-body">
@@ -1064,7 +1078,7 @@
 {{/course.has_data}}
 {{/has_course_selected}}
 
-{{! ═══ AI Analysis Chat JS ═══ }}
+{{! ═══ Learning Radar JS ═══ }}
 {{#has_meta_ai_providers}}
 {{#js}}
 (function() {
@@ -1195,6 +1209,34 @@
             function read() {
                 return reader.read().then(function(result) {
                     if (result.done) {
+                        // Strip [SOLA_NEXT]...[/SOLA_NEXT] block from the visible
+                        // response and render the 4 pipe-delimited suggestions
+                        // as clickable chips that repopulate the query input.
+                        var nextMatch = fullText.match(/\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/);
+                        var suggestions = [];
+                        if (nextMatch) {
+                            fullText = fullText.replace(nextMatch[0], '').trim();
+                            responseDiv.textContent = fullText;
+                            suggestions = nextMatch[1].split('||').map(function(s) { return s.trim(); }).filter(Boolean);
+                        }
+                        if (suggestions.length > 0) {
+                            var chipRow = document.createElement('div');
+                            chipRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px;';
+                            suggestions.forEach(function(txt) {
+                                var chip = document.createElement('button');
+                                chip.type = 'button';
+                                chip.textContent = txt;
+                                chip.className = 'btn btn-sm btn-outline-primary';
+                                chip.style.cssText = 'font-size:12px;padding:4px 10px;border-radius:14px;white-space:normal;text-align:left;';
+                                chip.addEventListener('click', function() {
+                                    inputField.value = txt;
+                                    sendQuery();
+                                });
+                                chipRow.appendChild(chip);
+                            });
+                            messagesDiv.appendChild(chipRow);
+                            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                        }
                         chatHistory.push({ role: 'assistant', content: fullText });
                         lastResponse = fullText;
                         sendBtn.disabled = false;
@@ -1242,6 +1284,23 @@
             e.preventDefault();
             sendQuery();
         }
+    });
+
+    // Metric chips: clicking a chip at the top of the Learning Radar opens the
+    // chat card (if collapsed), fills the query, and sends. v3.9.8+.
+    var chipButtons = document.querySelectorAll('.learning-radar-chip');
+    chipButtons.forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            var q = chip.getAttribute('data-query') || '';
+            if (!q) return;
+            var body = document.getElementById('ai-analysis-body');
+            if (body && !body.classList.contains('show')) {
+                var toggle = document.querySelector('[data-target="#ai-analysis-body"]');
+                if (toggle) { toggle.click(); }
+            }
+            inputField.value = q;
+            setTimeout(function() { sendQuery(); }, 150);
+        });
     });
 })();
 {{/js}}

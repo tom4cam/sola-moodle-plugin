@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * AI Analysis Chat SSE endpoint for the analytics dashboard.
+ * Learning Radar SSE endpoint for the analytics dashboard.
  *
  * Admin-only. Streams an LLM response based on anonymized student
  * conversation transcripts. Uses the same SSE protocol as sse.php
  * so the client-side EventSource handler works unchanged.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -140,6 +140,40 @@ try {
     if ($fullresponse === '') {
         $fullresponse = $llm->chat_completion($systemprompt, $messages);
         sse_send('token', json_encode(['token' => $fullresponse]));
+    }
+
+    // Log this Learning Radar query to msgs so it shows up under the
+    // "Analytics" category in Token Cost analytics. interaction_type=meta
+    // isolates admin-side queries from student chat. Tokens are approximated
+    // from content length (~4 chars/token) since the SSE stream does not
+    // surface an official usage total for every provider.
+    try {
+        $promptchars = strlen($systemprompt);
+        foreach ($messages as $m) {
+            $promptchars += strlen((string) ($m['content'] ?? ''));
+        }
+        $approxprompt = (int) ceil($promptchars / 4);
+        $approxcompletion = (int) ceil(strlen($fullresponse) / 4);
+
+        $llmconf = method_exists($llm, 'get_config_snapshot') ? $llm->get_config_snapshot() : [];
+        $modelname = $model !== '' ? $model : ($llmconf['model'] ?? 'unknown');
+        $providerid = $provider !== '' ? $provider
+            : ($llmconf['provider'] ?? (get_config('local_ai_course_assistant', 'provider') ?: 'unknown'));
+
+        $conv = \local_ai_course_assistant\conversation_manager::get_or_create_conversation(
+            $USER->id, SITEID);
+        \local_ai_course_assistant\conversation_manager::add_message(
+            $conv->id, $USER->id, SITEID, 'assistant',
+            '[Learning Radar query]',
+            $approxprompt + $approxcompletion,
+            $providerid,
+            $approxprompt,
+            $approxcompletion,
+            $modelname,
+            'meta'
+        );
+    } catch (\Throwable $logerr) {
+        debugging('Learning Radar meta-log failed: ' . $logerr->getMessage(), DEBUG_DEVELOPER);
     }
 
     sse_send('done', json_encode(['full' => $fullresponse]));

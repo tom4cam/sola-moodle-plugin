@@ -1,0 +1,169 @@
+Subject: SOLA v3.8.1 release notes, admin guide, and demo scripts
+To: tom.caswell@saylor.org
+
+================================================================
+SECTION 1: RELEASE NOTES (v3.7.1 through v3.8.1)
+================================================================
+
+Three releases since v3.7.0:
+
+v3.7.1: Help guide, persistent welcome, Ollama auth
+---------------------------------------------------------
+- Help guide button (? icon) in the SOLA header. Opens an in-drawer panel with sections on getting started, quizzes, study plans, voice, languages, and privacy.
+- Persistent welcome message. The admin-configured Chat Greeting now appears as the first assistant message on every page load. Supports {{firstname}} and {{coursename}}. Does not save to DB, does not count against the 50-pair cap, not sent to the LLM.
+- Ollama provider now sends the Authorization header when an API key is configured. Fixes remotely hosted Ollama instances behind API gateways. Local installs without a key are unaffected.
+
+v3.8.0: Student learning profiles
+---------------------------------------------------------
+- After every N student messages (configurable, default 10), SOLA generates a learning profile summarising strengths, weaknesses, learning style, interests, and preferred explanation depth.
+- Profile stored in a new DB table (local_ai_course_assistant_profiles), one per student per course.
+- Profile injected into the system prompt for all future responses so SOLA personalises without inflating conversation history.
+- Updated incrementally: only regenerates when enough new messages accumulate.
+- New admin setting: "Student Profile Update Interval" under AI Provider and Models (default 10, set to 0 to disable).
+
+v3.8.1: Edit mode hide, category exclusions, glow removed
+---------------------------------------------------------
+- SOLA hidden when Moodle's editing mode is turned on. The widget competes with course editing controls; now it stays out of the way during course maintenance.
+- New admin setting: "Hidden course categories" (General section). Comma-separated list of category names or IDs where SOLA should not appear. Example: "Course Development".
+- Idle glow/pulse animations removed from the toggle button. The button is visible without animation. TTS and mic active indicators unchanged.
+- Auto-open is already controllable via the existing admin setting (default off).
+
+Admin quick start for new features
+===================================
+
+Set up student profiles:
+  Site admin > Settings > AI Provider and Models > "Student Profile Update Interval"
+  Default is 10 (generates a profile after every 10 student messages). Set to 0 to disable.
+  No other configuration needed. Profiles are generated automatically and injected into the system prompt.
+
+Hide SOLA from editing and dev courses:
+  Site admin > Settings > General > "Hidden course categories"
+  Enter: Course Development
+  SOLA is also automatically hidden when editing mode is on. No setting needed for that.
+
+Verify glow is off:
+  No setting needed. The CSS animations are removed. The toggle button is static.
+
+Verify auto-open is off:
+  Site admin > Settings > General > "Auto-open on first visit" should be unchecked.
+
+Upgrade notes:
+  Version 2026041803, release 3.8.1.
+  New DB table: local_ai_course_assistant_profiles (created by upgrade step 2026041802).
+  New admin settings: profile_update_interval, hidden_categories.
+  47,441 lines of original code. 46 languages.
+
+
+================================================================
+SECTION 2: STUDENT DEMO SCRIPT (12 min)
+================================================================
+
+Pre flight:
+  * Log in as a student account on a course with SOLA enabled
+  * If auto-open is enabled, clear localStorage key aica_autoopened_course_{courseid}
+  * Use Student Mode (?sola_student_mode=1) for clean recordings
+  * The help button (?) is now visible in the header
+
+Scene 1 (45s): First visit
+  Drawer opens (if auto-open is on) or click the avatar. The welcome message appears as the first chat bubble with the student's name.
+  "SOLA greets you by name every time you open it. This is your AI learning assistant for this course."
+
+Scene 2 (60s): Help guide
+  Click the ? icon in the header.
+  "New students can click the question mark for a quick guide: how to use starters, quizzes, study plans, voice, and how to delete your data. Close it and you are back to the conversation."
+
+Scene 3 (60s): Explain This Page
+  Click Explain This Page. Let the response stream. Click a follow-up chip.
+  "Grounded in the actual page content. Follow-up chips dig deeper without typing."
+
+Scene 4 (60s): Quiz Me
+  Click Quiz Me. Pick Current Page. Answer one wrong, one right.
+  "Three multiple-choice questions from this page with explanations and a score summary."
+
+Scene 5 (90s): Study Plan
+  Click Study Plan. Set a goal and schedule.
+  "SOLA tailors the study plan to the level the student wants to reach. A student aiming to pass gets the essentials. A student aiming to master the material gets deeper practice, additional review cycles, and harder questions. Same course, same content, different depth."
+
+Scene 6 (60s): Voice
+  Switch to Voice tab. Ask a question by speaking.
+  "Live two-way conversation. Six voices, live transcript, ELL coaching mode."
+
+Scene 7 (60s): Language and avatar
+  Settings gear. Switch to Spanish. Change avatar.
+  "46 languages. Every label translates in real time. Ten avatar presets."
+
+Scene 8 (60s): Personalisation (after 10+ messages)
+  Send a few more questions. Note how SOLA adapts.
+  "After about ten messages, SOLA builds a learning profile: your strengths, weaknesses, preferred explanation style. From then on, responses are tailored to how you learn, not just what you ask."
+
+Scene 9 (60s): Clear vs Reset
+  Trash icon = permanent delete. Home icon = starters overlay, history preserved.
+
+Scene 10 (30s): Close
+  "SOLA is here to help you understand the course material. Your conversations are private. Every setting you can change or clear any time."
+
+
+================================================================
+SECTION 3: ADMIN DEMO SCRIPT (10 min)
+================================================================
+
+Scene 1 (60s): Settings overview
+  Single page with TOC. Seven sections.
+
+Scene 2 (90s): General
+  Enabled, Default for new courses, Auto-open, Hidden course categories.
+  "Hidden categories lets you exclude Course Development or staging categories. And SOLA automatically hides when editing mode is on, so it never competes with course maintenance."
+
+Scene 3 (90s): AI Provider and Models
+  Provider dropdown, API key, model. Comparison providers table with masked keys. Student Profile Update Interval.
+  "After every ten student messages, SOLA generates a learning profile: strengths, weaknesses, learning style, interests. The profile is injected into the system prompt so SOLA personalises responses without needing 100 messages of history in the context window."
+
+Scene 4 (60s): Course AI Settings
+  SOLA on this course toggle. Provider overrides. Auto-open override. Navigation buttons.
+
+Scene 5 (90s): Analytics dashboard
+  Summary cards. AI Analysis Chat with provider selector. Course search (25 default). Anonymisation toggle. Student Mode. Export CSV.
+
+Scene 6 (60s): Help guide
+  "Students now have a ? button in the header that opens a built-in help guide. No external docs needed."
+
+Scene 7 (60s): Scheduled reports + Redash
+  AI Analysis Scheduled Reports: frequency, query, provider, format (text or CSV attachment). Redash API export for external dashboards.
+
+
+================================================================
+SECTION 4: AI ANALYSIS DEMO SCRIPT (5 min)
+================================================================
+
+Scene 1 (30s): Open AI Analysis Chat
+  Expand the panel on the analytics dashboard.
+
+Scene 2 (30s): Select provider
+  Provider and model dropdowns from primary + comparison providers.
+
+Scene 3 (90s): First query
+  "What are the most common topics students ask about?"
+  Response streams in with anonymised data.
+
+Scene 4 (60s): Follow-up
+  "Which course has the lowest engagement?"
+  Context maintained from prior answer.
+
+Scene 5 (60s): Course-scoped query
+  Select a course, then ask about that course specifically.
+
+Scene 6 (30s): Scheduled reports
+  "Same queries on a cron. Daily, weekly, or monthly. Text in email or CSV attachment."
+
+
+================================================================
+NOTES
+================================================================
+
+All demos assume v3.8.1 or later.
+Student demo: ~12 min. Admin demo: ~10 min. AI Analysis demo: ~5 min.
+Widget does not appear on admin pages or when editing mode is on.
+Student Mode: analytics page toggle or Ctrl+Shift+A to exit.
+No glow/pulse animation on the toggle button.
+Student learning profiles activate automatically after 10 messages (configurable).
+Help guide (? icon) is always visible in the SOLA header for students.

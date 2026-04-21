@@ -18,14 +18,14 @@
  * Plugin version and other meta-data.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_ai_course_assistant';
-$plugin->version = 2026042102;
+$plugin->version = 2026042103;
 $plugin->requires = 2024100700; // Moodle 4.5+.
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.9.7';
+$plugin->release = '3.9.8';

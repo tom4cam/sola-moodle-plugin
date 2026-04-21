@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Slovak.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Poznámky';
 // History panel.
 $string['chat:history_title'] = 'Poznámky a história konverzácie';
 $string['task:send_inactivity_reminders'] = 'Odoslať týždenné e-maily o neaktivite';
-$string['task:run_meta_ai_query'] = 'Spustiť naplánovaný dotaz AI Analysis analytiky';
+$string['task:run_meta_ai_query'] = 'Spustiť naplánovaný dotaz Radar učenia analytiky';
 $string['messageprovider:study_notes'] = 'Poznámky zo študijnej relácie';
 
 // CDN settings.

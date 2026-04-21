@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Finnish.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -348,7 +348,7 @@ $string['chat:mode_history'] = 'Muistiinpanot';
 // History panel.
 $string['chat:history_title'] = 'Muistiinpanot ja keskusteluhistoria';
 $string['task:send_inactivity_reminders'] = 'Lähetä viikoittaiset muistutussähköpostit toimettomuudesta';
-$string['task:run_meta_ai_query'] = 'Suorita ajoitettu AI Analysis-analytiikkakysely';
+$string['task:run_meta_ai_query'] = 'Suorita ajoitettu Oppimistutka-analytiikkakysely';
 $string['messageprovider:study_notes'] = 'Opiskeluistunnon muistiinpanot';
 
 // CDN settings.

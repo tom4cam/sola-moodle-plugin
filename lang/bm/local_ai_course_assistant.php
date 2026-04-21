@@ -21,7 +21,7 @@
  * Language strings for local_ai_course_assistant — Bambara (Bamanankan).
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -378,7 +378,7 @@ $string['chat:history_title'] = 'Dɔgɔkunw ni kuma taarixi';
 $string['task:send_inactivity_reminders'] = 'Dɔgɔkun kelen kelen na hakili-jigin-bataki ci baara-bali kama';
 $string['messageprovider:study_notes'] = 'Kalanko waati sɛbɛnniw';
 $string['task:send_inactivity_reminders'] = 'Ci dɔgɔkun dɔgɔkun ladilikan bataki walasa ka baarakɛbaliya kɔfɔ';
-$string['task:run_meta_ai_query'] = 'Ka AI Analysis jateminɛ ɲininkali latilennin boli';
+$string['task:run_meta_ai_query'] = 'Ka Learning Radar jateminɛ ɲininkali latilennin boli';
 $string['messageprovider:study_notes'] = 'Kalanko waati kunnafoni sɛbɛnw';
 
 // CDN settings.

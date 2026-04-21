@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Filipino.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -371,7 +371,7 @@ $string['chat:history_title'] = 'Mga Tala at Kasaysayan ng Pag-uusap';
 $string['task:send_inactivity_reminders'] = 'Magpadala ng lingguhang paalala sa email dahil sa kawalan ng aktibidad';
 $string['messageprovider:study_notes'] = 'Mga tala ng sesyon ng pag-aaral';
 $string['task:send_inactivity_reminders'] = 'Magpadala ng lingguhang paalala sa kawalan ng aktibidad';
-$string['task:run_meta_ai_query'] = 'Patakbuhin ang nakaiskedyul na AI Analysis analytics query';
+$string['task:run_meta_ai_query'] = 'Patakbuhin ang nakaiskedyul na Learning Radar analytics query';
 $string['messageprovider:study_notes'] = 'Mga tala ng sesyon ng pag-aaral';
 
 // CDN settings.

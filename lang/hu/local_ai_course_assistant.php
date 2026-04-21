@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Hungarian.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -45,7 +45,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:timecreated'] = 'Az üz
 $string['ai_course_assistant:use'] = 'AI tutor csevegés használata';
 $string['ai_course_assistant:viewanalytics'] = 'AI tutor csevegés analitika megtekintése';
 $string['ai_course_assistant:manage'] = 'AI tutor csevegés beállítások kezelése (Adminisztrátor szerep)';
-$string['task:run_meta_ai_query'] = 'Ütemezett AI Analysis elemzési lekérdezés futtatása';
+$string['task:run_meta_ai_query'] = 'Ütemezett Tanulási radar elemzési lekérdezés futtatása';
 
 // Settings.
 $string['settings:enabled'] = 'AI Kurzus Asszisztens engedélyezése';

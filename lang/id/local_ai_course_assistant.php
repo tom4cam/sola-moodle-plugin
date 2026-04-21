@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Indonesian (Bahasa Indonesia).
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -379,7 +379,7 @@ $string['chat:history_title'] = 'Catatan dan Riwayat Percakapan';
 $string['task:send_inactivity_reminders'] = 'Kirim email pengingat ketidakaktifan mingguan';
 $string['messageprovider:study_notes'] = 'Catatan sesi belajar';
 $string['task:send_inactivity_reminders'] = 'Kirim email pengingat ketidakaktifan mingguan';
-$string['task:run_meta_ai_query'] = 'Jalankan kueri analitik AI Analysis terjadwal';
+$string['task:run_meta_ai_query'] = 'Jalankan kueri analitik Radar Pembelajaran terjadwal';
 $string['messageprovider:study_notes'] = 'Catatan sesi belajar';
 
 // CDN settings.

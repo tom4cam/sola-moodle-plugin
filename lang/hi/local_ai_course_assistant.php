@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Hindi (hi).
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -379,7 +379,7 @@ $string['chat:history_title'] = 'नोट्स और बातचीत क�
 $string['task:send_inactivity_reminders'] = 'साप्ताहिक निष्क्रियता अनुस्मारक ईमेल भेजें';
 $string['messageprovider:study_notes'] = 'अध्ययन सत्र नोट्स';
 $string['task:send_inactivity_reminders'] = 'साप्ताहिक निष्क्रियता अनुस्मारक ईमेल भेजें';
-$string['task:run_meta_ai_query'] = 'निर्धारित AI Analysis विश्लेषण क्वेरी चलाएं';
+$string['task:run_meta_ai_query'] = 'निर्धारित लर्निंग रडार विश्लेषण क्वेरी चलाएं';
 $string['messageprovider:study_notes'] = 'अध्ययन सत्र नोट्स';
 
 // CDN settings.

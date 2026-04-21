@@ -26,7 +26,7 @@
  *   since    (optional) - Unix timestamp to filter data from (default: 0 = all time)
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -262,7 +262,7 @@ try {
     $surveydata = [];
 }
 
-// AI Analysis analytics: anonymized stats and transcript excerpt for Redash dashboards.
+// Learning Radar analytics: anonymized stats and transcript excerpt for Redash dashboards.
 $metaai = [
     'summary' => \local_ai_course_assistant\meta_ai_data_builder::build_stats_summary($courseid, $since),
     'transcript_excerpt' => \local_ai_course_assistant\meta_ai_data_builder::build_transcript($courseid, $since, 50000),

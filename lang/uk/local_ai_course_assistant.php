@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Ukrainian.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -45,7 +45,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:timecreated'] = 'Час
 $string['ai_course_assistant:use'] = 'Використання чату AI-тьютора';
 $string['ai_course_assistant:viewanalytics'] = 'Перегляд аналітики AI-тьютора';
 $string['ai_course_assistant:manage'] = 'Керування налаштуваннями AI-тьютора (роль Адміністратора)';
-$string['task:run_meta_ai_query'] = 'Запустити заплановий запит аналітики AI Analysis';
+$string['task:run_meta_ai_query'] = 'Запустити заплановий запит аналітики Радар навчання';
 
 // Settings.
 $string['settings:enabled'] = 'Увімкнути AI Асистент Курсу';

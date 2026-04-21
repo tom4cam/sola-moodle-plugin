@@ -20,7 +20,7 @@
  * Language strings for local_ai_course_assistant — Somali (Soomaali).
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -366,7 +366,7 @@ $string['chat:mode_history'] = 'Xusuusin';
 // History panel.
 $string['chat:history_title'] = 'Xusuusin iyo Taariikhdii Wada-hadalka';
 $string['task:send_inactivity_reminders'] = 'Dir iimaylasha xusuusinta toddobaadlaha ee aan firfircoonayn';
-$string['task:run_meta_ai_query'] = 'Orod su\'aasha falanqaynta AI Analysis ee la qorsheeyay';
+$string['task:run_meta_ai_query'] = 'Orod su\'aasha falanqaynta Raadaarka Barashada ee la qorsheeyay';
 $string['messageprovider:study_notes'] = 'Qoraallada fadhiga daraasadda';
 
 // CDN settings.
