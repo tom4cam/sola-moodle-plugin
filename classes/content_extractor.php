@@ -53,9 +53,40 @@ TXT;
     /** @var int Curl timeout when fetching transcript URLs (seconds). */
     private const TRANSCRIPT_FETCH_TIMEOUT = 15;
 
-    /** @var string Browser-like UA used when fetching transcript URLs. */
+    /**
+     * Browser-like UA used when fetching transcript URLs. Matches a recent
+     * Chrome/macOS UA without the SOLA-Indexer suffix so naive bot-fight
+     * rules that key off unknown tokens do not trip on us. The IP allowlist
+     * on the transcript host remains the real bypass; this is defence-in-depth.
+     */
     private const TRANSCRIPT_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
-        . '(KHTML, like Gecko) Chrome/120.0 Safari/537.36 SOLA-Indexer/1.0';
+        . '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+
+    /**
+     * Full request header set used when fetching transcripts. Order and
+     * values match what a real Chrome desktop sends for a top-level
+     * navigation, so naive Cloudflare Bot Fight rules that look for
+     * missing/out-of-order Sec-Fetch-* or Accept-* headers do not trip
+     * on us. This is NOT a TLS-fingerprint bypass (for that we would need
+     * curl-impersonate or a headless browser). It complements the real
+     * fix of allowlisting the Moodle egress IP at the transcript host.
+     */
+    private const TRANSCRIPT_HEADERS = [
+        'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language: en-US,en;q=0.9',
+        'Accept-Encoding: gzip, deflate, br',
+        'Cache-Control: max-age=0',
+        'Upgrade-Insecure-Requests: 1',
+        'Sec-Fetch-Dest: document',
+        'Sec-Fetch-Mode: navigate',
+        'Sec-Fetch-Site: none',
+        'Sec-Fetch-User: ?1',
+        'Sec-Ch-Ua: "Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+        'Sec-Ch-Ua-Mobile: ?0',
+        'Sec-Ch-Ua-Platform: "macOS"',
+        'DNT: 1',
+        'Priority: u=0, i',
+    ];
 
     /**
      * Extract text content from all supported modules in a course.
@@ -458,10 +489,8 @@ TXT;
             CURLOPT_TIMEOUT        => self::TRANSCRIPT_FETCH_TIMEOUT,
             CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_USERAGENT      => self::TRANSCRIPT_UA,
-            CURLOPT_HTTPHEADER     => [
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language: en-US,en;q=0.9',
-            ],
+            CURLOPT_HTTPHEADER     => self::TRANSCRIPT_HEADERS,
+            CURLOPT_ENCODING       => '',  // Accept any encoding curl supports; auto-decodes gzip/br.
             CURLOPT_HEADER         => true,
         ]);
         $response = curl_exec($ch);
