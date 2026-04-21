@@ -686,3 +686,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Gharama ya Token & Uchambuzi &rarr;';
 $string['toc:testing'] = 'Mazingira ya majaribio &rarr;';
 $string['toc:back_to_course'] = '&larr; Rudi kwa {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'Binary ya pdftotext haijapatikana; uchambuzi wa PDF umezimwa.';
+$string['rag:pdftotext_available'] = 'pdftotext imegunduliwa katika {$a}.';
+$string['rag:docx_unavailable'] = 'Kipanuzi cha PHP ZipArchive hakipatikani; uchambuzi wa DOCX umezimwa.';
+$string['rag:h5p_unavailable'] = 'Maudhui ya H5P hayakuweza kusomwa; inarukwa.';
+$string['rag:scorm_too_large'] = 'Kifurushi cha SCORM kinazidi kikomo cha ukubwa kilichowekwa ({$a} MB); inarukwa.';
+$string['rag:scorm_unzip_failed'] = 'Kifurushi cha SCORM hakikuweza kufunguliwa; inarukwa.';
+$string['rag:transcript_fetch_failed'] = 'Haikuweza kupata nakala kutoka {$a}.';
+$string['rag:transcript_cf_challenge'] = 'URL ya nakala imezuiwa na changamoto ya Cloudflare: {$a}.';
+$string['rag:embed_detected'] = 'Vyombo vya habari vilivyopachikwa vimegunduliwa: {$a}';
+$string['rag:embed_transcript_attached'] = 'Nakala imeambatishwa kwa {$a}';
+

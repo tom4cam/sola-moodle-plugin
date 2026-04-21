@@ -686,3 +686,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Token Cost at Analytics &rarr;';
 $string['toc:testing'] = 'Kapaligiran ng pagsubok &rarr;';
 $string['toc:back_to_course'] = '&larr; Bumalik sa {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'Hindi natagpuan ang pdftotext binary; naka-disable ang pag-extract ng PDF.';
+$string['rag:pdftotext_available'] = 'Natukoy ang pdftotext sa {$a}.';
+$string['rag:docx_unavailable'] = 'Hindi available ang PHP ZipArchive extension; naka-disable ang pag-extract ng DOCX.';
+$string['rag:h5p_unavailable'] = 'Hindi mabasa ang nilalaman ng H5P; nilaktawan.';
+$string['rag:scorm_too_large'] = 'Lumampas ang SCORM package sa naka-configure na limitasyon sa laki ({$a} MB); nilaktawan.';
+$string['rag:scorm_unzip_failed'] = 'Hindi ma-unzip ang SCORM package; nilaktawan.';
+$string['rag:transcript_fetch_failed'] = 'Hindi makuha ang transcript mula sa {$a}.';
+$string['rag:transcript_cf_challenge'] = 'Na-block ang URL ng transcript ng Cloudflare challenge: {$a}.';
+$string['rag:embed_detected'] = 'Natukoy ang naka-embed na media: {$a}';
+$string['rag:embed_transcript_attached'] = 'Nakalakip ang transcript para sa {$a}';
+

@@ -663,3 +663,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Náklady na tokeny a analýzy &rarr;';
 $string['toc:testing'] = 'Testovacie prostredie &rarr;';
 $string['toc:back_to_course'] = '&larr; Späť na {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'Binárny súbor pdftotext sa nenašiel; extrakcia PDF je zakázaná.';
+$string['rag:pdftotext_available'] = 'pdftotext zistený v {$a}.';
+$string['rag:docx_unavailable'] = 'Rozšírenie PHP ZipArchive nie je k dispozícii; extrakcia DOCX je zakázaná.';
+$string['rag:h5p_unavailable'] = 'Obsah H5P sa nepodarilo prečítať; preskakuje sa.';
+$string['rag:scorm_too_large'] = 'Balík SCORM prekračuje nakonfigurovaný limit veľkosti ({$a} MB); preskakuje sa.';
+$string['rag:scorm_unzip_failed'] = 'Balík SCORM sa nepodarilo rozbaliť; preskakuje sa.';
+$string['rag:transcript_fetch_failed'] = 'Nepodarilo sa načítať prepis z {$a}.';
+$string['rag:transcript_cf_challenge'] = 'URL prepisu blokovaná výzvou Cloudflare: {$a}.';
+$string['rag:embed_detected'] = 'Zistené vložené médiá: {$a}';
+$string['rag:embed_transcript_attached'] = 'Prepis priložený pre {$a}';
+

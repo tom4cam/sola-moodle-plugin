@@ -663,3 +663,16 @@ $string['toc:analytics'] = 'Analytics-Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Token-Kosten & Analytics &rarr;';
 $string['toc:testing'] = 'Testumgebung &rarr;';
 $string['toc:back_to_course'] = '&larr; Zurück zu {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'pdftotext-Binärdatei nicht gefunden; PDF-Extraktion deaktiviert.';
+$string['rag:pdftotext_available'] = 'pdftotext wurde unter {$a} erkannt.';
+$string['rag:docx_unavailable'] = 'PHP-ZipArchive-Erweiterung nicht verfügbar; DOCX-Extraktion deaktiviert.';
+$string['rag:h5p_unavailable'] = 'H5P-Inhalt konnte nicht gelesen werden; wird übersprungen.';
+$string['rag:scorm_too_large'] = 'SCORM-Paket überschreitet die konfigurierte Größenbeschränkung ({$a} MB); wird übersprungen.';
+$string['rag:scorm_unzip_failed'] = 'SCORM-Paket konnte nicht entpackt werden; wird übersprungen.';
+$string['rag:transcript_fetch_failed'] = 'Transkript von {$a} konnte nicht abgerufen werden.';
+$string['rag:transcript_cf_challenge'] = 'Transkript-URL durch Cloudflare-Challenge blockiert: {$a}.';
+$string['rag:embed_detected'] = 'Eingebettete Medien erkannt: {$a}';
+$string['rag:embed_transcript_attached'] = 'Transkript angehängt für {$a}';
+

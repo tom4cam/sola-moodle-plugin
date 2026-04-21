@@ -304,7 +304,16 @@ def main():
         "--exclude=ai_course_assistant/cdn/dist",
         "--exclude=ai_course_assistant/.wiki",
         "--exclude=ai_course_assistant/.git",
+        "--exclude=ai_course_assistant/.claude",
+        "--exclude=ai_course_assistant/.drafts",
         "--exclude=.DS_Store",
+        # AppleDouble metadata from Dropbox/macOS sync. These files have the
+        # same name as a real JS/PHP file prefixed with "._" and contain raw
+        # binary xattrs. Moodle's AMD aggregator concatenates every file in
+        # amd/build/, which means a ._chat.min.js file breaks the whole JS
+        # bundle with a SyntaxError and kills the admin user menu, drawer,
+        # and widget. Exclude them aggressively.
+        "--exclude=._*",
         "ai_course_assistant",
     ])
     if r.returncode != 0:

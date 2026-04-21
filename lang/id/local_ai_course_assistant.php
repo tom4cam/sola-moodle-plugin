@@ -694,3 +694,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Biaya Token & Analitik &rarr;';
 $string['toc:testing'] = 'Lingkungan pengujian &rarr;';
 $string['toc:back_to_course'] = '&larr; Kembali ke {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'Biner pdftotext tidak ditemukan; ekstraksi PDF dinonaktifkan.';
+$string['rag:pdftotext_available'] = 'pdftotext terdeteksi di {$a}.';
+$string['rag:docx_unavailable'] = 'Ekstensi PHP ZipArchive tidak tersedia; ekstraksi DOCX dinonaktifkan.';
+$string['rag:h5p_unavailable'] = 'Konten H5P tidak dapat dibaca; dilewati.';
+$string['rag:scorm_too_large'] = 'Paket SCORM melebihi batas ukuran yang dikonfigurasi ({$a} MB); dilewati.';
+$string['rag:scorm_unzip_failed'] = 'Paket SCORM tidak dapat di-unzip; dilewati.';
+$string['rag:transcript_fetch_failed'] = 'Tidak dapat mengambil transkrip dari {$a}.';
+$string['rag:transcript_cf_challenge'] = 'URL transkrip diblokir oleh tantangan Cloudflare: {$a}.';
+$string['rag:embed_detected'] = 'Terdeteksi media tersemat: {$a}';
+$string['rag:embed_transcript_attached'] = 'Transkrip dilampirkan untuk {$a}';
+

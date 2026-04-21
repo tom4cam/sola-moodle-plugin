@@ -1,0 +1,305 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace local_ai_course_assistant\extractors;
+
+/**
+ * Extracts plain text from mod_resource uploaded files.
+ *
+ * Supports PDF (via pdftotext binary), DOCX (native ZipArchive parse),
+ * and plain text / markdown (direct read). Each format is individually
+ * gated by an admin setting and degrades gracefully when unavailable.
+ *
+ * @package    local_ai_course_assistant
+ * @copyright  2025 AI Course Assistant
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class file_extractor {
+
+    /** @var string[] MIME types we can handle as plain text. */
+    private const TEXT_MIMES = ['text/plain', 'text/markdown', 'text/x-markdown'];
+
+    /**
+     * Extract text from a mod_resource instance.
+     *
+     * @param int $instance mod_resource instance id.
+     * @param int $courseid Course id.
+     * @return string Extracted plain text, or empty string on failure / unsupported type.
+     */
+    public static function extract(int $instance, int $courseid): string {
+        global $DB;
+
+        try {
+            $resource = $DB->get_record('resource', ['id' => $instance, 'course' => $courseid], 'id, name');
+            if (!$resource) {
+                return '';
+            }
+
+            // Resolve the course module id so we can get the module context.
+            $cm = get_coursemodule_from_instance('resource', $instance, $courseid, false, IGNORE_MISSING);
+            if (!$cm) {
+                return '';
+            }
+
+            $cmcontext = \context_module::instance($cm->id);
+            $fs = get_file_storage();
+            $files = $fs->get_area_files($cmcontext->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false);
+
+            $file = null;
+            foreach ($files as $candidate) {
+                if (!$candidate->is_directory()) {
+                    $file = $candidate;
+                    break;
+                }
+            }
+            if (!$file) {
+                return '';
+            }
+
+            $mime = (string) $file->get_mimetype();
+            $filename = strtolower((string) $file->get_filename());
+
+            // Plain text / markdown: always on.
+            if (in_array($mime, self::TEXT_MIMES, true)
+                || str_ends_with($filename, '.txt')
+                || str_ends_with($filename, '.md')
+                || str_ends_with($filename, '.markdown')) {
+                $content = (string) $file->get_content();
+                return self::normalize_whitespace($content);
+            }
+
+            // PDF.
+            if ($mime === 'application/pdf' || str_ends_with($filename, '.pdf')) {
+                if (!self::is_enabled('rag_extract_pdf', true)) {
+                    return '';
+                }
+                return self::extract_pdf($file);
+            }
+
+            // DOCX.
+            $docxmime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+            if ($mime === $docxmime || str_ends_with($filename, '.docx')) {
+                if (!self::is_enabled('rag_extract_docx', true)) {
+                    return '';
+                }
+                return self::extract_docx($file);
+            }
+
+            return '';
+        } catch (\Throwable $e) {
+            debugging('file_extractor failed for instance ' . $instance . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return '';
+        }
+    }
+
+    /**
+     * Whether the pdftotext binary is available and resolvable.
+     *
+     * Exposed for the RAG admin status widget.
+     *
+     * @return bool
+     */
+    public static function pdftotext_available(): bool {
+        $path = self::resolve_pdftotext_path();
+        return $path !== '' && is_executable($path);
+    }
+
+    /**
+     * Resolve the path to the pdftotext binary.
+     *
+     * Checks the plugin setting first, then falls back to `which pdftotext`,
+     * then a small list of common install paths.
+     *
+     * @return string Absolute path, or empty string if not found.
+     */
+    public static function resolve_pdftotext_path(): string {
+        $configured = (string) (get_config('local_ai_course_assistant', 'rag_pdftotext_path') ?: '');
+        if ($configured !== '' && is_executable($configured)) {
+            return $configured;
+        }
+
+        // `which` lookup.
+        $which = @shell_exec('command -v pdftotext 2>/dev/null');
+        if (is_string($which)) {
+            $which = trim($which);
+            if ($which !== '' && is_executable($which)) {
+                return $which;
+            }
+        }
+
+        // Common install paths.
+        $candidates = [
+            '/usr/bin/pdftotext',
+            '/usr/local/bin/pdftotext',
+            '/opt/homebrew/bin/pdftotext',
+            '/opt/local/bin/pdftotext',
+        ];
+        foreach ($candidates as $candidate) {
+            if (is_executable($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Extract text from a PDF stored_file by shelling out to pdftotext.
+     *
+     * @param \stored_file $file
+     * @return string Extracted plain text, or empty string on failure.
+     */
+    private static function extract_pdf(\stored_file $file): string {
+        global $CFG;
+
+        $binary = self::resolve_pdftotext_path();
+        if ($binary === '') {
+            debugging(get_string('rag:pdftotext_missing', 'local_ai_course_assistant'), DEBUG_DEVELOPER);
+            return '';
+        }
+
+        $tempdir = isset($CFG->tempdir) ? $CFG->tempdir : sys_get_temp_dir();
+        if (!is_dir($tempdir)) {
+            @mkdir($tempdir, 0777, true);
+        }
+        $tmppath = tempnam($tempdir, 'sola_pdf_');
+        if ($tmppath === false) {
+            return '';
+        }
+
+        try {
+            $file->copy_content_to($tmppath);
+
+            $cmd = escapeshellcmd($binary) . ' -layout -q ' . escapeshellarg($tmppath) . ' -';
+            $descriptor = [
+                0 => ['pipe', 'r'],
+                1 => ['pipe', 'w'],
+                2 => ['pipe', 'w'],
+            ];
+            $process = @proc_open($cmd, $descriptor, $pipes);
+            if (!is_resource($process)) {
+                return '';
+            }
+
+            fclose($pipes[0]);
+            $stdout = stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($process);
+
+            if (!is_string($stdout) || $stdout === '') {
+                return '';
+            }
+
+            return self::normalize_whitespace($stdout);
+        } catch (\Throwable $e) {
+            debugging('pdftotext invocation failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return '';
+        } finally {
+            if (is_file($tmppath)) {
+                @unlink($tmppath);
+            }
+        }
+    }
+
+    /**
+     * Extract text from a DOCX stored_file by parsing word/document.xml.
+     *
+     * @param \stored_file $file
+     * @return string Extracted plain text, or empty string on failure.
+     */
+    private static function extract_docx(\stored_file $file): string {
+        global $CFG;
+
+        if (!class_exists('ZipArchive')) {
+            debugging('ZipArchive not available; DOCX extraction disabled.', DEBUG_DEVELOPER);
+            return '';
+        }
+
+        $tempdir = isset($CFG->tempdir) ? $CFG->tempdir : sys_get_temp_dir();
+        if (!is_dir($tempdir)) {
+            @mkdir($tempdir, 0777, true);
+        }
+        $tmppath = tempnam($tempdir, 'sola_docx_');
+        if ($tmppath === false) {
+            return '';
+        }
+
+        try {
+            $file->copy_content_to($tmppath);
+
+            $zip = new \ZipArchive();
+            if ($zip->open($tmppath) !== true) {
+                return '';
+            }
+
+            $xml = $zip->getFromName('word/document.xml');
+            $zip->close();
+            if (!is_string($xml) || $xml === '') {
+                return '';
+            }
+
+            // Convert paragraph and line breaks to newlines before stripping.
+            $xml = preg_replace('#<w:p\b[^>]*/>#i', "\n", $xml);
+            $xml = preg_replace('#</w:p>#i', "\n", $xml);
+            $xml = preg_replace('#<w:br\b[^/]*/>#i', "\n", $xml);
+            $xml = preg_replace('#<w:tab\b[^/]*/>#i', "\t", $xml);
+
+            // Strip all remaining XML tags (both w:* and others).
+            $text = preg_replace('#<[^>]+>#', '', $xml);
+
+            // Decode XML entities.
+            $text = html_entity_decode($text, ENT_QUOTES | ENT_XML1, 'UTF-8');
+
+            return self::normalize_whitespace($text);
+        } catch (\Throwable $e) {
+            debugging('DOCX extraction failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return '';
+        } finally {
+            if (is_file($tmppath)) {
+                @unlink($tmppath);
+            }
+        }
+    }
+
+    /**
+     * Normalize whitespace while preserving paragraph breaks.
+     *
+     * @param string $text
+     * @return string
+     */
+    private static function normalize_whitespace(string $text): string {
+        $text = str_replace(["\r\n", "\r"], "\n", $text);
+        $text = preg_replace('/[ \t]+/', ' ', $text);
+        $text = preg_replace('/\n{3,}/', "\n\n", $text);
+        return trim($text);
+    }
+
+    /**
+     * Read a boolean-ish plugin setting with a default when absent.
+     *
+     * @param string $name Setting key.
+     * @param bool   $default Value to use when setting is unset.
+     * @return bool
+     */
+    private static function is_enabled(string $name, bool $default): bool {
+        $raw = get_config('local_ai_course_assistant', $name);
+        if ($raw === false || $raw === null || $raw === '') {
+            return $default;
+        }
+        return (bool) (int) $raw;
+    }
+}

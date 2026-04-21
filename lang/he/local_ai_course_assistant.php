@@ -707,3 +707,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'עלות טוקנים ונתונים &rarr;';
 $string['toc:testing'] = 'סביבת בדיקה &rarr;';
 $string['toc:back_to_course'] = '&larr; חזרה ל-{$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'קובץ ההפעלה pdftotext לא נמצא; חילוץ PDF הושבת.';
+$string['rag:pdftotext_available'] = 'pdftotext זוהה ב-{$a}.';
+$string['rag:docx_unavailable'] = 'הרחבת PHP ZipArchive לא זמינה; חילוץ DOCX הושבת.';
+$string['rag:h5p_unavailable'] = 'לא ניתן לקרוא תוכן H5P; מדלג.';
+$string['rag:scorm_too_large'] = 'חבילת SCORM חורגת ממגבלת הגודל המוגדרת ({$a} MB); מדלג.';
+$string['rag:scorm_unzip_failed'] = 'לא ניתן לחלץ את חבילת SCORM; מדלג.';
+$string['rag:transcript_fetch_failed'] = 'לא ניתן לשלוף תמליל מ-{$a}.';
+$string['rag:transcript_cf_challenge'] = 'כתובת התמליל נחסמה על ידי אתגר Cloudflare: {$a}.';
+$string['rag:embed_detected'] = 'זוהה מדיה מוטמעת: {$a}';
+$string['rag:embed_transcript_attached'] = 'תמליל צורף עבור {$a}';
+

@@ -663,3 +663,16 @@ $string['toc:analytics'] = 'لوحة التحليلات &rarr;';
 $string['toc:tokenanalytics'] = 'تكلفة الرموز والتحليلات &rarr;';
 $string['toc:testing'] = 'بيئة الاختبار &rarr;';
 $string['toc:back_to_course'] = '&larr; العودة إلى {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'لم يتم العثور على ملف pdftotext؛ تم تعطيل استخراج PDF.';
+$string['rag:pdftotext_available'] = 'تم اكتشاف pdftotext في {$a}.';
+$string['rag:docx_unavailable'] = 'ملحق PHP ZipArchive غير متوفر؛ تم تعطيل استخراج DOCX.';
+$string['rag:h5p_unavailable'] = 'تعذرت قراءة محتوى H5P؛ تم التخطي.';
+$string['rag:scorm_too_large'] = 'تتجاوز حزمة SCORM حد الحجم المضبوط ({$a} MB)؛ تم التخطي.';
+$string['rag:scorm_unzip_failed'] = 'تعذر فك ضغط حزمة SCORM؛ تم التخطي.';
+$string['rag:transcript_fetch_failed'] = 'تعذر جلب النص من {$a}.';
+$string['rag:transcript_cf_challenge'] = 'تم حظر رابط النص بواسطة تحدي Cloudflare: {$a}.';
+$string['rag:embed_detected'] = 'تم اكتشاف وسائط مضمنة: {$a}';
+$string['rag:embed_transcript_attached'] = 'تم إرفاق النص لـ {$a}';
+

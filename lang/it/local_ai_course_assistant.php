@@ -707,3 +707,16 @@ $string['toc:analytics'] = 'Dashboard Analytics &rarr;';
 $string['toc:tokenanalytics'] = 'Costo dei token e analisi &rarr;';
 $string['toc:testing'] = 'Ambiente di test &rarr;';
 $string['toc:back_to_course'] = '&larr; Torna a {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'Binario pdftotext non trovato; estrazione PDF disattivata.';
+$string['rag:pdftotext_available'] = 'pdftotext rilevato in {$a}.';
+$string['rag:docx_unavailable'] = 'Estensione PHP ZipArchive non disponibile; estrazione DOCX disattivata.';
+$string['rag:h5p_unavailable'] = 'Impossibile leggere il contenuto H5P; saltato.';
+$string['rag:scorm_too_large'] = 'Il pacchetto SCORM supera il limite di dimensione configurato ({$a} MB); saltato.';
+$string['rag:scorm_unzip_failed'] = 'Impossibile decomprimere il pacchetto SCORM; saltato.';
+$string['rag:transcript_fetch_failed'] = 'Impossibile recuperare la trascrizione da {$a}.';
+$string['rag:transcript_cf_challenge'] = 'URL trascrizione bloccato dalla sfida Cloudflare: {$a}.';
+$string['rag:embed_detected'] = 'Rilevati media incorporati: {$a}';
+$string['rag:embed_transcript_attached'] = 'Trascrizione allegata per {$a}';
+

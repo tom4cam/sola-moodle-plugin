@@ -707,3 +707,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Вартість токенів та аналітика &rarr;';
 $string['toc:testing'] = 'Тестове середовище &rarr;';
 $string['toc:back_to_course'] = '&larr; Назад до {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'Бінарний файл pdftotext не знайдено; вилучення PDF вимкнено.';
+$string['rag:pdftotext_available'] = 'pdftotext виявлено в {$a}.';
+$string['rag:docx_unavailable'] = 'Розширення PHP ZipArchive недоступне; вилучення DOCX вимкнено.';
+$string['rag:h5p_unavailable'] = 'Не вдалося прочитати вміст H5P; пропускається.';
+$string['rag:scorm_too_large'] = 'Пакет SCORM перевищує налаштоване обмеження розміру ({$a} МБ); пропускається.';
+$string['rag:scorm_unzip_failed'] = 'Не вдалося розпакувати пакет SCORM; пропускається.';
+$string['rag:transcript_fetch_failed'] = 'Не вдалося отримати транскрипцію з {$a}.';
+$string['rag:transcript_cf_challenge'] = 'URL транскрипції заблоковано викликом Cloudflare: {$a}.';
+$string['rag:embed_detected'] = 'Виявлено вбудоване медіа: {$a}';
+$string['rag:embed_transcript_attached'] = 'Транскрипцію додано для {$a}';
+

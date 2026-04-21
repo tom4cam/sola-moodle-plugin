@@ -663,3 +663,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Tokenien kustannukset ja analytiikka &rarr;';
 $string['toc:testing'] = 'Testausympäristö &rarr;';
 $string['toc:back_to_course'] = '&larr; Takaisin: {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'pdftotext-binaaria ei löydy; PDF-poiminta pois käytöstä.';
+$string['rag:pdftotext_available'] = 'pdftotext havaittu polusta {$a}.';
+$string['rag:docx_unavailable'] = 'PHP ZipArchive -laajennus ei ole käytettävissä; DOCX-poiminta pois käytöstä.';
+$string['rag:h5p_unavailable'] = 'H5P-sisältöä ei voitu lukea; ohitetaan.';
+$string['rag:scorm_too_large'] = 'SCORM-paketti ylittää määritetyn kokorajan ({$a} MB); ohitetaan.';
+$string['rag:scorm_unzip_failed'] = 'SCORM-pakettia ei voitu purkaa; ohitetaan.';
+$string['rag:transcript_fetch_failed'] = 'Tekstitystä ei voitu hakea osoitteesta {$a}.';
+$string['rag:transcript_cf_challenge'] = 'Tekstityksen URL-osoite estetty Cloudflare-haasteella: {$a}.';
+$string['rag:embed_detected'] = 'Upotettu media havaittu: {$a}';
+$string['rag:embed_transcript_attached'] = 'Tekstitys liitetty kohteelle {$a}';
+

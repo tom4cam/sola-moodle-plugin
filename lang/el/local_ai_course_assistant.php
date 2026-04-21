@@ -707,3 +707,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Κόστος Token & Στατιστικά &rarr;';
 $string['toc:testing'] = 'Περιβάλλον δοκιμών &rarr;';
 $string['toc:back_to_course'] = '&larr; Πίσω στο {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'Το εκτελέσιμο pdftotext δεν βρέθηκε· η εξαγωγή PDF απενεργοποιήθηκε.';
+$string['rag:pdftotext_available'] = 'Το pdftotext εντοπίστηκε στο {$a}.';
+$string['rag:docx_unavailable'] = 'Η επέκταση PHP ZipArchive δεν είναι διαθέσιμη· η εξαγωγή DOCX απενεργοποιήθηκε.';
+$string['rag:h5p_unavailable'] = 'Το περιεχόμενο H5P δεν μπόρεσε να διαβαστεί· παράλειψη.';
+$string['rag:scorm_too_large'] = 'Το πακέτο SCORM υπερβαίνει το ρυθμισμένο όριο μεγέθους ({$a} MB)· παράλειψη.';
+$string['rag:scorm_unzip_failed'] = 'Το πακέτο SCORM δεν μπόρεσε να αποσυμπιεστεί· παράλειψη.';
+$string['rag:transcript_fetch_failed'] = 'Δεν ήταν δυνατή η λήψη απομαγνητοφώνησης από το {$a}.';
+$string['rag:transcript_cf_challenge'] = 'Το URL της απομαγνητοφώνησης αποκλείστηκε από την πρόκληση Cloudflare: {$a}.';
+$string['rag:embed_detected'] = 'Εντοπίστηκαν ενσωματωμένα πολυμέσα: {$a}';
+$string['rag:embed_transcript_attached'] = 'Η απομαγνητοφώνηση επισυνάφθηκε για το {$a}';
+

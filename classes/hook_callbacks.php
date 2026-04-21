@@ -174,8 +174,9 @@ class hook_callbacks {
         $avatar = $useravatar ?: (get_config('local_ai_course_assistant', 'avatar') ?: 'avatar_01');
 
         // Pull admin-uploaded custom avatars first so we can resolve custom:* URLs
-        // and include them in the per-user picker.
-        require_once($CFG->dirroot . '/local/ai_course_assistant/lib.php');
+        // and include them in the per-user picker. __DIR__ is reliable regardless
+        // of whether callers have globalised $CFG in this scope.
+        require_once(__DIR__ . '/../lib.php');
         $customavatars = local_ai_course_assistant_get_custom_avatars();
         $custommap = [];
         foreach ($customavatars as $ca) {

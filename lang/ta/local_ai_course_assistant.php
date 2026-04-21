@@ -686,3 +686,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'டோக்கன் செலவு & பகுப்பாய்வு &rarr;';
 $string['toc:testing'] = 'சோதனை சூழல் &rarr;';
 $string['toc:back_to_course'] = '&larr; {$a} க்கு திரும்பு';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'pdftotext பைனரி கண்டறியப்படவில்லை; PDF பிரித்தெடுத்தல் முடக்கப்பட்டுள்ளது.';
+$string['rag:pdftotext_available'] = '{$a} இல் pdftotext கண்டறியப்பட்டது.';
+$string['rag:docx_unavailable'] = 'PHP ZipArchive நீட்டிப்பு கிடைக்கவில்லை; DOCX பிரித்தெடுத்தல் முடக்கப்பட்டுள்ளது.';
+$string['rag:h5p_unavailable'] = 'H5P உள்ளடக்கத்தை படிக்க முடியவில்லை; தவிர்க்கப்படுகிறது.';
+$string['rag:scorm_too_large'] = 'SCORM தொகுப்பு உள்ளமைக்கப்பட்ட அளவு வரம்பை ({$a} MB) மீறுகிறது; தவிர்க்கப்படுகிறது.';
+$string['rag:scorm_unzip_failed'] = 'SCORM தொகுப்பை பிரிக்க முடியவில்லை; தவிர்க்கப்படுகிறது.';
+$string['rag:transcript_fetch_failed'] = '{$a} இலிருந்து நகலெடுப்பைப் பெற முடியவில்லை.';
+$string['rag:transcript_cf_challenge'] = 'நகலெடுப்பு URL Cloudflare சவாலால் தடுக்கப்பட்டது: {$a}.';
+$string['rag:embed_detected'] = 'உட்பொதிக்கப்பட்ட ஊடகம் கண்டறியப்பட்டது: {$a}';
+$string['rag:embed_transcript_attached'] = '{$a} க்கான நகலெடுப்பு இணைக்கப்பட்டது';
+

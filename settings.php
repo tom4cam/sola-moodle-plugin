@@ -410,6 +410,89 @@ if ($hassiteconfig) {
             ['class' => 'btn btn-secondary btn-sm'])
     ));
 
+    // Content source extractors (v3.9.6+). Each flag gates a specific module
+    // type or embed fetcher. Read from within the extractor classes.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/rag_sources_heading',
+        'RAG content sources',
+        'Choose which course content types the RAG indexer extracts text from. '
+        . 'Status indicators on the <a href="' . $ragadminurl->out() . '">RAG Admin page</a> show whether each extractor '
+        . 'has what it needs (e.g. the pdftotext binary, Cloudflare allowlist) to run.'
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/rag_extract_pdf',
+        'Index PDF files (mod_resource)',
+        'Extract text from PDF uploads via the <code>pdftotext</code> binary (poppler). Auto-detects the binary path; override below if needed.',
+        1
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rag_pdftotext_path',
+        'pdftotext binary path',
+        'Leave blank to auto-detect (checks <code>/usr/bin/pdftotext</code>, <code>/usr/local/bin/pdftotext</code>, and <code>which pdftotext</code>). Set this only if your installation lives somewhere else.',
+        ''
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/rag_extract_docx',
+        'Index DOCX files (mod_resource)',
+        'Extract text from Word uploads via PHP ZipArchive. No external dependency required.',
+        1
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/rag_extract_h5p',
+        'Index H5P content (mod_h5p)',
+        'Walk H5P content JSON and index every text-bearing field (questions, answers, feedback, descriptions). H5P content type metadata is broad; expect some false positives in edge cases.',
+        1
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/rag_extract_scorm',
+        'Index SCORM packages (mod_scorm)',
+        'Unzip SCORM packages and index <code>imsmanifest.xml</code>, any <code>.html</code> files, and Articulate Storyline content strings. <strong>Off by default</strong> because SCORM parses can be expensive. Max package size is controlled by <code>rag_scorm_max_mb</code>.',
+        0
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rag_scorm_max_mb',
+        'Max SCORM package size to index (MB)',
+        'Skip SCORM packages larger than this to avoid excessive memory use.',
+        '100',
+        PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/rag_fetch_transcripts',
+        'Fetch transcripts for embedded videos/interactives',
+        'Scan mod_page and mod_book content for embedded iframes (Synthesia, YouTube, Articulate, Genially) and fetch the companion transcript URL paired with each embed (searching both above and below the iframe). '
+        . 'Requires outbound HTTPS from this server to the transcript host. '
+        . '<strong>Off by default</strong>; enable once the transcript host has allowlisted this server (e.g. Cloudflare IP Access Rule).',
+        0
+    ));
+
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/rag_iframe_host_patterns',
+        'Iframe host patterns',
+        'One regex per line matching an iframe <code>src</code> attribute. Each matching iframe is treated as an interactive embed whose transcript should be paired and indexed. Lines starting with <code>#</code> are comments.',
+        "share\\.synthesia\\.io/embeds/videos/\n"
+        . "youtube\\.com/embed/\n"
+        . "youtube-nocookie\\.com/embed/\n"
+        . "review\\.articulate\\.com/\n"
+        . "articulateusercontent\\.com/\n"
+        . "360\\.articulate\\.com/\n"
+        . "view\\.genially\\.com/\n"
+        . "genial\\.ly/"
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rag_transcript_url_pattern',
+        'Transcript URL pattern',
+        'Regex that matches transcript anchor URLs. The indexer picks the nearest matching anchor (above or below) to each detected iframe and pairs them.',
+        "resources\\.saylor\\.org/transcripts/[^\"'\\s>]+"
+    ));
+
     // Performance: caps on how much course content goes into the system prompt.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/performance_heading',

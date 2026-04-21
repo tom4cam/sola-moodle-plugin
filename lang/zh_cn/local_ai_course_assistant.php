@@ -686,3 +686,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Token 成本和 Analytics &rarr;';
 $string['toc:testing'] = '测试环境 &rarr;';
 $string['toc:back_to_course'] = '&larr; 返回 {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = '未找到 pdftotext 二进制文件；已禁用 PDF 提取。';
+$string['rag:pdftotext_available'] = '已在 {$a} 检测到 pdftotext。';
+$string['rag:docx_unavailable'] = 'PHP ZipArchive 扩展不可用；已禁用 DOCX 提取。';
+$string['rag:h5p_unavailable'] = '无法读取 H5P 内容；跳过。';
+$string['rag:scorm_too_large'] = 'SCORM 包超出配置的大小限制（{$a} MB）；跳过。';
+$string['rag:scorm_unzip_failed'] = '无法解压 SCORM 包；跳过。';
+$string['rag:transcript_fetch_failed'] = '无法从 {$a} 获取文字记录。';
+$string['rag:transcript_cf_challenge'] = '文字记录 URL 被 Cloudflare 挑战阻止：{$a}。';
+$string['rag:embed_detected'] = '检测到嵌入媒体：{$a}';
+$string['rag:embed_transcript_attached'] = '已为 {$a} 附加文字记录';
+

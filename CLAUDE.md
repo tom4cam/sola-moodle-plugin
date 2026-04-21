@@ -120,6 +120,27 @@ python3 -c "import subprocess,os; subprocess.run(['bash', 'ai_course_assistant/c
 
 ---
 
+## Release Process
+
+Every tagged release must ship with a release-notes-and-walkthrough draft in `.drafts/`. The draft has three parts: a terse changelog headline + bullets, a "Key SOLA Features" snapshot, and a 20-minute conversational admin walkthrough script. These drafts become the source of truth for the GH release body, onboarding docs, and admin demo scripts.
+
+### Seed the draft (first step of every release)
+```bash
+python3 scripts/new_release_notes.py --version 3.9.6
+# -> writes .drafts/v3.9.6-release-notes-and-walkthrough.md with TODOs
+```
+Then carry forward Part 2 (Key Features) and Part 3 (Admin Walkthrough) from the most recent `.drafts/v*-release-notes-and-walkthrough.md`, updating only the sections that drifted. Fill in Part 1 with the headline + bullets for this release.
+
+### Release checklist (run in order)
+1. `python3 scripts/new_release_notes.py --version <N>` and fill the TODOs.
+2. Bump `version.php` (`$plugin->version` and `$plugin->release`).
+3. Update `.wiki/Changelog.md`.
+4. Run i18n sync, PHP lint, jailbreak test (25/25).
+5. Commit plugin + wiki, tag `v<N>`, push, `gh release create` using the `.drafts/` file as the body source.
+6. `python3 deploy_dev.py --target all` and verify BUS101 smoke on all 4 dev sites.
+
+---
+
 ## Local Development
 
 - **Moodle 4.5** at `~/Sites/moodle/`, moodledata at `~/Sites/moodledata/`

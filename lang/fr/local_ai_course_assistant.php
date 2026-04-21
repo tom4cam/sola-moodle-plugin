@@ -663,3 +663,16 @@ $string['toc:analytics'] = 'Tableau de bord Analytics &rarr;';
 $string['toc:tokenanalytics'] = 'Coût des tokens et Analytics &rarr;';
 $string['toc:testing'] = 'Environnement de test &rarr;';
 $string['toc:back_to_course'] = '&larr; Retour à {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'Binaire pdftotext introuvable ; extraction PDF désactivée.';
+$string['rag:pdftotext_available'] = 'pdftotext détecté à {$a}.';
+$string['rag:docx_unavailable'] = 'Extension PHP ZipArchive non disponible ; extraction DOCX désactivée.';
+$string['rag:h5p_unavailable'] = 'Le contenu H5P n\'a pas pu être lu ; ignoré.';
+$string['rag:scorm_too_large'] = 'Le paquet SCORM dépasse la limite de taille configurée ({$a} Mo) ; ignoré.';
+$string['rag:scorm_unzip_failed'] = 'Le paquet SCORM n\'a pas pu être décompressé ; ignoré.';
+$string['rag:transcript_fetch_failed'] = 'Impossible de récupérer la transcription depuis {$a}.';
+$string['rag:transcript_cf_challenge'] = 'URL de transcription bloquée par un défi Cloudflare : {$a}.';
+$string['rag:embed_detected'] = 'Média intégré détecté : {$a}';
+$string['rag:embed_transcript_attached'] = 'Transcription jointe pour {$a}';
+

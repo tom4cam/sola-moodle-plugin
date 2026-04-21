@@ -663,3 +663,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'ต้นทุนโทเคนและการวิเคราะห์ &rarr;';
 $string['toc:testing'] = 'สภาพแวดล้อมทดสอบ &rarr;';
 $string['toc:back_to_course'] = '&larr; กลับไปที่ {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'ไม่พบไบนารี pdftotext; ปิดใช้งานการแยก PDF';
+$string['rag:pdftotext_available'] = 'ตรวจพบ pdftotext ที่ {$a}';
+$string['rag:docx_unavailable'] = 'ไม่มีส่วนขยาย PHP ZipArchive; ปิดใช้งานการแยก DOCX';
+$string['rag:h5p_unavailable'] = 'ไม่สามารถอ่านเนื้อหา H5P; ข้ามไป';
+$string['rag:scorm_too_large'] = 'แพ็คเกจ SCORM เกินขีดจำกัดขนาดที่กำหนดไว้ ({$a} MB); ข้ามไป';
+$string['rag:scorm_unzip_failed'] = 'ไม่สามารถคลายซิปแพ็คเกจ SCORM; ข้ามไป';
+$string['rag:transcript_fetch_failed'] = 'ไม่สามารถดึงข้อมูลการถอดเสียงจาก {$a}';
+$string['rag:transcript_cf_challenge'] = 'URL การถอดเสียงถูกบล็อกโดยการท้าทาย Cloudflare: {$a}';
+$string['rag:embed_detected'] = 'ตรวจพบสื่อที่ฝังไว้: {$a}';
+$string['rag:embed_transcript_attached'] = 'แนบคำบรรยายสำหรับ {$a}';
+

@@ -663,3 +663,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Token Maliyeti ve Analitik &rarr;';
 $string['toc:testing'] = 'Test ortamı &rarr;';
 $string['toc:back_to_course'] = '&larr; {$a} geri dön';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'pdftotext ikili dosyası bulunamadı; PDF çıkarma devre dışı.';
+$string['rag:pdftotext_available'] = 'pdftotext {$a} konumunda algılandı.';
+$string['rag:docx_unavailable'] = 'PHP ZipArchive uzantısı kullanılamıyor; DOCX çıkarma devre dışı.';
+$string['rag:h5p_unavailable'] = 'H5P içeriği okunamadı; atlanıyor.';
+$string['rag:scorm_too_large'] = 'SCORM paketi yapılandırılmış boyut sınırını ({$a} MB) aşıyor; atlanıyor.';
+$string['rag:scorm_unzip_failed'] = 'SCORM paketi açılamadı; atlanıyor.';
+$string['rag:transcript_fetch_failed'] = '{$a} adresinden metin alınamadı.';
+$string['rag:transcript_cf_challenge'] = 'Metin URL\'si Cloudflare sorgulaması tarafından engellendi: {$a}.';
+$string['rag:embed_detected'] = 'Gömülü medya algılandı: {$a}';
+$string['rag:embed_transcript_attached'] = '{$a} için metin eklendi';
+

@@ -142,6 +142,72 @@ if (!$ragenabled) {
     );
 }
 
+// Content-source status card. Shows each extractor's gate (config flag) and
+// runtime prerequisite (binary present, network allowlisted) so admins can
+// see at a glance why content isn't being indexed. v3.9.6+.
+$statusrows = [];
+
+$pdfon = (bool) get_config('local_ai_course_assistant', 'rag_extract_pdf');
+if (class_exists('\\local_ai_course_assistant\\extractors\\file_extractor')) {
+    $pdfavail = \local_ai_course_assistant\extractors\file_extractor::pdftotext_available();
+} else {
+    $pdfavail = false;
+}
+$statusrows[] = [
+    'label' => 'PDF (mod_resource)',
+    'ok'    => $pdfon && $pdfavail,
+    'detail' => !$pdfon
+        ? 'Disabled in settings.'
+        : ($pdfavail
+            ? 'On. pdftotext binary found.'
+            : 'On, but pdftotext binary not found. Install poppler-utils (apt: <code>poppler-utils</code>; brew: <code>poppler</code>) or set the path in settings.'),
+];
+$statusrows[] = [
+    'label' => 'DOCX (mod_resource)',
+    'ok'    => (bool) get_config('local_ai_course_assistant', 'rag_extract_docx'),
+    'detail' => get_config('local_ai_course_assistant', 'rag_extract_docx')
+        ? 'On. Uses native PHP ZipArchive, no external dependency.'
+        : 'Disabled in settings.',
+];
+$statusrows[] = [
+    'label' => 'H5P content',
+    'ok'    => (bool) get_config('local_ai_course_assistant', 'rag_extract_h5p'),
+    'detail' => get_config('local_ai_course_assistant', 'rag_extract_h5p')
+        ? 'On. Walks content JSON for text fields.'
+        : 'Disabled in settings.',
+];
+$statusrows[] = [
+    'label' => 'SCORM packages',
+    'ok'    => (bool) get_config('local_ai_course_assistant', 'rag_extract_scorm'),
+    'detail' => get_config('local_ai_course_assistant', 'rag_extract_scorm')
+        ? 'On. Max package size ' . (get_config('local_ai_course_assistant', 'rag_scorm_max_mb') ?: 100) . ' MB.'
+        : 'Off by default. Enable in settings to index Articulate Storyline and other packaged content.',
+];
+$statusrows[] = [
+    'label' => 'Embedded video / interactive transcripts',
+    'ok'    => (bool) get_config('local_ai_course_assistant', 'rag_fetch_transcripts'),
+    'detail' => get_config('local_ai_course_assistant', 'rag_fetch_transcripts')
+        ? 'On. Scans pages/books for Synthesia, YouTube, Articulate, and Genially iframes; pairs each with the closest transcript link (above or below).'
+        : 'Off. Enable in settings once the transcript host has allowlisted this server.',
+];
+
+echo '<div class="card mb-4"><div class="card-body">';
+echo '<h4 class="mb-2">Content sources</h4>';
+echo '<p class="text-muted" style="font-size:13px;">Each row shows a content type the RAG indexer can extract text from, and whether it is currently enabled and ready to run. Click <a href="' . (new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant_general']))->out() . '#sec-content">Settings</a> to toggle.</p>';
+echo '<table class="table table-sm mb-0"><tbody>';
+foreach ($statusrows as $r) {
+    $badge = $r['ok']
+        ? '<span class="badge badge-success" style="background:#0f9d58;color:#fff;">Ready</span>'
+        : '<span class="badge badge-secondary" style="background:#6c757d;color:#fff;">Off</span>';
+    echo '<tr>'
+        . '<td style="width:260px;font-weight:500;">' . s($r['label']) . '</td>'
+        . '<td style="width:70px;">' . $badge . '</td>'
+        . '<td style="font-size:13px;color:#495057;">' . $r['detail'] . '</td>'
+        . '</tr>';
+}
+echo '</tbody></table>';
+echo '</div></div>';
+
 // Summary totals.
 $totalchunks   = array_sum(array_column((array) $indexedcourses, 'chunks'));
 $totalembedded = array_sum(array_column((array) $indexedcourses, 'embedded'));

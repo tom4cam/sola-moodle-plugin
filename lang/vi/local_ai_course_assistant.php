@@ -686,3 +686,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Chi phí Token & Phân tích &rarr;';
 $string['toc:testing'] = 'Môi trường thử nghiệm &rarr;';
 $string['toc:back_to_course'] = '&larr; Quay lại {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'Không tìm thấy tệp nhị phân pdftotext; đã vô hiệu hóa việc trích xuất PDF.';
+$string['rag:pdftotext_available'] = 'Đã phát hiện pdftotext tại {$a}.';
+$string['rag:docx_unavailable'] = 'Phần mở rộng PHP ZipArchive không khả dụng; đã vô hiệu hóa việc trích xuất DOCX.';
+$string['rag:h5p_unavailable'] = 'Không thể đọc nội dung H5P; đang bỏ qua.';
+$string['rag:scorm_too_large'] = 'Gói SCORM vượt quá giới hạn kích thước được cấu hình ({$a} MB); đang bỏ qua.';
+$string['rag:scorm_unzip_failed'] = 'Không thể giải nén gói SCORM; đang bỏ qua.';
+$string['rag:transcript_fetch_failed'] = 'Không thể lấy bản ghi từ {$a}.';
+$string['rag:transcript_cf_challenge'] = 'URL bản ghi bị chặn bởi thử thách Cloudflare: {$a}.';
+$string['rag:embed_detected'] = 'Đã phát hiện phương tiện nhúng: {$a}';
+$string['rag:embed_transcript_attached'] = 'Đã đính kèm bản ghi cho {$a}';
+

@@ -663,3 +663,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'টোকেন খরচ ও বিশ্লেষণ &rarr;';
 $string['toc:testing'] = 'পরীক্ষণ পরিবেশ &rarr;';
 $string['toc:back_to_course'] = '&larr; {$a} এ ফিরে যান';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'pdftotext বাইনারি পাওয়া যায়নি; PDF নিষ্কাশন নিষ্ক্রিয় করা হয়েছে।';
+$string['rag:pdftotext_available'] = '{$a} এ pdftotext সনাক্ত করা হয়েছে।';
+$string['rag:docx_unavailable'] = 'PHP ZipArchive এক্সটেনশন উপলব্ধ নয়; DOCX নিষ্কাশন নিষ্ক্রিয় করা হয়েছে।';
+$string['rag:h5p_unavailable'] = 'H5P সামগ্রী পড়া যায়নি; এড়িয়ে যাওয়া হচ্ছে।';
+$string['rag:scorm_too_large'] = 'SCORM প্যাকেজ কনফিগার করা আকার সীমা ({$a} MB) অতিক্রম করেছে; এড়িয়ে যাওয়া হচ্ছে।';
+$string['rag:scorm_unzip_failed'] = 'SCORM প্যাকেজ আনজিপ করা যায়নি; এড়িয়ে যাওয়া হচ্ছে।';
+$string['rag:transcript_fetch_failed'] = '{$a} থেকে ট্রান্সক্রিপ্ট আনা যায়নি।';
+$string['rag:transcript_cf_challenge'] = 'ট্রান্সক্রিপ্ট URL Cloudflare চ্যালেঞ্জ দ্বারা ব্লক করা হয়েছে: {$a}।';
+$string['rag:embed_detected'] = 'এম্বেড করা মিডিয়া সনাক্ত করা হয়েছে: {$a}';
+$string['rag:embed_transcript_attached'] = '{$a} এর জন্য ট্রান্সক্রিপ্ট সংযুক্ত করা হয়েছে';
+

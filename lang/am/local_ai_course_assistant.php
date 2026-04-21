@@ -692,3 +692,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Token Cost &amp; Analytics &rarr;';
 $string['toc:testing'] = 'የሙከራ አካባቢ &rarr;';
 $string['toc:back_to_course'] = '&larr; ወደ {$a} ተመለስ';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'pdftotext ፕሮግራም አልተገኘም፤ የPDF ማውጣት ተሰናክሏል።';
+$string['rag:pdftotext_available'] = 'pdftotext በ{$a} ተገኝቷል።';
+$string['rag:docx_unavailable'] = 'የPHP ZipArchive ማራዘሚያ የለም፤ የDOCX ማውጣት ተሰናክሏል።';
+$string['rag:h5p_unavailable'] = 'የH5P ይዘት ማንበብ አልተቻለም፤ ተዘሏል።';
+$string['rag:scorm_too_large'] = 'የSCORM ጥቅል ከተዋቀረው የመጠን ገደብ ያልፋል ({$a} MB)፤ ተዘሏል።';
+$string['rag:scorm_unzip_failed'] = 'የSCORM ጥቅል መክፈት አልተቻለም፤ ተዘሏል።';
+$string['rag:transcript_fetch_failed'] = 'ከ{$a} ጽሑፍ ማግኘት አልተቻለም።';
+$string['rag:transcript_cf_challenge'] = 'የጽሑፍ URL በCloudflare ፈተና ተዘግቷል: {$a}።';
+$string['rag:embed_detected'] = 'የተካተተ ሚዲያ ተገኝቷል: {$a}';
+$string['rag:embed_transcript_attached'] = 'ለ{$a} ጽሑፍ ተያይዟል';
+

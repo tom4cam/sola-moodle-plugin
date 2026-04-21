@@ -663,3 +663,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Cost tokenuri și analize &rarr;';
 $string['toc:testing'] = 'Mediu de testare &rarr;';
 $string['toc:back_to_course'] = '&larr; Înapoi la {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'Binarul pdftotext nu a fost găsit; extragerea PDF este dezactivată.';
+$string['rag:pdftotext_available'] = 'pdftotext detectat la {$a}.';
+$string['rag:docx_unavailable'] = 'Extensia PHP ZipArchive nu este disponibilă; extragerea DOCX este dezactivată.';
+$string['rag:h5p_unavailable'] = 'Conținutul H5P nu a putut fi citit; se omite.';
+$string['rag:scorm_too_large'] = 'Pachetul SCORM depășește limita de dimensiune configurată ({$a} MB); se omite.';
+$string['rag:scorm_unzip_failed'] = 'Pachetul SCORM nu a putut fi dezarhivat; se omite.';
+$string['rag:transcript_fetch_failed'] = 'Nu s-a putut prelua transcrierea de la {$a}.';
+$string['rag:transcript_cf_challenge'] = 'URL-ul transcrierii blocat de provocarea Cloudflare: {$a}.';
+$string['rag:embed_detected'] = 'Media încorporată detectată: {$a}';
+$string['rag:embed_transcript_attached'] = 'Transcriere atașată pentru {$a}';
+

@@ -694,3 +694,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Token Cost &amp; Analytics &rarr;';
 $string['toc:testing'] = 'Testing Environment &rarr;';
 $string['toc:back_to_course'] = '&larr; Back to {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'pdftotext binary not found; PDF extraction disabled.';
+$string['rag:pdftotext_available'] = 'pdftotext binary detected at {$a}.';
+$string['rag:docx_unavailable'] = 'PHP ZipArchive extension not available; DOCX extraction disabled.';
+$string['rag:h5p_unavailable'] = 'H5P content could not be read; skipping.';
+$string['rag:scorm_too_large'] = 'SCORM package exceeds the configured size limit ({$a} MB); skipping.';
+$string['rag:scorm_unzip_failed'] = 'SCORM package could not be unzipped; skipping.';
+$string['rag:transcript_fetch_failed'] = 'Could not fetch transcript from {$a}.';
+$string['rag:transcript_cf_challenge'] = 'Transcript URL blocked by Cloudflare challenge: {$a}.';
+$string['rag:embed_detected'] = 'Detected embedded media: {$a}';
+$string['rag:embed_transcript_attached'] = 'Transcript attached for {$a}';
+

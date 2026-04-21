@@ -663,3 +663,16 @@ $string['toc:analytics'] = 'Analytics-dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Tokenkosten & analyses &rarr;';
 $string['toc:testing'] = 'Testomgeving &rarr;';
 $string['toc:back_to_course'] = '&larr; Terug naar {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'pdftotext-binary niet gevonden; PDF-extractie uitgeschakeld.';
+$string['rag:pdftotext_available'] = 'pdftotext gedetecteerd op {$a}.';
+$string['rag:docx_unavailable'] = 'PHP ZipArchive-extensie niet beschikbaar; DOCX-extractie uitgeschakeld.';
+$string['rag:h5p_unavailable'] = 'H5P-inhoud kon niet worden gelezen; overgeslagen.';
+$string['rag:scorm_too_large'] = 'SCORM-pakket overschrijdt de geconfigureerde groottelimiet ({$a} MB); overgeslagen.';
+$string['rag:scorm_unzip_failed'] = 'SCORM-pakket kon niet worden uitgepakt; overgeslagen.';
+$string['rag:transcript_fetch_failed'] = 'Kan transcriptie niet ophalen van {$a}.';
+$string['rag:transcript_cf_challenge'] = 'Transcriptie-URL geblokkeerd door Cloudflare-uitdaging: {$a}.';
+$string['rag:embed_detected'] = 'Ingesloten media gedetecteerd: {$a}';
+$string['rag:embed_transcript_attached'] = 'Transcriptie bijgevoegd voor {$a}';
+

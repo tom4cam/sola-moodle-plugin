@@ -707,3 +707,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Tokenköltség és analitika &rarr;';
 $string['toc:testing'] = 'Tesztkörnyezet &rarr;';
 $string['toc:back_to_course'] = '&larr; Vissza: {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'A pdftotext bináris nem található; a PDF-kivonatolás letiltva.';
+$string['rag:pdftotext_available'] = 'A pdftotext észlelve itt: {$a}.';
+$string['rag:docx_unavailable'] = 'A PHP ZipArchive bővítmény nem érhető el; a DOCX-kivonatolás letiltva.';
+$string['rag:h5p_unavailable'] = 'A H5P-tartalom nem olvasható; kihagyás.';
+$string['rag:scorm_too_large'] = 'A SCORM-csomag meghaladja a beállított méretkorlátot ({$a} MB); kihagyás.';
+$string['rag:scorm_unzip_failed'] = 'A SCORM-csomagot nem sikerült kicsomagolni; kihagyás.';
+$string['rag:transcript_fetch_failed'] = 'Nem sikerült átiratot lekérni innen: {$a}.';
+$string['rag:transcript_cf_challenge'] = 'Az átirat URL-t a Cloudflare-kihívás blokkolja: {$a}.';
+$string['rag:embed_detected'] = 'Beágyazott média észlelve: {$a}';
+$string['rag:embed_transcript_attached'] = 'Átirat csatolva ehhez: {$a}';
+

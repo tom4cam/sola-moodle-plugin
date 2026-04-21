@@ -663,3 +663,16 @@ $string['toc:analytics'] = 'Analytics ダッシュボード &rarr;';
 $string['toc:tokenanalytics'] = 'トークンコスト & Analytics &rarr;';
 $string['toc:testing'] = 'テスト環境 &rarr;';
 $string['toc:back_to_course'] = '&larr; {$a} に戻る';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'pdftotext バイナリが見つかりません。PDF 抽出を無効にしました。';
+$string['rag:pdftotext_available'] = 'pdftotext を {$a} で検出しました。';
+$string['rag:docx_unavailable'] = 'PHP ZipArchive 拡張が利用できません。DOCX 抽出を無効にしました。';
+$string['rag:h5p_unavailable'] = 'H5P コンテンツを読み込めませんでした。スキップします。';
+$string['rag:scorm_too_large'] = 'SCORM パッケージが設定されたサイズ制限 ({$a} MB) を超えています。スキップします。';
+$string['rag:scorm_unzip_failed'] = 'SCORM パッケージを解凍できませんでした。スキップします。';
+$string['rag:transcript_fetch_failed'] = '{$a} から文字起こしを取得できませんでした。';
+$string['rag:transcript_cf_challenge'] = '文字起こし URL が Cloudflare チャレンジでブロックされました: {$a}。';
+$string['rag:embed_detected'] = '埋め込みメディアを検出しました: {$a}';
+$string['rag:embed_transcript_attached'] = '{$a} の文字起こしを添付しました';
+

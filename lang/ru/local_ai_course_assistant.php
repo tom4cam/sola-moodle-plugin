@@ -686,3 +686,16 @@ $string['toc:analytics'] = 'Панель Analytics &rarr;';
 $string['toc:tokenanalytics'] = 'Стоимость токенов и аналитика &rarr;';
 $string['toc:testing'] = 'Тестовая среда &rarr;';
 $string['toc:back_to_course'] = '&larr; Назад в {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'Бинарный файл pdftotext не найден; извлечение PDF отключено.';
+$string['rag:pdftotext_available'] = 'pdftotext обнаружен в {$a}.';
+$string['rag:docx_unavailable'] = 'Расширение PHP ZipArchive недоступно; извлечение DOCX отключено.';
+$string['rag:h5p_unavailable'] = 'Не удалось прочитать содержимое H5P; пропускается.';
+$string['rag:scorm_too_large'] = 'Пакет SCORM превышает настроенный лимит размера ({$a} МБ); пропускается.';
+$string['rag:scorm_unzip_failed'] = 'Не удалось распаковать пакет SCORM; пропускается.';
+$string['rag:transcript_fetch_failed'] = 'Не удалось получить расшифровку с {$a}.';
+$string['rag:transcript_cf_challenge'] = 'URL расшифровки заблокирован проверкой Cloudflare: {$a}.';
+$string['rag:embed_detected'] = 'Обнаружено встроенное медиа: {$a}';
+$string['rag:embed_transcript_attached'] = 'Расшифровка прикреплена для {$a}';
+

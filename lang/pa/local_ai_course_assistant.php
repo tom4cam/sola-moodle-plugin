@@ -686,3 +686,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'ਟੋਕਨ ਕੀਮਤ ਅਤੇ ਵਿਸ਼ਲੇਸ਼ਣ &rarr;';
 $string['toc:testing'] = 'ਟੈਸਟਿੰਗ ਵਾਤਾਵਰਨ &rarr;';
 $string['toc:back_to_course'] = '&larr; {$a} ਤੇ ਵਾਪਸ ਜਾਓ';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'pdftotext ਬਾਈਨਰੀ ਨਹੀਂ ਮਿਲੀ; PDF ਕੱਢਣਾ ਅਯੋਗ ਹੈ।';
+$string['rag:pdftotext_available'] = '{$a} \'ਤੇ pdftotext ਮਿਲਿਆ।';
+$string['rag:docx_unavailable'] = 'PHP ZipArchive ਐਕਸਟੈਂਸ਼ਨ ਉਪਲਬਧ ਨਹੀਂ; DOCX ਕੱਢਣਾ ਅਯੋਗ ਹੈ।';
+$string['rag:h5p_unavailable'] = 'H5P ਸਮੱਗਰੀ ਨਹੀਂ ਪੜ੍ਹੀ ਜਾ ਸਕੀ; ਛੱਡ ਰਹੇ ਹਾਂ।';
+$string['rag:scorm_too_large'] = 'SCORM ਪੈਕੇਜ ਕੌਂਫਿਗਰ ਕੀਤੇ ਆਕਾਰ ਸੀਮਾ ({$a} MB) ਤੋਂ ਵੱਧ ਹੈ; ਛੱਡ ਰਹੇ ਹਾਂ।';
+$string['rag:scorm_unzip_failed'] = 'SCORM ਪੈਕੇਜ ਨੂੰ ਅਨਜ਼ਿਪ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ; ਛੱਡ ਰਹੇ ਹਾਂ।';
+$string['rag:transcript_fetch_failed'] = '{$a} ਤੋਂ ਟ੍ਰਾਂਸਕ੍ਰਿਪਟ ਪ੍ਰਾਪਤ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕੀ।';
+$string['rag:transcript_cf_challenge'] = 'ਟ੍ਰਾਂਸਕ੍ਰਿਪਟ URL ਨੂੰ Cloudflare ਚੁਣੌਤੀ ਨੇ ਬਲੌਕ ਕੀਤਾ: {$a}।';
+$string['rag:embed_detected'] = 'ਐਮਬੇਡ ਕੀਤਾ ਮੀਡੀਆ ਮਿਲਿਆ: {$a}';
+$string['rag:embed_transcript_attached'] = '{$a} ਲਈ ਟ੍ਰਾਂਸਕ੍ਰਿਪਟ ਨੱਥੀ ਕੀਤੀ';
+

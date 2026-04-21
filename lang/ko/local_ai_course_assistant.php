@@ -663,3 +663,16 @@ $string['toc:analytics'] = 'Analytics 대시보드 &rarr;';
 $string['toc:tokenanalytics'] = '토큰 비용 & Analytics &rarr;';
 $string['toc:testing'] = '테스트 환경 &rarr;';
 $string['toc:back_to_course'] = '&larr; {$a}(으)로 돌아가기';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'pdftotext 바이너리를 찾을 수 없습니다. PDF 추출이 비활성화되었습니다.';
+$string['rag:pdftotext_available'] = '{$a}에서 pdftotext가 감지되었습니다.';
+$string['rag:docx_unavailable'] = 'PHP ZipArchive 확장 기능을 사용할 수 없습니다. DOCX 추출이 비활성화되었습니다.';
+$string['rag:h5p_unavailable'] = 'H5P 콘텐츠를 읽을 수 없습니다. 건너뜁니다.';
+$string['rag:scorm_too_large'] = 'SCORM 패키지가 구성된 크기 제한({$a} MB)을 초과했습니다. 건너뜁니다.';
+$string['rag:scorm_unzip_failed'] = 'SCORM 패키지의 압축을 풀 수 없습니다. 건너뜁니다.';
+$string['rag:transcript_fetch_failed'] = '{$a}에서 스크립트를 가져올 수 없습니다.';
+$string['rag:transcript_cf_challenge'] = '스크립트 URL이 Cloudflare 챌린지에 의해 차단되었습니다: {$a}.';
+$string['rag:embed_detected'] = '포함된 미디어가 감지되었습니다: {$a}';
+$string['rag:embed_transcript_attached'] = '{$a}에 대한 스크립트가 첨부되었습니다';
+

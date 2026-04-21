@@ -681,3 +681,16 @@ $string['toc:analytics'] = 'Analytics Dashboard &rarr;';
 $string['toc:tokenanalytics'] = 'Qiimaha Token iyo Analytics &rarr;';
 $string['toc:testing'] = 'Deegaanka tijaabada &rarr;';
 $string['toc:back_to_course'] = '&larr; Ku noqo {$a}';
+
+// RAG extractor status strings (v3.9.6+).
+$string['rag:pdftotext_missing'] = 'Binary-ga pdftotext lama helin; soo saarista PDF waa la damiyay.';
+$string['rag:pdftotext_available'] = 'pdftotext waxaa lagu helay {$a}.';
+$string['rag:docx_unavailable'] = 'Kordhinta PHP ZipArchive lama heli karo; soo saarista DOCX waa la damiyay.';
+$string['rag:h5p_unavailable'] = 'Nuxurka H5P lama akhrin karo; waa la boodayaa.';
+$string['rag:scorm_too_large'] = 'Xidhmada SCORM waxay ka badan tahay xadka cabbirka la habeeyey ({$a} MB); waa la boodayaa.';
+$string['rag:scorm_unzip_failed'] = 'Xidhmada SCORM lama furi karo; waa la boodayaa.';
+$string['rag:transcript_fetch_failed'] = 'Qoraalka lagama keeni karo {$a}.';
+$string['rag:transcript_cf_challenge'] = 'URL-ka qoraalka waxaa xiray caqabadda Cloudflare: {$a}.';
+$string['rag:embed_detected'] = 'Warbaahin ku dhex jirta oo la aqoonsaday: {$a}';
+$string['rag:embed_transcript_attached'] = 'Qoraalka waa lagu lifaaqay {$a}';
+
