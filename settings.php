@@ -1367,6 +1367,23 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // v3.9.13: xAI Realtime WebSocket proxy settings. When configured,
+    // xAI voice routes through services/xai_rt_proxy instead of opening a
+    // direct browser connection to api.x.ai with the master key.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/xai_proxy_url',
+        get_string('settings:xai_proxy_url', 'local_ai_course_assistant'),
+        get_string('settings:xai_proxy_url_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_URL
+    ));
+    $settings->add(new admin_setting_configpasswordunmask(
+        'local_ai_course_assistant/xai_proxy_jwt_secret',
+        get_string('settings:xai_proxy_jwt_secret', 'local_ai_course_assistant'),
+        get_string('settings:xai_proxy_jwt_secret_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
     // Catalyst's fork carries a whatsapp_test.php admin tool that calls
     // admin_externalpage_setup('local_ai_course_assistant_whatsapptest').
     // Register it defensively only when the file is present so upstream
