@@ -83,8 +83,25 @@ class context_builder {
 
         // Determine course content: RAG chunks or full content stuffing.
         if ($ragmode) {
+            // Number each chunk so the AI can cite it inline with [[c:N]].
+            // Include source title when we can resolve it, so the AI has
+            // human-readable context for what it's citing.
+            $numbered = [];
+            foreach (array_values($retrieved_chunks) as $i => $chunk) {
+                $label = "[c:{$i}]";
+                $cmid = isset($chunk['cmid']) ? (int) $chunk['cmid'] : 0;
+                if ($cmid > 0) {
+                    $label .= " (cmid: {$cmid})";
+                }
+                $numbered[] = $label . "\n" . ($chunk['content'] ?? '');
+            }
             $coursecontent = "### Relevant course content\n\n"
-                . implode("\n\n---\n\n", array_column($retrieved_chunks, 'content'));
+                . "Each passage below is labelled [c:N]. When you use information from a passage "
+                . "in your answer, cite it inline by writing [[c:N]] directly after the claim it "
+                . "supports (for example: \"Photosynthesis occurs in chloroplasts [[c:0]].\"). "
+                . "Only cite a passage if you actually used it. Do not invent citation numbers. "
+                . "Do not cite [[c:N]] for general knowledge that is not in these passages.\n\n"
+                . implode("\n\n---\n\n", $numbered);
         } else {
             $coursecontent = self::build_course_content($courseid);
         }
@@ -184,6 +201,15 @@ class context_builder {
 
         // Append AI literacy instructions.
         $prompt .= self::get_ai_literacy_instructions();
+
+        // Append mastery state (silent steering). No-op when the feature is
+        // off for the course or the course has no objectives.
+        if ($userid > 0 && $userrole === 'student') {
+            $masteryblock = objective_manager::build_prompt_injection($userid, $courseid);
+            if ($masteryblock !== '') {
+                $prompt .= $masteryblock;
+            }
+        }
 
         // Append source attribution instructions.
         $prompt .= self::get_source_attribution_instructions();

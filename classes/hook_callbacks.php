@@ -586,6 +586,18 @@ class hook_callbacks {
             'hasstarterdata'     => $hasstarterdata,
             'voicetabenabled'    => self::is_voice_tab_enabled($courseid),
             'voiceenabled'       => \local_ai_course_assistant\voice_registry::any_voice_enabled(),
+            // Mastery feature: both flags gated on master switch so the chip
+            // never renders when mastery tracking is off for the course.
+            'masteryenabled'     => \local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid),
+            'masterychipenabled' => \local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid)
+                && \local_ai_course_assistant\objective_manager::is_chip_enabled_for_course($courseid),
+            'attachmentsenabled' => \local_ai_course_assistant\attachment_manager::is_enabled(),
+            'attachmentmaxmb'    => (int) ceil(\local_ai_course_assistant\attachment_manager::get_max_size_bytes() / (1024 * 1024)),
+            'attachmentallowedmimes' => implode(',', \local_ai_course_assistant\attachment_manager::get_allowed_mimes()),
+            'providersupportsimages' => \local_ai_course_assistant\attachment_manager::provider_supports_images(
+                (string) (\local_ai_course_assistant\course_config_manager::get_effective_config($courseid)['provider']
+                    ?? get_config('local_ai_course_assistant', 'provider'))
+            ),
             'consentgiven'       => (bool) get_user_preferences('aica_sola_consent_given', 0),
             'consenturl'         => (new \moodle_url('/local/ai_course_assistant/consent.php'))->out(false),
             'privacynoticeurl'   => (new \moodle_url('/local/ai_course_assistant/privacy.php'))->out(false),

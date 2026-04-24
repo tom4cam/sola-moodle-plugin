@@ -85,6 +85,36 @@ class claude_provider extends base_provider {
      * @return string JSON body.
      */
     private function build_body(string $systemprompt, array $messages, bool $stream, array $options): string {
+        $apimessages = array_map(function ($msg) {
+            return [
+                'role' => $msg['role'],
+                'content' => $msg['content'],
+            ];
+        }, $messages);
+
+        // Multimodal: Claude accepts image content blocks on user messages.
+        // Attach the student's image to the latest user turn as a base64
+        // source block, preserving the original text as a text block.
+        if (!empty($options['attachment']['base64']) && !empty($options['attachment']['mime'])) {
+            for ($i = count($apimessages) - 1; $i >= 0; $i--) {
+                if (($apimessages[$i]['role'] ?? '') === 'user') {
+                    $text = is_string($apimessages[$i]['content']) ? $apimessages[$i]['content'] : '';
+                    $apimessages[$i]['content'] = [
+                        ['type' => 'text', 'text' => $text],
+                        [
+                            'type' => 'image',
+                            'source' => [
+                                'type' => 'base64',
+                                'media_type' => $options['attachment']['mime'],
+                                'data' => $options['attachment']['base64'],
+                            ],
+                        ],
+                    ];
+                    break;
+                }
+            }
+        }
+
         $body = [
             'model' => $this->model,
             'max_tokens' => $options['max_tokens'] ?? 4096,
@@ -95,12 +125,7 @@ class claude_provider extends base_provider {
                     'cache_control' => ['type' => 'ephemeral'],
                 ],
             ],
-            'messages' => array_map(function ($msg) {
-                return [
-                    'role' => $msg['role'],
-                    'content' => $msg['content'],
-                ];
-            }, $messages),
+            'messages' => $apimessages,
         ];
 
         // Adaptive thinking: Claude decides when and how much to reason.

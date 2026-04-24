@@ -157,6 +157,17 @@ class file_extractor {
     }
 
     /**
+     * Public entry point for extracting text from a PDF stored_file.
+     * Used by the student attachment pipeline as well as the RAG indexer.
+     *
+     * @param \stored_file $file
+     * @return string Extracted plain text, or empty string on failure.
+     */
+    public static function extract_pdf_text(\stored_file $file): string {
+        return self::extract_pdf($file);
+    }
+
+    /**
      * Extract text from a PDF stored_file by shelling out to pdftotext.
      *
      * @param \stored_file $file

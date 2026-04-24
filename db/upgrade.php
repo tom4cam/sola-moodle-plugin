@@ -598,5 +598,53 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026041802, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026042400) {
+        $dbman = $DB->get_manager();
+
+        $objstable = new xmldb_table('local_ai_course_assistant_objs');
+        if (!$dbman->table_exists($objstable)) {
+            $objstable->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+            $objstable->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $objstable->add_field('sortorder', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, '0');
+            $objstable->add_field('code', XMLDB_TYPE_CHAR, '40', null, null, null, null);
+            $objstable->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL);
+            $objstable->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+            $objstable->add_field('source', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'manual');
+            $objstable->add_field('external_ref', XMLDB_TYPE_CHAR, '64', null, null, null, null);
+            $objstable->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $objstable->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $objstable->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $objstable->add_key('courseid_fk', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+            $objstable->add_index('courseid_sortorder', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'sortorder']);
+            $dbman->create_table($objstable);
+        }
+
+        $attstable = new xmldb_table('local_ai_course_assistant_obj_att');
+        if (!$dbman->table_exists($attstable)) {
+            $attstable->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+            $attstable->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $attstable->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $attstable->add_field('objectiveid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $attstable->add_field('source', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'quiz');
+            $attstable->add_field('msgid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $attstable->add_field('iscorrect', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+            $attstable->add_field('weight', XMLDB_TYPE_NUMBER, '5,2', null, XMLDB_NOTNULL, null, '1.00');
+            $attstable->add_field('confidence', XMLDB_TYPE_NUMBER, '5,2', null, null, null, null);
+            $attstable->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $attstable->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $attstable->add_key('userid_fk', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+            $attstable->add_key('courseid_fk', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+            $attstable->add_key('objectiveid_fk', XMLDB_KEY_FOREIGN, ['objectiveid'],
+                'local_ai_course_assistant_objs', ['id']);
+            $attstable->add_index('userid_objective_time', XMLDB_INDEX_NOTUNIQUE,
+                ['userid', 'objectiveid', 'timecreated']);
+            $attstable->add_index('courseid_time', XMLDB_INDEX_NOTUNIQUE,
+                ['courseid', 'timecreated']);
+            $dbman->create_table($attstable);
+        }
+
+        upgrade_plugin_savepoint(true, 2026042400, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

@@ -234,7 +234,7 @@ define(['core/str'], function(Str) {
      * @param {string}      topic       Quiz topic label
      * @param {Function}    onFinish    Called with (score, total, topic) on first completion
      */
-    const init = function(container, questions, topic, onFinish, onExit) {
+    const init = function(container, questions, topic, onFinish, onExit, onAnswer) {
         const state = {
             questions: questions,
             currentIndex: 0,
@@ -315,6 +315,19 @@ define(['core/str'], function(Str) {
                     const chosen = choice.charAt(0);
                     const correct = q.correct;
                     state.answers[index] = chosen;
+
+                    // Fire mastery attempt hook when the question carries an
+                    // objective tag. The server silently ignores the call if
+                    // mastery is disabled for the course, so we can always emit.
+                    if (typeof onAnswer === 'function' && q && q.objectiveid) {
+                        try {
+                            onAnswer({
+                                questionId: q.id || (index + 1),
+                                objectiveid: q.objectiveid,
+                                iscorrect: chosen === correct,
+                            });
+                        } catch (e) { /* non-fatal */ }
+                    }
 
                     // Disable all buttons and inject ✓/✗ icons.
                     choicesEl.querySelectorAll('.aica-quiz__choice').forEach(function(b) {

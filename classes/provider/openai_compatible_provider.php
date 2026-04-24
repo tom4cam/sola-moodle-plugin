@@ -107,6 +107,25 @@ abstract class openai_compatible_provider extends base_provider {
             ];
         }
 
+        // Multimodal: attach the image to the latest user message as a
+        // content-block array, matching the OpenAI chat/completions schema
+        // that Gemini, xAI, and other compatible endpoints also accept.
+        if (!empty($options['attachment']['base64']) && !empty($options['attachment']['mime'])) {
+            for ($i = count($apimessages) - 1; $i >= 0; $i--) {
+                if (($apimessages[$i]['role'] ?? '') === 'user') {
+                    $text = is_string($apimessages[$i]['content']) ? $apimessages[$i]['content'] : '';
+                    $apimessages[$i]['content'] = [
+                        ['type' => 'text', 'text' => $text],
+                        ['type' => 'image_url', 'image_url' => [
+                            'url' => 'data:' . $options['attachment']['mime']
+                                . ';base64,' . $options['attachment']['base64'],
+                        ]],
+                    ];
+                    break;
+                }
+            }
+        }
+
         $body = [
             'model' => $this->model,
             'messages' => $apimessages,

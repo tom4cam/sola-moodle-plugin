@@ -22,6 +22,7 @@ use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
 use local_ai_course_assistant\context_builder;
+use local_ai_course_assistant\objective_manager;
 use local_ai_course_assistant\provider\base_provider;
 
 /**
@@ -79,6 +80,26 @@ class generate_quiz extends external_api {
         $course = $DB->get_record('course', ['id' => $courseid], 'id,fullname', MUST_EXIST);
         $coursetopics = context_builder::get_course_topics_text($courseid);
 
+        // Mastery tracking: if enabled and objectives exist, feed them to the
+        // LLM so each generated question is tagged with the best-fit objective.
+        $objectivesblock = '';
+        $objectivemap = [];
+        if (objective_manager::is_enabled_for_course($courseid)) {
+            $objectives = objective_manager::list_for_course($courseid);
+            if (!empty($objectives)) {
+                $lines = [];
+                foreach ($objectives as $obj) {
+                    $label = $obj->code ? "[{$obj->code}] " : '';
+                    $lines[] = (int) $obj->id . ': ' . $label . $obj->title;
+                    $objectivemap[(int) $obj->id] = true;
+                }
+                $objectivesblock = "\n\n## Learning objectives (for tagging)\n"
+                    . "Each question MUST be tagged with the id of the single best-fit objective from this list. "
+                    . "Use exactly the numeric id shown (left of the colon), not the title:\n"
+                    . implode("\n", $lines);
+            }
+        }
+
         // Build the system prompt.
         if ($topic === '__guided__') {
             // AI-guided mode: gather grade data and recent chat history.
@@ -122,7 +143,12 @@ class generate_quiz extends external_api {
             }
         }
 
-        $quizschema = self::get_quiz_json_schema($count);
+        // Append the objectives-tagging block (if any) to whichever branch produced the prompt.
+        if ($objectivesblock !== '') {
+            $systemprompt .= $objectivesblock;
+        }
+
+        $quizschema = self::get_quiz_json_schema($count, $objectivesblock !== '');
         try {
             $provider = base_provider::create_from_config($courseid);
             $response = $provider->chat_completion(
@@ -156,12 +182,23 @@ class generate_quiz extends external_api {
             if (empty($q['question']) || empty($q['choices']) || empty($q['correct'])) {
                 continue;
             }
+            // Carry through the LLM's objective tag only if it matches one of
+            // this course's actual objectives. A hallucinated id is dropped
+            // so downstream attempt recording can't write to a stale row.
+            $objectiveid = 0;
+            if (isset($q['objectiveid']) && $objectivemap) {
+                $candidate = (int) $q['objectiveid'];
+                if ($candidate > 0 && isset($objectivemap[$candidate])) {
+                    $objectiveid = $candidate;
+                }
+            }
             $questions[] = [
                 'id'          => (int) ($q['id'] ?? count($questions) + 1),
                 'question'    => (string) $q['question'],
                 'choices'     => array_values(array_map('strval', (array) $q['choices'])),
                 'correct'     => (string) $q['correct'],
                 'explanation' => (string) ($q['explanation'] ?? ''),
+                'objectiveid' => $objectiveid,
             ];
         }
 
@@ -196,6 +233,7 @@ class generate_quiz extends external_api {
                     ),
                     'correct'     => new external_value(PARAM_TEXT, 'Correct answer letter (A/B/C/D)'),
                     'explanation' => new external_value(PARAM_RAW, 'Explanation of the correct answer'),
+                    'objectiveid' => new external_value(PARAM_INT, 'Matching learning objective id, or 0 if none'),
                 ])
             ),
         ]);
@@ -211,7 +249,25 @@ class generate_quiz extends external_api {
      * @param int $count Number of quiz questions.
      * @return array Schema definition with name, description, and JSON Schema.
      */
-    private static function get_quiz_json_schema(int $count): array {
+    private static function get_quiz_json_schema(int $count, bool $tagobjectives = false): array {
+        $questionprops = [
+            'id' => ['type' => 'integer'],
+            'question' => ['type' => 'string'],
+            'choices' => [
+                'type' => 'array',
+                'items' => ['type' => 'string'],
+            ],
+            'correct' => ['type' => 'string', 'enum' => ['A', 'B', 'C', 'D']],
+            'explanation' => ['type' => 'string'],
+        ];
+        $required = ['id', 'question', 'choices', 'correct', 'explanation'];
+        if ($tagobjectives) {
+            $questionprops['objectiveid'] = [
+                'type' => 'integer',
+                'description' => 'id of the best-fit learning objective for this question',
+            ];
+            $required[] = 'objectiveid';
+        }
         return [
             'name' => 'generate_quiz',
             'description' => "Generate a {$count}-question multiple-choice quiz",
@@ -223,17 +279,8 @@ class generate_quiz extends external_api {
                         'type' => 'array',
                         'items' => [
                             'type' => 'object',
-                            'properties' => [
-                                'id' => ['type' => 'integer'],
-                                'question' => ['type' => 'string'],
-                                'choices' => [
-                                    'type' => 'array',
-                                    'items' => ['type' => 'string'],
-                                ],
-                                'correct' => ['type' => 'string', 'enum' => ['A', 'B', 'C', 'D']],
-                                'explanation' => ['type' => 'string'],
-                            ],
-                            'required' => ['id', 'question', 'choices', 'correct', 'explanation'],
+                            'properties' => $questionprops,
+                            'required' => $required,
                             'additionalProperties' => false,
                         ],
                     ],

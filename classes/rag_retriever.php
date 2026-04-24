@@ -42,8 +42,13 @@ class rag_retriever {
      * @param int    $courseid
      * @param string $query    The user's message / question.
      * @param int    $topk     Number of chunks to return.
-     * @return array Array of ['content' => string, 'score' => float] sorted by score desc.
-     *               Empty array if no chunks or embedding fails.
+     * @return array Array of [
+     *                  'content'    => string,
+     *                  'score'      => float,
+     *                  'cmid'       => int|null,
+     *                  'modtype'    => string,
+     *                  'chunkindex' => int,
+     *               ] sorted by score desc. Empty array if no chunks or embedding fails.
      */
     public static function retrieve(int $courseid, string $query, int $topk = 5): array {
         global $DB;
@@ -68,7 +73,7 @@ class rag_retriever {
                 'courseid = :courseid AND embedding IS NOT NULL',
                 ['courseid' => $courseid],
                 '',
-                'id, content, embedding'
+                'id, content, embedding, cmid, modtype, chunkindex'
             );
 
             $embedding_cache[$cache_key] = [];
@@ -76,7 +81,13 @@ class rag_retriever {
                 foreach ($rows as $row) {
                     $vec = json_decode($row->embedding, true);
                     if (is_array($vec) && !empty($vec)) {
-                        $embedding_cache[$cache_key][$row->id] = ['content' => $row->content, 'vec' => $vec];
+                        $embedding_cache[$cache_key][$row->id] = [
+                            'content'    => $row->content,
+                            'vec'        => $vec,
+                            'cmid'       => isset($row->cmid) ? (int) $row->cmid : null,
+                            'modtype'    => (string) ($row->modtype ?? ''),
+                            'chunkindex' => (int) ($row->chunkindex ?? 0),
+                        ];
                     }
                 }
             }
@@ -90,7 +101,13 @@ class rag_retriever {
         $scored = [];
         foreach ($embedding_cache[$cache_key] as $entry) {
             $score    = self::cosine($queryvec, $entry['vec']);
-            $scored[] = ['content' => $entry['content'], 'score' => $score];
+            $scored[] = [
+                'content'    => $entry['content'],
+                'score'      => $score,
+                'cmid'       => $entry['cmid'],
+                'modtype'    => $entry['modtype'],
+                'chunkindex' => $entry['chunkindex'],
+            ];
         }
 
         if (empty($scored)) {

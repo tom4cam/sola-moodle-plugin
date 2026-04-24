@@ -103,6 +103,10 @@ define([
     let practiceRubricId = null;
     /** @type {Array|null} Rubric criteria for current practice session */
     let practiceRubricCriteria = null;
+    /** @type {?{draftitemid:number, filename:string, mime:string, size:number, url:string}} */
+    let pendingAttachment = null;
+    /** @type {boolean} Whether an attachment upload is currently in flight */
+    let attachmentUploading = false;
     /** @type {RegExp} SOLA follow-up marker parser */
     const NEXT_BLOCK_RE = /\n*\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/;
     /** @type {RegExp} Source attribution tag parser — matches [SOURCE:page], [SOURCE:course], [SOURCE:general], [SOURCE:activity:123] */
@@ -1633,6 +1637,18 @@ define([
         // Mic button (STT).
         if (els.micBtn) {
             els.micBtn.addEventListener('click', handleMic);
+        }
+
+        // Attachment button → hidden file input.
+        if (els.attachBtn && els.attachFileInput) {
+            els.attachBtn.addEventListener('click', function() {
+                if (attachmentUploading) {
+                    return;
+                }
+                els.attachFileInput.value = '';
+                els.attachFileInput.click();
+            });
+            els.attachFileInput.addEventListener('change', handleAttachmentChange);
         }
 
         if (els.modeButtons && els.modeButtons.forEach) {
@@ -3566,7 +3582,7 @@ define([
         if (!options.skipHistory) {
             recordConversationMessage('user', text, ts || Date.now());
         }
-        return UI.addMessage('user', text, null, ts || null);
+        return UI.addMessage('user', text, null, ts || null, options.attachment || null);
     };
 
     /**
@@ -3686,6 +3702,13 @@ define([
                         return;
                     }
                     let pendingQuizChips = null;
+                    var onQuizAnswer = function(payload) {
+                        if (!payload || !payload.objectiveid) {
+                            return;
+                        }
+                        Repo.recordObjectiveAttempt(courseId, payload.objectiveid, !!payload.iscorrect)
+                            .catch(function() { /* mastery recording is non-critical */ });
+                    };
                     UI.showQuiz(result.questions, result.topic, function onFinish(score, total, topic) {
                         quizModeActive = false;
                         setQuizBtnActive(quizBtn, false);
@@ -3729,7 +3752,7 @@ define([
                             pendingQuizChips = null;
                             setTimeout(function() { UI.showSuggestions(chips, handleSuggestionClick); }, 150);
                         }
-                    });
+                    }, onQuizAnswer);
                 }).catch(function() {
                     UI.showTyping(false);
                     quizModeActive = false;
@@ -4254,6 +4277,7 @@ define([
         if (opened) {
             setBottomMode('chat', {force: true});
             syncVoicePanel();
+            hydrateMasteryChip();
         }
         if (opened && quizLocked && !historyLoaded) {
             // Show quiz-locked notice instead of normal history/starters flow.
@@ -4496,7 +4520,18 @@ define([
                             alreadyClean: true,
                         });
                     } else {
-                        addUserMsg(text, msg.timecreated ? msg.timecreated * 1000 : null, {skipHistory: true});
+                        var histAttachment = null;
+                        if (msg.attachment && msg.attachment.url) {
+                            histAttachment = {
+                                filename: msg.attachment.filename || '',
+                                mime: msg.attachment.mime || '',
+                                url: msg.attachment.url,
+                            };
+                        }
+                        addUserMsg(text, msg.timecreated ? msg.timecreated * 1000 : null, {
+                            skipHistory: true,
+                            attachment: histAttachment,
+                        });
                     }
                 });
                 UI.scrollToBottom(true);
@@ -4533,6 +4568,125 @@ define([
      */
     const detectQuizIntent = function(text) {
         return /quiz\s+me|test\s+me|give\s+(?:me\s+)?a\s+quiz|practice\s+quiz|take\s+a\s+quiz|let'?s\s+(?:do\s+a\s+)?quiz|quiz\s+(?:me\s+)?on|quiz\s+(?:me\s+)?about|test\s+my\s+knowledge/i.test(text);
+    };
+
+    /**
+     * Handle a newly picked attachment file: client-side validate, upload to
+     * the upload endpoint, and show the preview chip. Errors surface as a
+     * toast and clear the input so the user can retry.
+     */
+    const handleAttachmentChange = function(ev) {
+        const input = ev && ev.target;
+        if (!input || !input.files || !input.files.length) {
+            return;
+        }
+        const file = input.files[0];
+        const rootEl = document.getElementById('local-ai-course-assistant');
+        const card = rootEl && rootEl.querySelector('.local-ai-course-assistant__composer-card');
+        const maxMb = card ? (parseInt(card.dataset.attachmentsMaxMb, 10) || 10) : 10;
+        const allowedMimes = card && card.dataset.attachmentsAllowedMimes
+            ? card.dataset.attachmentsAllowedMimes.split(',').map(function(s) { return s.trim().toLowerCase(); })
+            : [];
+        const supportsImages = card && card.dataset.providerSupportsImages === '1';
+
+        // Client-side size check — duplicates the server check so we can fail fast.
+        if (file.size > maxMb * 1024 * 1024) {
+            UI.showNotification('File is too large. Maximum size is ' + maxMb + ' MB.', 'error');
+            input.value = '';
+            return;
+        }
+        // Client-side MIME check — authoritative check still lives server-side (finfo).
+        const mime = (file.type || '').toLowerCase();
+        if (allowedMimes.length && allowedMimes.indexOf(mime) === -1) {
+            UI.showNotification('Unsupported file type.', 'error');
+            input.value = '';
+            return;
+        }
+        // Block image uploads when the current provider can't handle them.
+        if (mime.indexOf('image/') === 0 && !supportsImages) {
+            Str.get_string('attachment:error_provider_no_images', 'local_ai_course_assistant').then(function(msg) {
+                UI.showNotification(msg, 'error');
+                return;
+            }).catch(function() {
+                UI.showNotification('The current AI provider does not accept images.', 'error');
+            });
+            input.value = '';
+            return;
+        }
+
+        attachmentUploading = true;
+        const attachBtn = UI.getElements().attachBtn;
+        if (attachBtn) {
+            attachBtn.disabled = true;
+            attachBtn.classList.add('aica-attachment-btn--uploading');
+        }
+
+        Repo.uploadAttachment(courseId, file).then(function(data) {
+            pendingAttachment = {
+                draftitemid: parseInt(data.draftitemid, 10) || 0,
+                filename: data.filename || file.name,
+                mime: data.mime || mime,
+                size: parseInt(data.size, 10) || file.size,
+                url: data.url || '',
+            };
+            UI.showAttachmentPreview(pendingAttachment, clearPendingAttachment);
+            return;
+        }).catch(function(err) {
+            window.console && console.error('[SOLA attachment]', err); // eslint-disable-line no-console
+            UI.showNotification((err && err.message) || 'Upload failed.', 'error');
+        }).finally(function() {
+            attachmentUploading = false;
+            if (attachBtn) {
+                attachBtn.disabled = false;
+                attachBtn.classList.remove('aica-attachment-btn--uploading');
+            }
+            input.value = '';
+        });
+    };
+
+    /**
+     * Clear any pending attachment and hide the preview chip. Used both
+     * when the user clicks the remove button and after a successful send.
+     */
+    const clearPendingAttachment = function() {
+        pendingAttachment = null;
+        UI.hideAttachmentPreview();
+    };
+
+    /**
+     * Fetch and render the Learning Mastery Chip. No-ops on the server if
+     * mastery isn't enabled for the course, so we can call unconditionally.
+     * The chip element itself only exists when the template was rendered
+     * with masterychipenabled = true, so ui.js no-ops quietly when the
+     * per-course toggle is off.
+     */
+    const hydrateMasteryChip = function() {
+        var els = UI.getElements();
+        if (!els.masteryChip) {
+            return;
+        }
+        Promise.all([
+            Repo.getMasterySummary(courseId),
+            Str.get_strings([
+                {key: 'mastery:chip_label', component: 'local_ai_course_assistant'},
+                {key: 'mastery:status_mastered', component: 'local_ai_course_assistant'},
+                {key: 'mastery:status_learning', component: 'local_ai_course_assistant'},
+                {key: 'mastery:status_not_started', component: 'local_ai_course_assistant'},
+                {key: 'mastery:popover_empty', component: 'local_ai_course_assistant'},
+            ]),
+        ]).then(function(results) {
+            var summary = results[0];
+            var strings = results[1];
+            UI.renderMasteryChip(summary, strings[0], {
+                mastered: strings[1],
+                learning: strings[2],
+                not_started: strings[3],
+                empty: strings[4],
+            });
+            return;
+        }).catch(function() {
+            UI.hideMasteryChip();
+        });
     };
 
     /**
@@ -4586,8 +4740,13 @@ define([
         // Track last session topic for personalized welcome-back.
         updateLastSession();
 
+        // Snapshot the pending attachment so the preview can clear immediately
+        // while we render the user bubble with the file still attached.
+        var sendingAttachment = pendingAttachment;
+        clearPendingAttachment();
+
         // Add user message.
-        addUserMsg(text, null);
+        addUserMsg(text, null, sendingAttachment ? {attachment: sendingAttachment} : null);
         UI.showTyping(true);
 
         // Accumulated response text.
@@ -4599,6 +4758,9 @@ define([
             courseid: courseId,
             message: text,
         };
+        if (sendingAttachment && sendingAttachment.draftitemid) {
+            postData.draftitemid = sendingAttachment.draftitemid;
+        }
         const currentLang = Speech.getLang();
         if (currentLang) {
             postData.lang = currentLang;
@@ -4688,6 +4850,7 @@ define([
         streamController = SSE.startStream(sseUrl, postData, {
             onMeta: function(meta) {
                 streamMeta = meta;
+                UI.setStreamCitations(meta && meta.citations ? meta.citations : []);
             },
             onDebug: function(payload) {
                 updateContextDebugServer(payload);
@@ -4704,6 +4867,10 @@ define([
                 displayText = displayText.replace(/\n*\[SOLA_NEXT\][^\[]*$/, '');
                 displayText = displayText.replace(/\n*\[SOURCE[^\]]*$/, '');
                 displayText = displayText.replace(/\n*\[SOLA_SCORE\][^\[]*$/, '');
+                // Strip a partial [[c:N inline citation at the very end — the closing ]] has
+                // not arrived yet, so we hide the marker until it resolves.
+                displayText = displayText.replace(/\[\[c:\d*\]?$/, '');
+                displayText = displayText.replace(/\[\[?$/, '');
                 UI.updateStreamContent(displayText);
             },
             onDone: function(doneData) {

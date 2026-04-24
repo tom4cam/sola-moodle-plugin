@@ -499,6 +499,76 @@ if ($hassiteconfig) {
         ""
     ));
 
+    // Mastery tracking tunables. Per-course opt-in lives on the Objectives admin page.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/mastery_heading',
+        'Mastery tracking',
+        'Tunables for the mastery-tracking feature (learning objectives). Per-course opt-in lives on each course\'s Learning Objectives page, not here.'
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_threshold',
+        'Mastery threshold (0-1)',
+        'Score at or above which an objective counts as mastered. Minimum attempts gate (3) still applies.',
+        '0.85',
+        PARAM_FLOAT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_window',
+        'Rolling window size',
+        'How many most-recent attempts feed the mastery estimator. Higher = more stable, slower to react.',
+        '8',
+        PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_classifier_threshold',
+        'Conversation classifier min confidence',
+        'Classifier confidence threshold (0-1). Turns below this are not recorded.',
+        '0.70',
+        PARAM_FLOAT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_classifier_weight',
+        'Conversation attempt weight',
+        'Weight applied to conversation-derived attempts relative to quiz answers (1.0). Lower = noisier signal counts less.',
+        '0.30',
+        PARAM_FLOAT
+    ));
+
+    // Student attachments (images + PDFs) on chat messages.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/attachments_heading',
+        'Student attachments',
+        'Let students attach an image or PDF to their chat messages. Images are sent to multimodal providers (OpenAI, Anthropic, Gemini, xAI); '
+        . 'PDFs are always text-extracted on the server so every provider can read them.'
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/allow_student_attachments',
+        'Allow attachments',
+        'When enabled, students see a paperclip button in the chat composer. Files are stored under the course context and linked from their message bubble.',
+        1
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/attachment_max_size_mb',
+        'Max attachment size (MB)',
+        'Hard cap on the size of an individual attachment. Clamped to 1–25 MB at runtime.',
+        '10',
+        PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/attachment_allowed_types',
+        'Allowed MIME types',
+        'Comma-separated MIME allowlist. The server also sniffs the uploaded file; a spoofed Content-Type will be rejected.',
+        'image/png,image/jpeg,image/webp,application/pdf',
+        PARAM_RAW_TRIMMED
+    ));
+
     // Performance: caps on how much course content goes into the system prompt.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/performance_heading',
@@ -1418,6 +1488,50 @@ if ($hassiteconfig) {
         get_string('settings:xai_proxy_jwt_secret', 'local_ai_course_assistant'),
         get_string('settings:xai_proxy_jwt_secret_desc', 'local_ai_course_assistant'),
         ''
+    ));
+
+    // v3.9.17: mastery tracking tunables. Per-course enable toggles live
+    // on the per-course Objectives admin page; these are the site-wide
+    // knobs that govern mastery math and the classifier behavior.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/mastery_heading',
+        get_string('settings:mastery_heading', 'local_ai_course_assistant'),
+        get_string('settings:mastery_heading_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_threshold',
+        get_string('settings:mastery_threshold', 'local_ai_course_assistant'),
+        get_string('settings:mastery_threshold_desc', 'local_ai_course_assistant'),
+        '0.85',
+        PARAM_RAW
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_window',
+        get_string('settings:mastery_window', 'local_ai_course_assistant'),
+        get_string('settings:mastery_window_desc', 'local_ai_course_assistant'),
+        '8',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_classifier_model',
+        get_string('settings:mastery_classifier_model', 'local_ai_course_assistant'),
+        get_string('settings:mastery_classifier_model_desc', 'local_ai_course_assistant'),
+        'gpt-4o-mini',
+        PARAM_RAW_TRIMMED
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_classifier_weight',
+        get_string('settings:mastery_classifier_weight', 'local_ai_course_assistant'),
+        get_string('settings:mastery_classifier_weight_desc', 'local_ai_course_assistant'),
+        '0.3',
+        PARAM_RAW
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_classifier_threshold',
+        get_string('settings:mastery_classifier_threshold', 'local_ai_course_assistant'),
+        get_string('settings:mastery_classifier_threshold_desc', 'local_ai_course_assistant'),
+        '0.7',
+        PARAM_RAW
     ));
 
     // Catalyst's fork carries a whatsapp_test.php admin tool that calls

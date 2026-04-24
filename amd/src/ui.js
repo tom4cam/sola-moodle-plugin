@@ -442,6 +442,312 @@ define([
     /** Characters revealed per 20ms tick (~200 chars/sec) */
     const TYPEWRITER_SPEED = 5;
 
+    /** @type {Array<{index:number, cmid:?number, url:string, title:string, modtype:string, score:number}>}
+     *  Citation entries for the current streaming turn, set from SSE meta. */
+    let currentCitations = [];
+
+    /**
+     * Escape a string for safe interpolation into an HTML attribute value.
+     *
+     * @param {string} s
+     * @returns {string}
+     */
+    const escapeAttr = function(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    };
+
+    /**
+     * Replace inline [[c:N]] citation markers in rendered HTML with
+     * superscript links to the cited Moodle resource. Markers that don't
+     * resolve to a known citation are silently dropped so a hallucinated
+     * index can't render a broken link.
+     *
+     * Superscripts are numbered in first-appearance order so the reader
+     * sees 1, 2, 3 regardless of the underlying chunk index.
+     *
+     * Runs after Markdown.render/sanitize; the sanitizer's allowlist
+     * permits <a href="..."> and <sup>, so the injected HTML is safe.
+     *
+     * @param {string} html
+     * @returns {string}
+     */
+    const applyCitations = function(html) {
+        if (!html || html.indexOf('[[c:') === -1) {
+            return html || '';
+        }
+        const cites = currentCitations || [];
+        const order = {};
+        let nextNum = 0;
+        return html.replace(/\[\[c:(\d+)\]\]/g, function(_m, nStr) {
+            const n = parseInt(nStr, 10);
+            if (!(n >= 0) || n >= cites.length || !cites[n] || !cites[n].url) {
+                return '';
+            }
+            const cite = cites[n];
+            if (!Object.prototype.hasOwnProperty.call(order, n)) {
+                nextNum += 1;
+                order[n] = nextNum;
+            }
+            const num = order[n];
+            const titleAttr = cite.title
+                ? ' title="' + escapeAttr(cite.title) + '"'
+                : '';
+            return '<sup class="aica-citation">'
+                + '<a href="' + escapeAttr(cite.url) + '"' + titleAttr
+                + ' target="_blank" rel="noopener noreferrer">'
+                + num + '</a></sup>';
+        });
+    };
+
+    /**
+     * Set the citation map for the current streaming response.
+     *
+     * @param {Array<Object>} citations
+     */
+    const setStreamCitations = function(citations) {
+        currentCitations = Array.isArray(citations) ? citations : [];
+    };
+
+    /**
+     * Render assistant text: markdown → sanitize → citation substitution.
+     *
+     * @param {string} text
+     * @returns {string}
+     */
+    const renderAssistantHtml = function(text) {
+        return applyCitations(Markdown.sanitize(Markdown.render(text)));
+    };
+
+    /**
+     * Build the attachment node shown inside a user bubble.
+     *
+     * For images: an inline <img> thumbnail that links to the full file.
+     * For PDFs (and other non-image types): a compact filename chip.
+     *
+     * @param {{filename:string, mime:string, url:string}} att
+     * @returns {HTMLElement}
+     */
+    const buildAttachmentNode = function(att) {
+        const wrap = document.createElement('a');
+        wrap.className = 'aica-attachment';
+        wrap.href = att.url;
+        wrap.target = '_blank';
+        wrap.rel = 'noopener noreferrer';
+        wrap.title = att.filename || '';
+
+        const isImage = typeof att.mime === 'string' && att.mime.indexOf('image/') === 0;
+        if (isImage) {
+            const img = document.createElement('img');
+            img.className = 'aica-attachment__thumb';
+            img.src = att.url;
+            img.alt = att.filename || '';
+            img.loading = 'lazy';
+            wrap.appendChild(img);
+        } else {
+            wrap.classList.add('aica-attachment--file');
+            const icon = document.createElement('span');
+            icon.className = 'aica-attachment__icon';
+            icon.innerHTML =
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14"' +
+                ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"' +
+                ' stroke-linejoin="round" aria-hidden="true">' +
+                '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
+                '<polyline points="14 2 14 8 20 8"/>' +
+                '</svg>';
+            const label = document.createElement('span');
+            label.className = 'aica-attachment__name';
+            label.textContent = att.filename || 'attachment';
+            wrap.appendChild(icon);
+            wrap.appendChild(label);
+        }
+        return wrap;
+    };
+
+    /**
+     * Show the composer preview chip for an uploaded-but-not-yet-sent
+     * attachment. The "remove" button's click handler is wired by the
+     * caller to clear the draft state.
+     *
+     * @param {{filename:string, mime:string, url:string, size?:number}} meta
+     * @param {Function} onRemove
+     */
+    const showAttachmentPreview = function(meta, onRemove) {
+        const els = getElements();
+        const slot = els.attachPreview;
+        if (!slot) {
+            return;
+        }
+        slot.innerHTML = '';
+        slot.hidden = false;
+
+        const chip = document.createElement('div');
+        chip.className = 'aica-attachment-preview__chip';
+
+        const isImage = meta && typeof meta.mime === 'string' && meta.mime.indexOf('image/') === 0;
+        if (isImage && meta.url) {
+            const img = document.createElement('img');
+            img.className = 'aica-attachment-preview__thumb';
+            img.src = meta.url;
+            img.alt = meta.filename || '';
+            chip.appendChild(img);
+        } else {
+            const icon = document.createElement('span');
+            icon.className = 'aica-attachment-preview__icon';
+            icon.textContent = 'PDF';
+            chip.appendChild(icon);
+        }
+
+        const name = document.createElement('span');
+        name.className = 'aica-attachment-preview__name';
+        name.textContent = (meta && meta.filename) || 'attachment';
+        chip.appendChild(name);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'aica-attachment-preview__remove';
+        removeBtn.setAttribute('aria-label', 'Remove attachment');
+        removeBtn.innerHTML = '&times;';
+        removeBtn.addEventListener('click', function() {
+            hideAttachmentPreview();
+            if (typeof onRemove === 'function') {
+                onRemove();
+            }
+        });
+        chip.appendChild(removeBtn);
+
+        slot.appendChild(chip);
+    };
+
+    /**
+     * Hide and reset the attachment preview chip.
+     */
+    const hideAttachmentPreview = function() {
+        const els = getElements();
+        const slot = els.attachPreview;
+        if (!slot) {
+            return;
+        }
+        slot.innerHTML = '';
+        slot.hidden = true;
+    };
+
+    /**
+     * Render the compact Learning Mastery Chip with a summary payload from
+     * the get_mastery_summary external function. The chip is hidden until
+     * there is at least one objective to report. Clicking it toggles a
+     * small popover listing per-objective statuses. Labels and statuses
+     * come from the caller (localised via Str in chat.js) so this helper
+     * stays i18n-agnostic.
+     *
+     * @param {{enabled:boolean, total:number, mastered:number, learning:number, not_started:number, objectives:Array}} summary
+     * @param {string} chipLabelTemplate Pre-localised label with {$a->mastered} / {$a->total}
+     * @param {{mastered:string, learning:string, not_started:string, empty:string}} statusLabels
+     */
+    const renderMasteryChip = function(summary, chipLabelTemplate, statusLabels) {
+        const els = getElements();
+        if (!els.masteryChip || !els.masteryPopover) {
+            return;
+        }
+        if (!summary || !summary.enabled || !summary.total) {
+            els.masteryChip.hidden = true;
+            els.masteryPopover.hidden = true;
+            return;
+        }
+        const total = summary.total;
+        const mastered = summary.mastered;
+
+        // Label.
+        const label = String(chipLabelTemplate || '{$a->mastered} of {$a->total} mastered')
+            .replace('{$a->mastered}', mastered)
+            .replace('{$a->total}', total);
+        if (els.masteryChipLabel) {
+            els.masteryChipLabel.textContent = label;
+        }
+        // Colour-coded dot based on overall completion.
+        if (els.masteryChipDot) {
+            els.masteryChipDot.classList.remove(
+                'aica-mastery-chip__dot--low',
+                'aica-mastery-chip__dot--mid',
+                'aica-mastery-chip__dot--high'
+            );
+            const ratio = total > 0 ? mastered / total : 0;
+            const klass = ratio >= 0.75 ? 'aica-mastery-chip__dot--high'
+                : (ratio >= 0.33 ? 'aica-mastery-chip__dot--mid'
+                : 'aica-mastery-chip__dot--low');
+            els.masteryChipDot.classList.add(klass);
+        }
+        els.masteryChip.hidden = false;
+
+        // Popover body: per-objective rows.
+        if (els.masteryPopoverBody) {
+            els.masteryPopoverBody.innerHTML = '';
+            if (!summary.objectives || !summary.objectives.length) {
+                const empty = document.createElement('p');
+                empty.className = 'aica-mastery-chip-popover__empty';
+                empty.textContent = statusLabels.empty;
+                els.masteryPopoverBody.appendChild(empty);
+            } else {
+                const list = document.createElement('ul');
+                list.className = 'aica-mastery-chip-popover__list';
+                summary.objectives.forEach(function(obj) {
+                    const li = document.createElement('li');
+                    li.className = 'aica-mastery-chip-popover__item aica-mastery-status--' + obj.status;
+                    const dot = document.createElement('span');
+                    dot.className = 'aica-mastery-chip-popover__dot';
+                    dot.setAttribute('aria-hidden', 'true');
+                    li.appendChild(dot);
+                    const titlespan = document.createElement('span');
+                    titlespan.className = 'aica-mastery-chip-popover__title';
+                    titlespan.textContent = (obj.code ? '[' + obj.code + '] ' : '') + obj.title;
+                    li.appendChild(titlespan);
+                    const status = document.createElement('span');
+                    status.className = 'aica-mastery-chip-popover__status';
+                    status.textContent = statusLabels[obj.status] || obj.status;
+                    li.appendChild(status);
+                    list.appendChild(li);
+                });
+                els.masteryPopoverBody.appendChild(list);
+            }
+        }
+
+        // Click-to-toggle (idempotent — rebinding is harmless but we guard).
+        if (!els.masteryChip._aicaChipBound) {
+            els.masteryChip.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const open = !els.masteryPopover.hidden;
+                els.masteryPopover.hidden = open;
+                els.masteryChip.setAttribute('aria-expanded', open ? 'false' : 'true');
+            });
+            document.addEventListener('click', function(e) {
+                if (!els.masteryPopover || els.masteryPopover.hidden) {
+                    return;
+                }
+                if (!els.masteryPopover.contains(e.target) && e.target !== els.masteryChip) {
+                    els.masteryPopover.hidden = true;
+                    els.masteryChip.setAttribute('aria-expanded', 'false');
+                }
+            });
+            els.masteryChip._aicaChipBound = true;
+        }
+    };
+
+    /**
+     * Hide and collapse the mastery chip (used on drawer close / tab switch).
+     */
+    const hideMasteryChip = function() {
+        const els = getElements();
+        if (els.masteryChip) {
+            els.masteryChip.hidden = true;
+        }
+        if (els.masteryPopover) {
+            els.masteryPopover.hidden = true;
+        }
+    };
+
     /** @type {HTMLElement|null} Currently playing TTS message element */
     let speakingEl = null;
     /** @type {Function|null} Cleanup for Web Audio mouth sync */
@@ -1484,13 +1790,14 @@ define([
     /**
      * Add a message bubble to the messages area.
      *
-     * @param {string}        role     'user' or 'assistant'
-     * @param {string}        text     The message text (markdown for assistant, plain for user)
-     * @param {Function|null} onSpeak  Optional callback when TTS button is clicked; receives (text, el)
-     * @param {number|null}   ts       Optional Unix timestamp (ms) — shown as tooltip on message
+     * @param {string}        role        'user' or 'assistant'
+     * @param {string}        text        The message text (markdown for assistant, plain for user)
+     * @param {Function|null} onSpeak     Optional callback when TTS button is clicked; receives (text, el)
+     * @param {number|null}   ts          Optional Unix timestamp (ms) — shown as tooltip on message
+     * @param {Object|null}   attachment  Optional user-message attachment {filename, mime, url}
      * @returns {HTMLElement} The message element
      */
-    const addMessage = function(role, text, onSpeak, ts) {
+    const addMessage = function(role, text, onSpeak, ts, attachment) {
         const el = document.createElement('div');
         el.className = 'local-ai-course-assistant__message local-ai-course-assistant__message--' + role;
         el.setAttribute('data-role', role);
@@ -1498,11 +1805,18 @@ define([
         const msgTs = ts || Date.now();
         el.dataset.ts = msgTs;
 
+        // Attachment rendering for user messages: thumbnail for images,
+        // filename pill for PDFs. Appended before the text content so the
+        // reading order is "student shared this, and asked this".
+        if (role === 'user' && attachment && attachment.url) {
+            el.appendChild(buildAttachmentNode(attachment));
+        }
+
         const content = document.createElement('div');
         content.className = 'local-ai-course-assistant__message-content';
 
         if (role === 'assistant') {
-            content.innerHTML = Markdown.sanitize(Markdown.render(text));
+            content.innerHTML = renderAssistantHtml(text);
         } else {
             content.textContent = text;
         }
@@ -1634,6 +1948,8 @@ define([
     const startStreaming = function(onStop) {
         showTyping(false);
         scrollFollowMode = false;
+        // Reset citation map; a new turn's map arrives via setStreamCitations.
+        currentCitations = [];
         streamingEl = addMessage('assistant', '');
 
         // If onStop provided and no stop button already showing, create one in the fixed slot.
@@ -1709,7 +2025,7 @@ define([
         const partial = typewriterFull.substring(0, typewriterPos);
         const content = streamingEl.querySelector('.local-ai-course-assistant__message-content');
         if (content) {
-            content.innerHTML = Markdown.sanitize(Markdown.render(partial));
+            content.innerHTML = renderAssistantHtml(partial);
             programmaticScroll = true;
             if (scrollFollowMode) {
                 // User scrolled down or clicked the down arrow — follow the bottom.
@@ -1768,7 +2084,7 @@ define([
         if (streamingEl) {
             const completedEl = streamingEl;
             const content = streamingEl.querySelector('.local-ai-course-assistant__message-content');
-            content.innerHTML = Markdown.sanitize(Markdown.render(fullText));
+            content.innerHTML = renderAssistantHtml(fullText);
 
             // Ensure footer wrapper exists (source slot + action buttons).
             let footer = streamingEl.querySelector('.local-ai-course-assistant__msg-footer');
@@ -2197,6 +2513,15 @@ define([
             modeButtons: root.querySelectorAll('.local-ai-course-assistant__mode-btn'),
             voiceStartBtn: root.querySelector('.aica-voice-panel__start'),
             historyRefreshBtn: root.querySelector('.aica-history-panel__refresh'),
+            attachBtn: root.querySelector('.aica-attachment-btn'),
+            attachFileInput: root.querySelector('.aica-attachment-file-input'),
+            attachPreview: root.querySelector('.aica-attachment-preview'),
+            composerCard: root.querySelector('.local-ai-course-assistant__composer-card'),
+            masteryChip: root.querySelector('.aica-mastery-chip'),
+            masteryChipLabel: root.querySelector('.aica-mastery-chip__label'),
+            masteryChipDot: root.querySelector('.aica-mastery-chip__dot'),
+            masteryPopover: root.querySelector('.aica-mastery-chip-popover'),
+            masteryPopoverBody: root.querySelector('.aica-mastery-chip-popover__body'),
         };
     };
 
@@ -2923,13 +3248,15 @@ define([
      * @param {Array}    questions  Question objects from the API
      * @param {string}   topic      Quiz topic
      * @param {Function} onFinish   Called with (score, total, topic)
+     * @param {Function} onExit     Called when the student cancels/closes
+     * @param {Function} onAnswer   Called with ({questionId, objectiveid, iscorrect})
      */
-    const showQuiz = function(questions, topic, onFinish, onExit) {
+    const showQuiz = function(questions, topic, onFinish, onExit, onAnswer) {
         if (!messagesContainer) {
             return;
         }
         scrollToBottom(true);
-        Quiz.init(messagesContainer, questions, topic, onFinish, onExit);
+        Quiz.init(messagesContainer, questions, topic, onFinish, onExit, onAnswer);
         scrollToBottom(true);
     };
 
@@ -5115,6 +5442,11 @@ define([
         startStreaming: startStreaming,
         updateStreamContent: updateStreamContent,
         finishStreaming: finishStreaming,
+        setStreamCitations: setStreamCitations,
+        showAttachmentPreview: showAttachmentPreview,
+        hideAttachmentPreview: hideAttachmentPreview,
+        renderMasteryChip: renderMasteryChip,
+        hideMasteryChip: hideMasteryChip,
         showStopButton: showStopButton,
         removeStopButton: removeStopButton,
         scrollToBottom: scrollToBottom,

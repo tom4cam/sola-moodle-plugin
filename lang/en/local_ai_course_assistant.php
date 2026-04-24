@@ -813,3 +813,60 @@ $string['rag:transcript_cf_challenge'] = 'Transcript URL blocked by Cloudflare c
 $string['rag:embed_detected'] = 'Detected embedded media: {$a}';
 $string['rag:embed_transcript_attached'] = 'Transcript attached for {$a}';
 
+// Mastery tracking — objectives admin page (v3.9.17).
+$string['objectives:title']             = 'Learning objectives & mastery';
+$string['objectives:toggles_heading']   = 'Mastery tracking';
+$string['objectives:toggle_master']     = 'Enable mastery tracking for this course';
+$string['objectives:toggle_chip']       = 'Show the Learning Mastery chip to students';
+$string['objectives:toggle_chip_help']  = 'Optional. When off, mastery still steers the assistant silently but learners see no indicator.';
+$string['objectives:toggled']           = 'Setting updated.';
+$string['objectives:detected_heading']  = 'Detected {$a->count} learning objectives from {$a->source}.';
+$string['objectives:source_competency'] = 'Moodle competencies';
+$string['objectives:source_summary']    = 'course summary';
+$string['objectives:source_section']    = 'section or first-page content';
+$string['objectives:source_page']       = 'course page';
+$string['objectives:source_llm']        = 'AI extraction';
+$string['objectives:source_manual']     = 'manual entry';
+$string['objectives:source_none']       = 'no automatic source';
+$string['objectives:import_detected']   = 'Import these detected objectives';
+$string['objectives:import_llm']        = 'Extract objectives with AI';
+$string['objectives:llm_empty']         = 'AI extraction did not return any objectives. Try again later or enter them manually.';
+$string['objectives:imported']          = 'Imported {$a} objectives.';
+$string['objectives:none_detected']     = 'No learning objectives detected automatically. Enter them manually below, or use AI extraction.';
+$string['objectives:list_heading']      = 'Current objectives';
+$string['objectives:col_code']          = 'Code';
+$string['objectives:col_title']         = 'Title';
+$string['objectives:col_source']        = 'Source';
+$string['objectives:col_actions']       = 'Actions';
+$string['objectives:add_heading']       = 'Add an objective';
+$string['objectives:add_submit']        = 'Add objective';
+$string['objectives:saved']             = 'Objective saved.';
+$string['objectives:deleted']           = 'Objective deleted.';
+$string['objectives:delete_confirm']    = 'Delete this objective and all attempt history for it?';
+$string['objectives:delete_all']        = 'Delete all objectives for this course';
+$string['objectives:delete_all_confirm']= 'Delete every objective and all attempt history for this course? Cannot be undone.';
+$string['objectives:deleted_all']       = 'All objectives for this course deleted.';
+
+// Mastery chip (v3.9.17) — shown in the widget when the per-course chip toggle is on.
+$string['mastery:chip_aria']            = 'Learning mastery status';
+$string['mastery:popover_aria']         = 'Learning mastery details';
+$string['mastery:chip_label']           = '{$a->mastered} of {$a->total} mastered';
+$string['mastery:status_mastered']      = 'mastered';
+$string['mastery:status_learning']      = 'in progress';
+$string['mastery:status_not_started']   = 'not started';
+$string['mastery:popover_empty']        = 'No learning objectives configured for this course.';
+
+// Mastery admin settings (v3.9.17).
+$string['settings:mastery_heading']              = 'Mastery tracking';
+$string['settings:mastery_heading_desc']         = 'Opt-in per-course feature that tags quiz answers and assistant conversation turns against the course\'s learning objectives, then feeds a compact mastery snapshot back into the system prompt to steer questioning. Subtle by default: learners see nothing unless the per-course chip toggle is on.';
+$string['settings:mastery_threshold']            = 'Mastered threshold';
+$string['settings:mastery_threshold_desc']       = 'Rolling accuracy at or above which an objective is considered mastered. 0.0 to 1.0. Default 0.85.';
+$string['settings:mastery_window']               = 'Attempt window';
+$string['settings:mastery_window_desc']          = 'Number of most-recent attempts per objective to weight in the rolling accuracy. Default 8.';
+$string['settings:mastery_classifier_model']     = 'Classifier model';
+$string['settings:mastery_classifier_model_desc']= 'Model used to classify assistant turns against objectives. Leave empty to inherit the default AI provider model; otherwise specify a cheap model like gpt-4o-mini.';
+$string['settings:mastery_classifier_weight']    = 'Classifier weight';
+$string['settings:mastery_classifier_weight_desc']= 'How much a conversation attempt counts relative to a quiz attempt (1.0). Default 0.3.';
+$string['settings:mastery_classifier_threshold'] = 'Classifier confidence threshold';
+$string['settings:mastery_classifier_threshold_desc'] = 'Minimum classifier confidence required to record a conversation attempt. 0.0 to 1.0. Default 0.7.';
+

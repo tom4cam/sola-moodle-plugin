@@ -240,12 +240,43 @@ $functions = [
         'capabilities' => 'local/ai_course_assistant:use',
         'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'local_ai_course_assistant_get_mastery_summary' => [
+        'classname'    => \local_ai_course_assistant\external\get_mastery_summary::class,
+        'description'  => 'Get current mastery summary for the caller in a course.',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
+    'local_ai_course_assistant_record_objective_attempt' => [
+        'classname'    => \local_ai_course_assistant\external\record_objective_attempt::class,
+        'description'  => 'Record a mastery attempt against a learning objective.',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
     'local_ai_course_assistant_export_analytics_csv' => [
         'classname'    => \local_ai_course_assistant\external\export_analytics_csv::class,
         'description'  => 'Export analytics data as CSV.',
         'type'         => 'read',
         'ajax'         => true,
         'capabilities' => 'moodle/site:config',
+        'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    // Mastery tracking (v3.9.17).
+    'local_ai_course_assistant_get_mastery_summary' => [
+        'classname'    => \local_ai_course_assistant\external\get_mastery_summary::class,
+        'description'  => 'Return the learner mastery summary for a course; empty when mastery is disabled.',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+        'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'local_ai_course_assistant_record_objective_attempt' => [
+        'classname'    => \local_ai_course_assistant\external\record_objective_attempt::class,
+        'description'  => 'Record a single learner attempt against a learning objective.',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
         'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
 ];

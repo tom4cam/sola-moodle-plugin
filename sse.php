@@ -38,6 +38,7 @@ use local_ai_course_assistant\rate_limiter;
 use local_ai_course_assistant\audit_logger;
 use local_ai_course_assistant\content_indexer;
 use local_ai_course_assistant\rag_retriever;
+use local_ai_course_assistant\attachment_manager;
 
 /**
  * Scrub leaked system prompt fragments, PII, and credentials from LLM
@@ -55,6 +56,7 @@ function filter_response_safety(string $response): string {
         '/## Student Learning Profile/i',
         '/## Wellbeing & Safety/i',
         '/\[SOURCE:(page|activity|course|general)\]/i',
+        '/\[\[c:\d+\]\]/',
         '/\[SOLA_NEXT\].*?\[\/SOLA_NEXT\]/s',
         '/You are SOLA \(Online Learning Assistant\)/i',
         '/KEEP RESPONSES BRIEF:/i',
@@ -105,6 +107,7 @@ $interactiontype = optional_param('interaction_type', 'chat', PARAM_ALPHA); // I
 $logonly         = optional_param('log_only', 0, PARAM_BOOL);              // Log a system message without AI call.
 $clientprovider  = optional_param('provider', '', PARAM_ALPHA);            // Admin LLM picker override.
 $clientmodel     = optional_param('model', '', PARAM_RAW_TRIMMED);         // Admin LLM picker model override.
+$draftitemid     = optional_param('draftitemid', 0, PARAM_INT);            // Student attachment draft itemid.
 
 // Log-only mode: record a cost/usage entry without calling the AI provider.
 if ($logonly) {
@@ -229,7 +232,7 @@ try {
     }
 
     // Save user message with interaction context.
-    conversation_manager::add_message(
+    $usermsgid = conversation_manager::add_message(
         $conv->id, $userid, $courseid, 'user', $message,
         0, '', null, null, null,
         $interactiontype, $pageid ?: null
@@ -241,6 +244,38 @@ try {
         'role' => 'user',
         'message_length' => strlen($message),
     ]);
+
+    // Resolve and promote any student attachment that was uploaded for this
+    // message. Draft files live in the user's draft area; once we have the
+    // user-message id we move the file into the permanent per-message area
+    // so history reload can render it. PDF attachments are always text-
+    // extracted and injected into the system prompt so every provider can
+    // see them; image attachments travel as a content block to the provider.
+    $attachmentpayload = null;   // Prepared payload for the provider, if image.
+    $attachedpdftext = '';       // Extracted PDF text, if PDF.
+    $attachmentmeta = null;      // {filename, mime, url} for the SSE meta event.
+    if ($draftitemid > 0 && attachment_manager::is_enabled()) {
+        $attachedfile = attachment_manager::promote_draft_to_message(
+            $userid, $draftitemid, $courseid, $usermsgid
+        );
+        if ($attachedfile) {
+            $mime = strtolower($attachedfile->get_mimetype() ?: '');
+            if (attachment_manager::is_mime_allowed($mime)) {
+                $url = attachment_manager::build_pluginfile_url($courseid, $usermsgid, $attachedfile);
+                $attachmentmeta = [
+                    'filename' => $attachedfile->get_filename(),
+                    'mime' => $mime,
+                    'size' => (int) $attachedfile->get_filesize(),
+                    'url' => $url,
+                ];
+                if (attachment_manager::is_pdf_mime($mime)) {
+                    $attachedpdftext = attachment_manager::extract_pdf_text($attachedfile);
+                } else if (attachment_manager::is_image_mime($mime)) {
+                    $attachmentpayload = attachment_manager::get_image_payload($attachedfile);
+                }
+            }
+        }
+    }
 
     // RAG retrieval: embed user query and fetch relevant chunks.
     $retrievedchunks = [];
@@ -345,6 +380,21 @@ try {
         }
     }
 
+    // Inject PDF attachment text before the conversation history. This runs
+    // on every provider (text only, provider-agnostic), so the assistant can
+    // reason about the document's contents even when the provider can't
+    // accept native PDFs.
+    if ($attachedpdftext !== '' && $attachmentmeta !== null) {
+        $maxpdfchars = 24000;
+        $pdfsnippet = mb_substr($attachedpdftext, 0, $maxpdfchars);
+        $suffix = (mb_strlen($attachedpdftext) > $maxpdfchars) ? "\n\n[Document truncated for length.]" : '';
+        $systemprompt .= "\n\n## Attached Document\n"
+            . "The student attached a PDF titled \"" . $attachmentmeta['filename'] . "\". "
+            . "Here is its extracted text. Reason about it directly when it is relevant to the question, "
+            . "and quote short passages when helpful.\n\n"
+            . $pdfsnippet . $suffix;
+    }
+
     $history = conversation_manager::get_history_for_api($conv->id);
 
     // Create provider. Admin LLM picker can override the provider/model for
@@ -354,9 +404,22 @@ try {
         context_course::instance($courseid));
     if ($isadmin && !empty($clientprovider)) {
         $provider = base_provider::create_for_comparison($clientprovider, $clientmodel, $courseid);
+        $effectiveprovidername = $clientprovider;
     } else {
         $provider = base_provider::create_from_config($courseid);
+        $effectiveprovidername = (\local_ai_course_assistant\course_config_manager::get_effective_config($courseid)['provider']
+            ?? get_config('local_ai_course_assistant', 'provider')) ?: '';
     }
+
+    // If the student attached an image, confirm the effective provider can
+    // handle images before we start the stream. A friendly error is better
+    // than a silent drop or a provider-side 400.
+    if ($attachmentpayload !== null
+        && !attachment_manager::provider_supports_images((string) $effectiveprovidername)) {
+        sse_send(['error' => get_string('attachment:error_provider_no_images', 'local_ai_course_assistant')]);
+        die();
+    }
+
     $fullresponse = '';
 
     // Pass max_tokens from config (0 = no limit / provider default).
@@ -372,6 +435,12 @@ try {
         if ($maxtokens > 0 && $maxtokens < 8192) {
             $streamoptions['max_tokens'] = 8192;
         }
+    }
+
+    // Multimodal: image attachment travels as a content block on the last
+    // user message. Each provider adapts this to its native shape.
+    if ($attachmentpayload !== null) {
+        $streamoptions['attachment'] = $attachmentpayload;
     }
 
     // Emit source attribution metadata before streaming begins.
@@ -398,13 +467,43 @@ try {
     } catch (\Throwable $e) {
         // Non-critical; pill will fall back to generic course link.
     }
-    sse_send([
+
+    // Resolve retrieved RAG chunks to inline-citation payloads. The frontend
+    // uses these to turn [[c:N]] markers in the streamed response into
+    // clickable superscript links to the cited Moodle resource.
+    $citations = [];
+    foreach ($retrievedchunks as $idx => $chunk) {
+        $cmid = isset($chunk['cmid']) ? (int) $chunk['cmid'] : 0;
+        $entry = [
+            'index' => (int) $idx,
+            'cmid' => $cmid ?: null,
+            'modtype' => (string) ($chunk['modtype'] ?? ''),
+            'score' => round((float) ($chunk['score'] ?? 0), 4),
+        ];
+        if ($cmid > 0 && isset($modulesmap[(string) $cmid])) {
+            $entry['url'] = $modulesmap[(string) $cmid]['url'];
+            $entry['title'] = $modulesmap[(string) $cmid]['title'];
+        } else {
+            // Course-level content or non-visible module: link back to the course page.
+            $entry['url'] = $courseurl;
+            $entry['title'] = '';
+        }
+        $citations[] = $entry;
+    }
+
+    $metaevent = [
         'type' => 'meta',
         'pageurl' => $pageurl,
         'courseurl' => $courseurl,
         'pagetitle' => $pagetitle ?? '',
         'modules' => $modulesmap,
-    ]);
+        'citations' => $citations,
+        'usermsgid' => (int) $usermsgid,
+    ];
+    if ($attachmentmeta !== null) {
+        $metaevent['attachment'] = $attachmentmeta;
+    }
+    sse_send($metaevent);
 
     try {
         $provider->chat_completion_stream($systemprompt, $history, function (string $chunk) use (&$fullresponse) {
@@ -478,6 +577,25 @@ try {
         $interactiontype,
         $pageid ?: null
     );
+
+    // Queue the conversation-mastery classifier as an adhoc task so it runs
+    // out of band. Only when mastery is turned on for the course AND the
+    // course has at least one objective to classify against.
+    if (\local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid)
+        && !empty(\local_ai_course_assistant\objective_manager::list_for_course($courseid))) {
+        try {
+            $classifytask = new \local_ai_course_assistant\task\classify_conversation_turn();
+            $classifytask->set_custom_data([
+                'userid' => (int) $userid,
+                'courseid' => (int) $courseid,
+                'usermsgid' => (int) $usermsgid,
+                'assistantmsgid' => (int) $assistantmsgid,
+            ]);
+            \core\task\manager::queue_adhoc_task($classifytask);
+        } catch (\Throwable $e) {
+            debugging('mastery classify task queue failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        }
+    }
 
     // Handle off-topic tracking.
     if ($offtopicenabled) {

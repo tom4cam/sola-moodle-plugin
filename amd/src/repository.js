@@ -21,7 +21,37 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax'], function(Ajax) {
+define(['core/ajax', 'core/config'], function(Ajax, Config) {
+
+    /**
+     * Upload a student attachment to the server and get back a Moodle draft
+     * itemid that can be included in the next SSE chat submission. Uses
+     * fetch() directly because the endpoint is a multipart receiver, not a
+     * Moodle external function.
+     *
+     * @param {number} courseid
+     * @param {File} file
+     * @returns {Promise<{draftitemid:number, filename:string, mime:string, size:number, url:string}>}
+     */
+    const uploadAttachment = function(courseid, file) {
+        const form = new FormData();
+        form.append('courseid', String(courseid));
+        form.append('sesskey', Config.sesskey);
+        form.append('file', file);
+        const url = Config.wwwroot + '/local/ai_course_assistant/upload_attachment.php';
+        return fetch(url, {
+            method: 'POST',
+            body: form,
+            credentials: 'same-origin',
+        }).then(function(resp) {
+            return resp.json().then(function(data) {
+                if (!resp.ok || data.error) {
+                    throw new Error(data.error || ('Upload failed (' + resp.status + ')'));
+                }
+                return data;
+            });
+        });
+    };
 
     /**
      * Send a message (non-streaming fallback).
@@ -332,6 +362,40 @@ define(['core/ajax'], function(Ajax) {
     };
 
     /**
+     * Fetch the current mastery summary for the caller in a course.
+     *
+     * @param {number} courseid
+     * @returns {Promise<{enabled:boolean, total:number, mastered:number, learning:number, not_started:number, objectives:Array}>}
+     */
+    const getMasterySummary = function(courseid) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_get_mastery_summary',
+            args: {courseid: courseid},
+        }])[0];
+    };
+
+    /**
+     * Record a single mastery attempt from a quiz answer. No-op on the server
+     * when mastery isn't enabled for the course, so the client can call
+     * unconditionally.
+     *
+     * @param {number} courseid
+     * @param {number} objectiveid
+     * @param {boolean} iscorrect
+     * @returns {Promise<{recorded:boolean, status:string, score:number}>}
+     */
+    const recordObjectiveAttempt = function(courseid, objectiveid, iscorrect) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_record_objective_attempt',
+            args: {
+                courseid: courseid,
+                objectiveid: objectiveid,
+                iscorrect: iscorrect ? 1 : 0,
+            },
+        }])[0];
+    };
+
+    /**
      * Save a practice session score.
      *
      * @param {number} courseid
@@ -363,6 +427,7 @@ define(['core/ajax'], function(Ajax) {
         getHistory: getHistory,
         clearHistory: clearHistory,
         getConfig: getConfig,
+        uploadAttachment: uploadAttachment,
         updateStudyPlan: updateStudyPlan,
         getStudyPlan: getStudyPlan,
         updateReminderPreferences: updateReminderPreferences,
@@ -379,5 +444,7 @@ define(['core/ajax'], function(Ajax) {
         submitUserTestingResponse: submitUserTestingResponse,
         getRubric: getRubric,
         savePracticeScore: savePracticeScore,
+        recordObjectiveAttempt: recordObjectiveAttempt,
+        getMasterySummary: getMasterySummary,
     };
 });
