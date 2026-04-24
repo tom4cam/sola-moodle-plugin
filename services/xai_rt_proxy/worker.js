@@ -112,19 +112,32 @@ export default {
         server.accept();
 
         // Open upstream connection to xAI with the master API key.
+        // Cloudflare Workers fetch() for WebSocket outbound requires the
+        // scheme to be http:// or https://, not ws:// or wss://. The
+        // Upgrade: websocket header drives the protocol switch; the scheme
+        // selects the transport security.
         const voice = (verdict.payload.voice || 'eve').replace(/[^a-zA-Z0-9_-]/g, '');
-        const baseUpstream = env.XAI_REALTIME_URL || 'wss://api.x.ai/v1/realtime';
+        let baseUpstream = env.XAI_REALTIME_URL || 'wss://api.x.ai/v1/realtime';
+        baseUpstream = baseUpstream.replace(/^wss:\/\//, 'https://').replace(/^ws:\/\//, 'http://');
         const upstreamUrl = baseUpstream + (baseUpstream.includes('?') ? '&' : '?') + 'voice=' + encodeURIComponent(voice);
-        const upstreamResp = await fetch(upstreamUrl, {
-            headers: {
-                'Upgrade': 'websocket',
-                'Connection': 'Upgrade',
-                'Authorization': 'Bearer ' + env.XAI_API_KEY,
-            },
-        });
+        let upstreamResp;
+        try {
+            upstreamResp = await fetch(upstreamUrl, {
+                headers: {
+                    'Upgrade': 'websocket',
+                    'Connection': 'Upgrade',
+                    'Authorization': 'Bearer ' + env.XAI_API_KEY,
+                },
+            });
+        } catch (err) {
+            // Catch fetch-level exceptions so the client sees a clean close
+            // frame instead of a Cloudflare "Worker threw exception" 500.
+            server.close(1011, 'upstream_fetch_error');
+            return new Response(null, { status: 101, webSocket: client });
+        }
         const upstream = upstreamResp.webSocket;
         if (!upstream) {
-            server.close(1011, 'upstream_handshake_failed');
+            server.close(1011, 'upstream_handshake_failed_' + upstreamResp.status);
             return new Response(null, { status: 101, webSocket: client });
         }
         upstream.accept();

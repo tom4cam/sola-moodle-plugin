@@ -8,7 +8,9 @@ compatibility_date = "2026-04-15"
 # switch to a custom route under saylor.org once verified.
 
 [vars]
-XAI_REALTIME_URL = "wss://api.x.ai/v1/realtime"
+# Upstream xAI Realtime URL. Cloudflare Workers fetch() uses the Upgrade
+# header to switch to WebSocket, so the scheme must be https:// (not wss://).
+XAI_REALTIME_URL = "https://api.x.ai/v1/realtime"
 
 # Secrets (NOT stored in this file):
 #   wrangler secret put XAI_API_KEY
