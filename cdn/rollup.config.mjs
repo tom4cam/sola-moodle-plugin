@@ -52,6 +52,7 @@ function buildBundle() {
     // Read shim files.
     const ajaxShim = readFileSync(resolve(__dirname, 'shims', 'ajax.js'), 'utf8');
     const strShim = readFileSync(resolve(__dirname, 'shims', 'str.js'), 'utf8');
+    const configShim = readFileSync(resolve(__dirname, 'shims', 'config.js'), 'utf8');
 
     // Read all AMD source modules. Dependency order: deps first.
     const modules = [
@@ -121,6 +122,13 @@ import '../styles.css';
     _resolved['core/str'] = (function() {
         ${strShim.replace(/export\s+default\s+.*/, '').replace(/export\s*\{[^}]*\}/, '')}
         return {get_string: get_string, get_strings: get_strings};
+    })();
+
+    // core/config shim — exposes M.cfg.sesskey + M.cfg.wwwroot under the
+    // same default-export shape as Moodle's real core/config module.
+    _resolved['core/config'] = (function() {
+        ${configShim.replace(/export\s+default\s+.*/, '').replace(/export\s*\{[^}]*\}/, '')}
+        return cfg;
     })();
 
     // ---- Register AMD modules ----
