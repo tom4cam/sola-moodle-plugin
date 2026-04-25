@@ -558,6 +558,10 @@ $string['settings:audit_retention_days_desc'] = 'Daily scheduled task purges aud
 $string['settings:conversation_retention_days'] = 'Conversation retention (days)';
 $string['settings:conversation_retention_days_desc'] = 'Daily scheduled task purges conversation rows whose last modified timestamp is older than this. 0 disables. Default 730.';
 
+// SSRF allowlist for self-hosted LLMs on trusted networks (v3.9.28).
+$string['settings:ssrf_trusted_endpoints'] = 'SSRF trusted endpoints';
+$string['settings:ssrf_trusted_endpoints_desc'] = 'One URL per line. Listed hosts bypass the loopback / private-IP / https-only checks in SOLA\'s SSRF validator. Use this only for self-hosted LLMs on a network you control — for example <code>http://localhost:11434</code> for local Ollama, <code>http://10.0.0.5:8000</code> for a vLLM pod on the same VPC. Comparison matches scheme + host + port; any path is ignored. Default empty (block everything internal). Lines starting with <code>#</code> are comments.';
+
 // xAI Realtime proxy (v3.9.13).
 $string['settings:xai_proxy_url'] = 'xAI Realtime proxy URL';
 $string['settings:xai_proxy_url_desc'] = 'Public wss URL of the SOLA xAI Realtime proxy service (for example wss://voice.example.com/xai-rt/rt). When this is set together with the JWT secret, xAI voice routes through the proxy and the master xAI API key never reaches the browser. Leave empty to fall back to the direct connection (not recommended for production).';

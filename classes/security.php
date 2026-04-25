@@ -48,16 +48,37 @@ class security {
      * compromised admin account from aiming a provider at 127.0.0.1 or
      * 169.254.169.254 (cloud metadata).
      *
+     * Operators running a self-hosted LLM (Ollama, vLLM, etc.) on the same
+     * VPC as Moodle can list those exact hostnames in the
+     * `ssrf_trusted_endpoints` admin setting (one per line, scheme + host
+     * + optional port). Listed hosts bypass the https-only and private-IP
+     * checks. Default empty — zero behaviour change for everyone else.
+     *
      * @param string $url
      * @return bool
      */
     public static function is_safe_provider_url(string $url): bool {
         $parts = parse_url($url);
-        if (!$parts || ($parts['scheme'] ?? '') !== 'https') {
+        if (!$parts) {
             return false;
         }
+        $scheme = $parts['scheme'] ?? '';
         $host = $parts['host'] ?? '';
-        if ($host === '' || $host === 'localhost' || $host === '0.0.0.0') {
+        $port = isset($parts['port']) ? (int) $parts['port'] : null;
+
+        if ($host === '') {
+            return false;
+        }
+
+        // Admin-managed allowlist for self-hosted LLMs on trusted networks.
+        if (self::host_is_trusted($scheme, $host, $port)) {
+            return true;
+        }
+
+        if ($scheme !== 'https') {
+            return false;
+        }
+        if ($host === 'localhost' || $host === '0.0.0.0') {
             return false;
         }
         // Resolve to an IP, block if it lands in a private or reserved range.
@@ -71,6 +92,47 @@ class security {
             return false;
         }
         return true;
+    }
+
+    /**
+     * True when the (scheme, host, port) tuple matches an entry in the
+     * admin-managed SSRF allowlist. Comparison is case-insensitive on host
+     * and ignores trailing slashes / paths in the configured entry.
+     *
+     * @param string $scheme
+     * @param string $host
+     * @param int|null $port
+     * @return bool
+     */
+    private static function host_is_trusted(string $scheme, string $host, ?int $port): bool {
+        $raw = trim((string) get_config('local_ai_course_assistant', 'ssrf_trusted_endpoints'));
+        if ($raw === '') {
+            return false;
+        }
+        $needlehost = strtolower($host);
+        foreach (preg_split('/\r\n|\r|\n/', $raw) as $line) {
+            $line = trim($line);
+            if ($line === '' || $line[0] === '#') {
+                continue;
+            }
+            $parts = parse_url($line);
+            if (!$parts || empty($parts['host'])) {
+                continue;
+            }
+            if (strtolower($parts['host']) !== $needlehost) {
+                continue;
+            }
+            // If admin specified a scheme, require an exact match.
+            if (!empty($parts['scheme']) && $parts['scheme'] !== $scheme) {
+                continue;
+            }
+            // If admin specified a port, require an exact match.
+            if (isset($parts['port']) && (int) $parts['port'] !== (int) $port) {
+                continue;
+            }
+            return true;
+        }
+        return false;
     }
 
     /**

@@ -425,10 +425,11 @@ echo html_writer::div(
                     <form method="post" action="" style="display:inline">
                         <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>" />
                         <input type="hidden" name="save_socratic" value="1" />
-                        <label class="mb-0">
+                        <label class="mb-0" onclick="event.stopPropagation();">
                             <input type="checkbox" name="socratic_mode" value="1"
                                 <?php echo $socraticon ? 'checked' : ''; ?>
-                                onchange="this.form.submit()" />
+                                onchange="this.form.submit()"
+                                onclick="event.stopPropagation();" />
                             <?php echo get_string('socratic:toggle', 'local_ai_course_assistant'); ?>
                         </label>
                     </form>
@@ -455,10 +456,11 @@ echo html_writer::div(
                     <form method="post" action="" style="display:inline">
                         <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>" />
                         <input type="hidden" name="save_flashcards" value="1" />
-                        <label class="mb-0">
+                        <label class="mb-0" onclick="event.stopPropagation();">
                             <input type="checkbox" name="flashcards_on" value="1"
                                 <?php echo $fcon ? 'checked' : ''; ?>
-                                onchange="this.form.submit()" />
+                                onchange="this.form.submit()"
+                                onclick="event.stopPropagation();" />
                             <?php echo get_string('flashcards:toggle', 'local_ai_course_assistant'); ?>
                         </label>
                     </form>
@@ -494,10 +496,11 @@ echo html_writer::div(
                     <form method="post" action="" style="display:inline">
                         <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>" />
                         <input type="hidden" name="save_sandbox" value="1" />
-                        <label class="mb-0">
+                        <label class="mb-0" onclick="event.stopPropagation();">
                             <input type="checkbox" name="sandbox_on" value="1"
                                 <?php echo $sbon ? 'checked' : ''; ?>
-                                onchange="this.form.submit()" />
+                                onchange="this.form.submit()"
+                                onclick="event.stopPropagation();" />
                             <?php echo get_string('sandbox:toggle', 'local_ai_course_assistant'); ?>
                         </label>
                     </form>
@@ -533,10 +536,11 @@ echo html_writer::div(
                     <form method="post" action="" style="display:inline">
                         <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>" />
                         <input type="hidden" name="save_essay" value="1" />
-                        <label class="mb-0">
+                        <label class="mb-0" onclick="event.stopPropagation();">
                             <input type="checkbox" name="essay_on" value="1"
                                 <?php echo $esson ? 'checked' : ''; ?>
-                                onchange="this.form.submit()" />
+                                onchange="this.form.submit()"
+                                onclick="event.stopPropagation();" />
                             <?php echo get_string('essay_feedback:toggle', 'local_ai_course_assistant'); ?>
                         </label>
                     </form>
@@ -572,10 +576,11 @@ echo html_writer::div(
                     <form method="post" action="" style="display:inline">
                         <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>" />
                         <input type="hidden" name="save_we" value="1" />
-                        <label class="mb-0">
+                        <label class="mb-0" onclick="event.stopPropagation();">
                             <input type="checkbox" name="we_on" value="1"
                                 <?php echo $weon ? 'checked' : ''; ?>
-                                onchange="this.form.submit()" />
+                                onchange="this.form.submit()"
+                                onclick="event.stopPropagation();" />
                             <?php echo get_string('worked_examples:toggle', 'local_ai_course_assistant'); ?>
                         </label>
                     </form>
@@ -602,10 +607,11 @@ echo html_writer::div(
                     <form method="post" action="" style="display:inline">
                         <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>" />
                         <input type="hidden" name="save_digest" value="1" />
-                        <label class="mb-0">
+                        <label class="mb-0" onclick="event.stopPropagation();">
                             <input type="checkbox" name="digest_email" value="1"
                                 <?php echo $digeston ? 'checked' : ''; ?>
-                                onchange="this.form.submit()" />
+                                onchange="this.form.submit()"
+                                onclick="event.stopPropagation();" />
                             <?php echo get_string('digest:toggle', 'local_ai_course_assistant'); ?>
                         </label>
                     </form>

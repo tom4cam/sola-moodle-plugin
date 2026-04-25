@@ -1473,6 +1473,18 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // v3.9.28: SSRF trusted-endpoints allowlist. Operators running a self-hosted
+    // LLM (Ollama, vLLM, etc.) on the same VPC as Moodle can list those exact
+    // hostnames here to bypass the loopback/private-IP and https-only checks
+    // in security::is_safe_provider_url(). Default empty.
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/ssrf_trusted_endpoints',
+        get_string('settings:ssrf_trusted_endpoints', 'local_ai_course_assistant'),
+        get_string('settings:ssrf_trusted_endpoints_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW
+    ));
+
     // v3.9.13: xAI Realtime WebSocket proxy settings. When configured,
     // xAI voice routes through services/xai_rt_proxy instead of opening a
     // direct browser connection to api.x.ai with the master key.
