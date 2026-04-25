@@ -906,6 +906,18 @@ $string['instructor_dashboard:col_questions']   = 'Questions asked';
 $string['instructor_dashboard:col_distinct_learners'] = 'Distinct learners';
 $string['instructor_dashboard:col_low_rated']   = 'Low-rated count';
 
+// v3.9.20: Socratic mode + weekly digest + math note.
+$string['socratic:title']                       = 'Socratic mode';
+$string['socratic:toggle']                      = 'Enable Socratic mode for this course';
+$string['socratic:toggle_help']                 = 'When on, the assistant leads with guiding questions instead of giving direct answers. Pedagogical lift; no UI change for learners. Off by default.';
+$string['digest:title']                         = 'Weekly digest emails';
+$string['digest:toggle']                        = 'Email a weekly digest to anyone with analytics access on this course';
+$string['digest:toggle_help']                   = 'Mondays 09:00 server time. Aggregate-only — no learner names appear in the email body. Off by default.';
+$string['digest:subject']                       = '{$a->product} weekly digest — {$a->course}';
+$string['task:instructor_weekly_digest']        = 'AI Course Assistant weekly digest email';
+$string['settings:math_render_heading']         = 'Math rendering';
+$string['settings:math_render_heading_desc']    = 'Math expressions in assistant replies (LaTeX, e.g. $E=mc^2$) render via Moodle\'s built-in MathJax filter — enable filter_mathjaxloader in Site administration → Plugins → Filters → Manage filters for the math to render. Without it, expressions display as raw LaTeX text.';
+
 // Mastery admin settings (v3.9.17).
 $string['settings:mastery_heading']              = 'Mastery tracking';
 $string['settings:mastery_heading_desc']         = 'Opt-in per-course feature that tags quiz answers and assistant conversation turns against the course\'s learning objectives, then feeds a compact mastery snapshot back into the system prompt to steer questioning. Subtle by default: learners see nothing unless the per-course chip toggle is on.';

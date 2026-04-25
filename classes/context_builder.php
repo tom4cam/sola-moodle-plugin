@@ -211,6 +211,18 @@ class context_builder {
             }
         }
 
+        // Socratic mode (v3.9.20). Per-course toggle. When on, append a
+        // pedagogy directive that shifts SOLA from "answer the question" to
+        // "ask guiding questions until the learner arrives at the answer."
+        if ((bool) get_config('local_ai_course_assistant', 'socratic_mode_course_' . $courseid)) {
+            $prompt .= "\n\n## Socratic Mode (active for this course)\n"
+                . "Instead of giving direct answers, lead the learner with short, focused guiding questions. "
+                . "Help them think the problem through one step at a time. "
+                . "Affirm correct reasoning explicitly when you see it. "
+                . "Only state the final answer after the learner has worked through the reasoning, or when they explicitly ask for the answer. "
+                . "Keep individual questions concise; avoid lecturing.\n";
+        }
+
         // Append source attribution instructions.
         $prompt .= self::get_source_attribution_instructions();
 

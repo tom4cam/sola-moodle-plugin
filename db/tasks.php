@@ -88,4 +88,15 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        // Weekly digest email to course authors / instructional designers
+        // for every course with the per-course digest toggle on.
+        'classname' => \local_ai_course_assistant\task\instructor_weekly_digest::class,
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '9',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '1',  // Mondays at 09:00 server time.
+    ],
 ];

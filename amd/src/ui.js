@@ -523,6 +523,48 @@ define([
     };
 
     /**
+     * Trigger a math typeset pass on a freshly-injected node. Relies on
+     * Moodle's filter_mathjaxloader (or any other site-loaded MathJax/KaTeX)
+     * being present on the page; no-ops cleanly when neither is available so
+     * sites without a math filter render LaTeX as plain text rather than
+     * crashing.
+     *
+     * Supports MathJax v3 (typesetPromise) and v2 (Hub.Queue) plus a KaTeX
+     * auto-render fallback. Wrapped in try/catch because typeset can throw
+     * on very long or malformed expressions and we never want a math glitch
+     * to break the chat surface.
+     *
+     * @param {HTMLElement|null} node
+     */
+    const tryRenderMath = function(node) {
+        if (!node) { return; }
+        try {
+            // MathJax v3.
+            if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+                window.MathJax.typesetPromise([node]).catch(function() { /* ignore */ });
+                return;
+            }
+            // MathJax v2.
+            if (window.MathJax && window.MathJax.Hub && typeof window.MathJax.Hub.Queue === 'function') {
+                window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub, node]);
+                return;
+            }
+            // KaTeX auto-render extension (if site loaded it).
+            if (typeof window.renderMathInElement === 'function') {
+                window.renderMathInElement(node, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '\\[', right: '\\]', display: true},
+                        {left: '$',  right: '$',  display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                    ],
+                    throwOnError: false,
+                });
+            }
+        } catch (e) { /* never block the chat surface on a math typeset error */ }
+    };
+
+    /**
      * Build the attachment node shown inside a user bubble.
      *
      * For images: an inline <img> thumbnail that links to the full file.
@@ -1960,6 +2002,7 @@ define([
 
         if (role === 'assistant') {
             content.innerHTML = renderAssistantHtml(text);
+            tryRenderMath(content);
         } else {
             content.textContent = text;
         }
@@ -2228,6 +2271,7 @@ define([
             const completedEl = streamingEl;
             const content = streamingEl.querySelector('.local-ai-course-assistant__message-content');
             content.innerHTML = renderAssistantHtml(fullText);
+            tryRenderMath(content);
 
             // Ensure footer wrapper exists (source slot + action buttons).
             let footer = streamingEl.querySelector('.local-ai-course-assistant__msg-footer');

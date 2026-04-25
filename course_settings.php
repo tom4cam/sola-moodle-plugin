@@ -407,6 +407,66 @@ echo html_writer::div(
                     <?php } ?>
                 </div>
             </div>
+
+            <?php // v3.9.20: Socratic mode toggle (per-course). ?>
+            <div class="form-group row mt-3">
+                <label class="col-sm-3 col-form-label">
+                    <?php echo get_string('socratic:title', 'local_ai_course_assistant'); ?>
+                </label>
+                <div class="col-sm-9">
+                    <?php
+                    $socraticon = (bool) get_config('local_ai_course_assistant', 'socratic_mode_course_' . $courseid);
+                    if (data_submitted() && optional_param('save_socratic', 0, PARAM_INT) && confirm_sesskey()) {
+                        $socraticon = (bool) optional_param('socratic_mode', 0, PARAM_BOOL);
+                        set_config('socratic_mode_course_' . $courseid,
+                            $socraticon ? 1 : 0, 'local_ai_course_assistant');
+                    }
+                    ?>
+                    <form method="post" action="" style="display:inline">
+                        <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>" />
+                        <input type="hidden" name="save_socratic" value="1" />
+                        <label class="mb-0">
+                            <input type="checkbox" name="socratic_mode" value="1"
+                                <?php echo $socraticon ? 'checked' : ''; ?>
+                                onchange="this.form.submit()" />
+                            <?php echo get_string('socratic:toggle', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </form>
+                    <small class="form-text text-muted">
+                        <?php echo get_string('socratic:toggle_help', 'local_ai_course_assistant'); ?>
+                    </small>
+                </div>
+            </div>
+
+            <?php // v3.9.20: Weekly digest email toggle (per-course). ?>
+            <div class="form-group row mt-2">
+                <label class="col-sm-3 col-form-label">
+                    <?php echo get_string('digest:title', 'local_ai_course_assistant'); ?>
+                </label>
+                <div class="col-sm-9">
+                    <?php
+                    $digeston = (bool) get_config('local_ai_course_assistant', 'digest_email_enabled_course_' . $courseid);
+                    if (data_submitted() && optional_param('save_digest', 0, PARAM_INT) && confirm_sesskey()) {
+                        $digeston = (bool) optional_param('digest_email', 0, PARAM_BOOL);
+                        set_config('digest_email_enabled_course_' . $courseid,
+                            $digeston ? 1 : 0, 'local_ai_course_assistant');
+                    }
+                    ?>
+                    <form method="post" action="" style="display:inline">
+                        <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>" />
+                        <input type="hidden" name="save_digest" value="1" />
+                        <label class="mb-0">
+                            <input type="checkbox" name="digest_email" value="1"
+                                <?php echo $digeston ? 'checked' : ''; ?>
+                                onchange="this.form.submit()" />
+                            <?php echo get_string('digest:toggle', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </form>
+                    <small class="form-text text-muted">
+                        <?php echo get_string('digest:toggle_help', 'local_ai_course_assistant'); ?>
+                    </small>
+                </div>
+            </div>
         </div>
     </div>
     <?php } ?>
