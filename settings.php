@@ -1531,6 +1531,23 @@ if ($hassiteconfig) {
         '8',
         PARAM_INT
     ));
+
+    // v4.0 / M4 — Mastery decay model. Default off in v4.0; planned default-on
+    // in v4.1 once tuning data is in. Read-side only; no schema change.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/mastery_decay_enabled',
+        get_string('settings:mastery_decay_enabled', 'local_ai_course_assistant'),
+        get_string('settings:mastery_decay_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_decay_half_life_days',
+        get_string('settings:mastery_decay_half_life_days', 'local_ai_course_assistant'),
+        get_string('settings:mastery_decay_half_life_days_desc', 'local_ai_course_assistant'),
+        '30',
+        PARAM_INT
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_classifier_model',
         get_string('settings:mastery_classifier_model', 'local_ai_course_assistant'),

@@ -52,6 +52,8 @@ class objective_manager {
     private const DEFAULT_THRESHOLD = 0.85;
     /** Minimum attempts before the status can flip to "mastered". */
     private const MIN_ATTEMPTS_FOR_MASTERY = 3;
+    /** v4.0 / M4 — Default half-life for the time-decay factor in days. */
+    private const DEFAULT_DECAY_HALF_LIFE_DAYS = 30;
 
     // ------------------------------------------------------------------
     //  Feature gates
@@ -354,16 +356,39 @@ class objective_manager {
         }
 
         $score = $denominator > 0 ? ($numerator / $denominator) : 0.0;
+
+        // v4.0 / M4 — Time-decay against the most recent attempt timestamp.
+        // Multiplies the raw score by 0.5 ^ (days_since_last / half_life)
+        // so a previously-mastered objective drops back to "learning" once
+        // it has been long enough since the learner last touched it. Read-
+        // side only; no schema change. Behind a feature flag, default off
+        // in v4.0 — flipped default-on in v4.1 once tuning data lands.
+        // Never demotes past 'learning': a learner who has any attempts at
+        // all stays at least at 'learning', never returns to 'not_started'.
+        $decayenabled = (bool) get_config('local_ai_course_assistant', 'mastery_decay_enabled');
+        $decaymultiplier = 1.0;
+        if ($decayenabled && $last > 0) {
+            $halflifedays = (int) (get_config('local_ai_course_assistant', 'mastery_decay_half_life_days')
+                ?: self::DEFAULT_DECAY_HALF_LIFE_DAYS);
+            if ($halflifedays > 0) {
+                $agedays = max(0, (time() - $last) / 86400);
+                $decaymultiplier = pow(0.5, $agedays / $halflifedays);
+            }
+        }
+        $adjusted = $score * $decaymultiplier;
+
         $status = 'learning';
-        if ($count >= self::MIN_ATTEMPTS_FOR_MASTERY && $score >= $threshold) {
+        if ($count >= self::MIN_ATTEMPTS_FOR_MASTERY && $adjusted >= $threshold) {
             $status = 'mastered';
         }
 
         return [
-            'score' => round($score, 4),
+            'score' => round($adjusted, 4),
+            'raw_score' => round($score, 4),
             'attempts' => $count,
             'status' => $status,
             'last' => $last,
+            'decay_multiplier' => round($decaymultiplier, 4),
         ];
     }
 
