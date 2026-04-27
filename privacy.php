@@ -82,7 +82,7 @@ if (is_string($override) && trim($override) !== '') {
     <li>Answer your questions at the moment.</li>
     <li>Personalize <?php echo $product; ?>'s responses to you.</li>
     <li>Improve <?php echo $product; ?> itself, using anonymized and aggregated data.</li>
-    <li>Detecting and preventing abuse.</li>
+    <li>Detect and prevent abuse.</li>
     <li>Generate analytics that help course authors improve course materials. Analytics are anonymized before they reach a human reviewer.</li>
 </ol>
 <p><?php echo $inst; ?> does not sell your information. <?php echo $inst; ?> does not use your <?php echo $product; ?> conversations to market unrelated products to you.</p>
@@ -120,7 +120,7 @@ if (is_string($override) && trim($override) !== '') {
     <li><strong>Access.</strong> View your current conversation in the widget; download a complete copy of all <?php echo $product; ?> data from the <?php echo $product; ?> user settings page.</li>
     <li><strong>Download.</strong> The user settings page offers a "Download my <?php echo $product; ?> data" button that produces a structured file with all your <?php echo $product; ?> data.</li>
     <li><strong>Delete.</strong> The same page offers course level and global delete options. Deletion is immediate.</li>
-    <li><strong>Correction.</strong> <?php echo $product; ?> conversations are raw transcripts and are not normally amended. If a derived record looks wrong, continue using <?php echo $product; ?> or contact the <?php echo $inst; ?> Data Protection Officer.</li>
+    <li><strong>Correction.</strong> <?php echo $product; ?> conversations are raw transcripts and are not normally amended. If a derived record looks wrong, continue using <?php echo $product; ?> or contact <?php echo $inst; ?> at the address below.</li>
     <li><strong>Object or restrict.</strong> You do not have to use <?php echo $product; ?>. You can remove your data at any time.</li>
     <li><strong>Portability.</strong> The download is in a standard JSON format and can be imported into other systems.</li>
     <li><strong>Complaint.</strong> Contact <?php echo $inst; ?>. Learners in the EU, UK, Switzerland, Brazil, or Canada may also complain to their national data protection authority.</li>
