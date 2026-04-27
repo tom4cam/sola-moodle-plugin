@@ -1492,6 +1492,21 @@ if ($hassiteconfig) {
         PARAM_RAW
     ));
 
+    // v4.1.1: Active-learners-online indicator scope. Default 'global' (the
+    // anti-loneliness default — a global count rarely hits zero, so the
+    // indicator actually appears on small courses). Set to 'course' to
+    // restore the v4.1.0 per-course behaviour.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/active_learners_scope',
+        get_string('settings:active_learners_scope', 'local_ai_course_assistant'),
+        get_string('settings:active_learners_scope_desc', 'local_ai_course_assistant'),
+        'global',
+        [
+            'global' => get_string('settings:active_learners_scope_global', 'local_ai_course_assistant'),
+            'course' => get_string('settings:active_learners_scope_course', 'local_ai_course_assistant'),
+        ]
+    ));
+
     // v3.9.13: xAI Realtime WebSocket proxy settings. When configured,
     // xAI voice routes through services/xai_rt_proxy instead of opening a
     // direct browser connection to api.x.ai with the master key.

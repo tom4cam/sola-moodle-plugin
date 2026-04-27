@@ -1816,8 +1816,12 @@ define([
                         .then(function(res) {
                             const n = res && res.count ? parseInt(res.count, 10) : 0;
                             if (n >= 2) {
-                                Str.get_string('active_learners:line',
-                                    'local_ai_course_assistant', n).then(function(line) {
+                                // v4.1.1: pick the per-course or global copy
+                                // based on the scope the server reports.
+                                const key = (res && res.scope === 'course')
+                                    ? 'active_learners:line'
+                                    : 'active_learners:line_global';
+                                Str.get_string(key, 'local_ai_course_assistant', n).then(function(line) {
                                     text.textContent = line;
                                     box.hidden = false;
                                 });

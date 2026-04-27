@@ -233,11 +233,14 @@ echo html_writer::div(
                     <?php echo get_string('coursesettings:sola_enabled', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <label class="aica-toggle-row mb-0">
-                        <input type="checkbox" class="aica-toggle" name="sola_course_enabled" value="1"
-                            <?php if ($solacourseenabled) { echo 'checked'; } ?> />
-                        <?php echo get_string('coursesettings:sola_enabled_toggle', 'local_ai_course_assistant'); ?>
-                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                               id="aica-sola-course-enabled" name="sola_course_enabled" value="1"
+                               <?php if ($solacourseenabled) { echo 'checked'; } ?>>
+                        <label class="form-check-label" for="aica-sola-course-enabled">
+                            <?php echo get_string('coursesettings:sola_enabled_toggle', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -256,11 +259,14 @@ echo html_writer::div(
                     <?php echo get_string('coursesettings:enabled', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <label class="aica-toggle-row mb-0">
-                        <input type="checkbox" class="aica-toggle" name="enabled" value="1"
-                            <?php if ($current && $current->enabled) { echo 'checked'; } ?> />
-                        <?php echo get_string('coursesettings:enabled', 'local_ai_course_assistant'); ?>
-                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                               id="aica-enabled" name="enabled" value="1"
+                               <?php if ($current && $current->enabled) { echo 'checked'; } ?>>
+                        <label class="form-check-label" for="aica-enabled">
+                            <?php echo get_string('coursesettings:enabled', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
                     <small class="form-text text-muted">
                         <?php echo get_string('coursesettings:using_global', 'local_ai_course_assistant'); ?>
                         &mdash;
@@ -390,11 +396,14 @@ echo html_writer::div(
                     <?php echo get_string('coursesettings:rag', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <label class="aica-toggle-row mb-0">
-                        <input type="checkbox" class="aica-toggle" name="rag_course_enabled" value="1"
-                            <?php if ($ragcourseenabled) { echo 'checked'; } ?> />
-                        <?php echo get_string('coursesettings:rag_enable', 'local_ai_course_assistant'); ?>
-                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                               id="aica-rag-course-enabled" name="rag_course_enabled" value="1"
+                               <?php if ($ragcourseenabled) { echo 'checked'; } ?>>
+                        <label class="form-check-label" for="aica-rag-course-enabled">
+                            <?php echo get_string('coursesettings:rag_enable', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
                 </div>
             </div>
             <div class="form-group row mt-2">
@@ -442,11 +451,14 @@ echo html_writer::div(
                     <?php echo get_string('socratic:title', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <label class="aica-toggle-row mb-0">
-                        <input type="checkbox" class="aica-toggle" name="socratic_mode" value="1"
-                            <?php echo $socraticon ? 'checked' : ''; ?> />
-                        <?php echo get_string('socratic:toggle', 'local_ai_course_assistant'); ?>
-                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                               id="aica-socratic-mode" name="socratic_mode" value="1"
+                               <?php echo $socraticon ? 'checked' : ''; ?>>
+                        <label class="form-check-label" for="aica-socratic-mode">
+                            <?php echo get_string('socratic:toggle', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
                     <small class="form-text text-muted">
                         <?php echo get_string('socratic:toggle_help', 'local_ai_course_assistant'); ?>
                     </small>
@@ -459,11 +471,14 @@ echo html_writer::div(
                     <?php echo get_string('flashcards:title', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <label class="aica-toggle-row mb-0">
-                        <input type="checkbox" class="aica-toggle" name="flashcards_on" value="1"
-                            <?php echo $fcon ? 'checked' : ''; ?> />
-                        <?php echo get_string('flashcards:toggle', 'local_ai_course_assistant'); ?>
-                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                               id="aica-flashcards-on" name="flashcards_on" value="1"
+                               <?php echo $fcon ? 'checked' : ''; ?>>
+                        <label class="form-check-label" for="aica-flashcards-on">
+                            <?php echo get_string('flashcards:toggle', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
                     <small class="form-text text-muted">
                         <?php echo get_string('flashcards:toggle_help', 'local_ai_course_assistant'); ?>
                     </small>
@@ -485,11 +500,14 @@ echo html_writer::div(
                     <?php echo get_string('sandbox:title', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <label class="aica-toggle-row mb-0">
-                        <input type="checkbox" class="aica-toggle" name="sandbox_on" value="1"
-                            <?php echo $sbon ? 'checked' : ''; ?> />
-                        <?php echo get_string('sandbox:toggle', 'local_ai_course_assistant'); ?>
-                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                               id="aica-sandbox-on" name="sandbox_on" value="1"
+                               <?php echo $sbon ? 'checked' : ''; ?>>
+                        <label class="form-check-label" for="aica-sandbox-on">
+                            <?php echo get_string('sandbox:toggle', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
                     <small class="form-text text-muted">
                         <?php echo get_string('sandbox:toggle_help', 'local_ai_course_assistant'); ?>
                     </small>
@@ -511,11 +529,14 @@ echo html_writer::div(
                     <?php echo get_string('essay_feedback:title', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <label class="aica-toggle-row mb-0">
-                        <input type="checkbox" class="aica-toggle" name="essay_on" value="1"
-                            <?php echo $esson ? 'checked' : ''; ?> />
-                        <?php echo get_string('essay_feedback:toggle', 'local_ai_course_assistant'); ?>
-                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                               id="aica-essay-on" name="essay_on" value="1"
+                               <?php echo $esson ? 'checked' : ''; ?>>
+                        <label class="form-check-label" for="aica-essay-on">
+                            <?php echo get_string('essay_feedback:toggle', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
                     <small class="form-text text-muted">
                         <?php echo get_string('essay_feedback:toggle_help', 'local_ai_course_assistant'); ?>
                     </small>
@@ -537,11 +558,14 @@ echo html_writer::div(
                     <?php echo get_string('worked_examples:starter', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <label class="aica-toggle-row mb-0">
-                        <input type="checkbox" class="aica-toggle" name="we_on" value="1"
-                            <?php echo $weon ? 'checked' : ''; ?> />
-                        <?php echo get_string('worked_examples:toggle', 'local_ai_course_assistant'); ?>
-                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                               id="aica-we-on" name="we_on" value="1"
+                               <?php echo $weon ? 'checked' : ''; ?>>
+                        <label class="form-check-label" for="aica-we-on">
+                            <?php echo get_string('worked_examples:toggle', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
                     <small class="form-text text-muted">
                         <?php echo get_string('worked_examples:toggle_help', 'local_ai_course_assistant'); ?>
                     </small>
@@ -554,11 +578,14 @@ echo html_writer::div(
                     <?php echo get_string('digest:title', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <label class="aica-toggle-row mb-0">
-                        <input type="checkbox" class="aica-toggle" name="digest_email" value="1"
-                            <?php echo $digeston ? 'checked' : ''; ?> />
-                        <?php echo get_string('digest:toggle', 'local_ai_course_assistant'); ?>
-                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                               id="aica-digest-email" name="digest_email" value="1"
+                               <?php echo $digeston ? 'checked' : ''; ?>>
+                        <label class="form-check-label" for="aica-digest-email">
+                            <?php echo get_string('digest:toggle', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
                     <small class="form-text text-muted">
                         <?php echo get_string('digest:toggle_help', 'local_ai_course_assistant'); ?>
                     </small>
@@ -579,11 +606,14 @@ echo html_writer::div(
                     English Lock
                 </label>
                 <div class="col-sm-9">
-                    <label class="aica-toggle-row mb-0">
-                        <input type="checkbox" class="aica-toggle" name="english_lock" value="1"
-                            <?php if ($englishlockenabled) { echo 'checked'; } ?> />
-                        Always respond in English
-                    </label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                               id="aica-english-lock" name="english_lock" value="1"
+                               <?php if ($englishlockenabled) { echo 'checked'; } ?>>
+                        <label class="form-check-label" for="aica-english-lock">
+                            Always respond in English
+                        </label>
+                    </div>
                     <small class="form-text text-muted">
                         When enabled, SOLA will respond in English even if the student writes in another language. The student's language preference in their settings panel will be overridden.
                     </small>
@@ -674,11 +704,12 @@ echo html_writer::div(
                     <?php } ?>
                 </label>
                 <div class="col-sm-7">
-                    <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="<?php echo $paramname; ?>"
+                    <div class="form-check form-switch">
+                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                               id="<?php echo $paramname; ?>"
                                name="<?php echo $paramname; ?>" value="1"
                                <?php if ($isenabled) { echo 'checked'; } ?>>
-                        <label class="custom-control-label" for="<?php echo $paramname; ?>"></label>
+                        <label class="form-check-label" for="<?php echo $paramname; ?>"></label>
                     </div>
                 </div>
             </div>
@@ -715,23 +746,25 @@ echo html_writer::div(
 </form>
 
 <style>
-.aica-toggle-row {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+/* v4.1.1: Bootstrap 5 form-switch with our smartedu-bypass class. The
+   form-check / form-switch / form-check-input / form-check-label classes
+   come from Moodle 4.x bundled CSS; the .aica-toggle class is what our
+   pointerdown JS below binds against. Visual size bump on the switch
+   pill so it's easier to tap and clearly behaves as a control. */
+.form-check.form-switch .form-check-input.aica-toggle {
+    width: 2.4em;
+    height: 1.2em;
+    cursor: pointer;
+}
+.form-check.form-switch .form-check-label {
     cursor: pointer;
     user-select: none;
-}
-.aica-toggle-row .aica-toggle {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
 }
 </style>
 
 <script>
 /*
- * smartedu / generic click-hijack workaround (v3.9.31).
+ * smartedu / generic click-hijack workaround (v3.9.31, refreshed v4.1.1).
  *
  * Some Moodle blocks (notably block_smartedu) attach document-level click
  * handlers that intercept label clicks before the browser flips a checkbox.
@@ -745,9 +778,12 @@ echo html_writer::div(
  * keyboard accessibility because a focused checkbox dispatches its own
  * synthetic click that doesn't go through the document hijacker.
  *
- * Same handler is applied to the older Bootstrap custom-control switches
- * (sola_course_enabled, enabled, rag_course_enabled, english_lock) so they
- * behave consistently on smartedu sites.
+ * v4.1.1: every toggle on this page now uses Bootstrap 5's form-check
+ * form-switch markup, with our `aica-toggle` class kept on the input so
+ * this handler still binds. Replaces the legacy Bootstrap-4
+ * custom-control / custom-switch markup that Moodle 4.x's bundled CSS
+ * dropped — that markup rendered a styled pill but the input was
+ * effectively invisible and unclickable.
  */
 (function() {
     'use strict';

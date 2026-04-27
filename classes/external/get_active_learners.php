@@ -53,26 +53,50 @@ class get_active_learners extends external_api {
         $params = self::validate_parameters(self::execute_parameters(), ['courseid' => $courseid]);
         $courseid = (int) $params['courseid'];
 
+        // Capability is gated against the calling course context — the user
+        // must be allowed to use SOLA on *this* course before they get any
+        // count, even when the configured scope is global. Avoids using a
+        // public learner count as a side-channel for cross-course discovery.
         $context = \context_course::instance($courseid);
         self::validate_context($context);
         require_capability('local/ai_course_assistant:use', $context);
 
+        // v4.1.1: scope selectable via admin setting. Default 'global' is the
+        // anti-loneliness default — a global count rarely hits zero, so the
+        // indicator actually appears. 'course' is the v4.1.0 behaviour for
+        // institutions that prefer the per-course specificity.
+        $scope = (string) (get_config('local_ai_course_assistant', 'active_learners_scope') ?: 'global');
         $since = time() - self::ACTIVE_WINDOW_SECS;
-        $count = (int) $DB->get_field_sql(
-            "SELECT COUNT(DISTINCT userid)
-               FROM {local_ai_course_assistant_msgs}
-              WHERE courseid = :courseid
-                AND timecreated >= :since
-                AND userid <> :selfid",
-            [
-                'courseid' => $courseid,
-                'since' => $since,
-                'selfid' => (int) $USER->id,
-            ]
-        );
+
+        if ($scope === 'course') {
+            $count = (int) $DB->get_field_sql(
+                "SELECT COUNT(DISTINCT userid)
+                   FROM {local_ai_course_assistant_msgs}
+                  WHERE courseid = :courseid
+                    AND timecreated >= :since
+                    AND userid <> :selfid",
+                [
+                    'courseid' => $courseid,
+                    'since' => $since,
+                    'selfid' => (int) $USER->id,
+                ]
+            );
+        } else {
+            $count = (int) $DB->get_field_sql(
+                "SELECT COUNT(DISTINCT userid)
+                   FROM {local_ai_course_assistant_msgs}
+                  WHERE timecreated >= :since
+                    AND userid <> :selfid",
+                [
+                    'since' => $since,
+                    'selfid' => (int) $USER->id,
+                ]
+            );
+        }
 
         return [
             'count' => $count,
+            'scope' => $scope,
             'window_secs' => self::ACTIVE_WINDOW_SECS,
         ];
     }
@@ -80,6 +104,7 @@ class get_active_learners extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'count' => new external_value(PARAM_INT, 'Count of other learners active in the window'),
+            'scope' => new external_value(PARAM_ALPHA, 'Either "course" or "global"'),
             'window_secs' => new external_value(PARAM_INT, 'Active window length in seconds'),
         ]);
     }
