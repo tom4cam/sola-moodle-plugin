@@ -233,8 +233,8 @@ echo html_writer::div(
                     <?php echo get_string('coursesettings:sola_enabled', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                    <div>
+                        <input type="checkbox" role="switch"
                                id="aica-sola-course-enabled" name="sola_course_enabled" value="1"
                                <?php if ($solacourseenabled) { echo 'checked'; } ?>>
                         <label class="form-check-label" for="aica-sola-course-enabled">
@@ -259,8 +259,8 @@ echo html_writer::div(
                     <?php echo get_string('coursesettings:enabled', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                    <div>
+                        <input type="checkbox" role="switch"
                                id="aica-enabled" name="enabled" value="1"
                                <?php if ($current && $current->enabled) { echo 'checked'; } ?>>
                         <label class="form-check-label" for="aica-enabled">
@@ -396,8 +396,8 @@ echo html_writer::div(
                     <?php echo get_string('coursesettings:rag', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                    <div>
+                        <input type="checkbox" role="switch"
                                id="aica-rag-course-enabled" name="rag_course_enabled" value="1"
                                <?php if ($ragcourseenabled) { echo 'checked'; } ?>>
                         <label class="form-check-label" for="aica-rag-course-enabled">
@@ -435,8 +435,7 @@ echo html_writer::div(
             // per-course toggle. Each <input> is a plain checkbox without an
             // inline form so the outer form is no longer auto-closed by the
             // browser HTML parser, which previously orphaned the bottom Save
-            // Changes button. The aica-toggle class wires the smartedu-bypass
-            // pointerdown handler at the bottom of this file.
+            // Changes button.
             $socraticon = (bool) get_config('local_ai_course_assistant', 'socratic_mode_course_' . $courseid);
             $fcon       = (bool) get_config('local_ai_course_assistant', 'flashcards_enabled_course_' . $courseid);
             $sbon       = (bool) get_config('local_ai_course_assistant', 'code_sandbox_enabled_course_' . $courseid);
@@ -445,25 +444,28 @@ echo html_writer::div(
             $digeston   = (bool) get_config('local_ai_course_assistant', 'digest_email_enabled_course_' . $courseid);
             ?>
 
-            <?php // v3.9.20: Socratic mode toggle. v4.1.3: bare-checkbox markup
-            // (no form-check form-switch wrapper) — Tomi's known-working "no
-            // CSS" version. The form-switch wrapper triggers a double-toggle on
-            // installs without smartedu: our pointerdown handler flips the
-            // input, then the form-check-label's natural click action dispatches
-            // a synthetic click on the input which flips it back. Removing the
-            // wrapper drops the pill UI but restores reliable click-to-toggle.
-            // Keep the aica-toggle class so the smartedu-bypass JS still binds. ?>
+            <?php // v3.9.20: Socratic mode toggle. v4.1.5: bare-checkbox markup
+            // applied universally across all 12 toggles on this page (Tomi's
+            // course_settings_G.php pattern). The form-check form-switch wrapper
+            // triggered a double-toggle on installs without smartedu — our
+            // pointerdown handler flipped the input, then the form-check-label's
+            // natural click action dispatched a synthetic click that flipped it
+            // back. Removing the wrapper drops the pill UI but restores reliable
+            // click-to-toggle on every install. The smartedu-bypass JS and
+            // inline style block are also gone — no longer needed. ?>
             <div class="form-group row mt-3">
                 <label class="col-sm-3 col-form-label" for="aica-socratic-mode">
                     <?php echo get_string('socratic:title', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <input class="aica-toggle" type="checkbox"
-                           id="aica-socratic-mode" name="socratic_mode" value="1"
-                           <?php echo $socraticon ? 'checked' : ''; ?>>
-                    <label for="aica-socratic-mode" class="ml-2">
-                        <?php echo get_string('socratic:toggle', 'local_ai_course_assistant'); ?>
-                    </label>
+                    <div>
+                        <input type="checkbox" role="switch"
+                               id="aica-socratic-mode" name="socratic_mode" value="1"
+                               <?php echo $socraticon ? 'checked' : ''; ?>>
+                        <label class="form-check-label" for="aica-socratic-mode">
+                            <?php echo get_string('socratic:toggle', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
                     <small class="form-text text-muted">
                         <?php echo get_string('socratic:toggle_help', 'local_ai_course_assistant'); ?>
                     </small>
@@ -476,8 +478,8 @@ echo html_writer::div(
                     <?php echo get_string('flashcards:title', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                    <div>
+                        <input type="checkbox" role="switch"
                                id="aica-flashcards-on" name="flashcards_on" value="1"
                                <?php echo $fcon ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="aica-flashcards-on">
@@ -505,8 +507,8 @@ echo html_writer::div(
                     <?php echo get_string('sandbox:title', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                    <div>
+                        <input type="checkbox" role="switch"
                                id="aica-sandbox-on" name="sandbox_on" value="1"
                                <?php echo $sbon ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="aica-sandbox-on">
@@ -534,8 +536,8 @@ echo html_writer::div(
                     <?php echo get_string('essay_feedback:title', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                    <div>
+                        <input type="checkbox" role="switch"
                                id="aica-essay-on" name="essay_on" value="1"
                                <?php echo $esson ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="aica-essay-on">
@@ -563,8 +565,8 @@ echo html_writer::div(
                     <?php echo get_string('worked_examples:starter', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                    <div>
+                        <input type="checkbox" role="switch"
                                id="aica-we-on" name="we_on" value="1"
                                <?php echo $weon ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="aica-we-on">
@@ -583,8 +585,8 @@ echo html_writer::div(
                     <?php echo get_string('digest:title', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                    <div>
+                        <input type="checkbox" role="switch"
                                id="aica-digest-email" name="digest_email" value="1"
                                <?php echo $digeston ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="aica-digest-email">
@@ -611,8 +613,8 @@ echo html_writer::div(
                     English Lock
                 </label>
                 <div class="col-sm-9">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                    <div>
+                        <input type="checkbox" role="switch"
                                id="aica-english-lock" name="english_lock" value="1"
                                <?php if ($englishlockenabled) { echo 'checked'; } ?>>
                         <label class="form-check-label" for="aica-english-lock">
@@ -709,8 +711,8 @@ echo html_writer::div(
                     <?php } ?>
                 </label>
                 <div class="col-sm-7">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
+                    <div>
+                        <input type="checkbox" role="switch"
                                id="<?php echo $paramname; ?>"
                                name="<?php echo $paramname; ?>" value="1"
                                <?php if ($isenabled) { echo 'checked'; } ?>>
@@ -749,96 +751,6 @@ echo html_writer::div(
         <?php echo get_string('cancel'); ?>
     </a>
 </form>
-
-<style>
-/* v4.1.2: Bootstrap 5 form-switch with our smartedu-bypass class. The
-   form-check / form-switch / form-check-input / form-check-label classes
-   come from Moodle 4.x bundled CSS; the .aica-toggle class is what our
-   pointerdown JS below binds against. We only bump height and cursor —
-   never width. Bootstrap pairs `.form-switch .form-check-input` width
-   2em with wrapper `padding-left: 2.5em` and input `margin-left: -2.5em`
-   to leave ~0.5em of gap before the label; widening the input eats into
-   that gap and clips the first character of every label (v4.1.1 bug
-   reported by Tamás: "Enable RAG first" rendered as "nable RAG first"). */
-.form-check.form-switch .form-check-input.aica-toggle {
-    height: 1.2em;
-    cursor: pointer;
-}
-.form-check.form-switch .form-check-label {
-    cursor: pointer;
-    user-select: none;
-}
-</style>
-
-<script>
-/*
- * smartedu / generic click-hijack workaround (v3.9.31, refreshed v4.1.1).
- *
- * Some Moodle blocks (notably block_smartedu) attach document-level click
- * handlers that intercept label clicks before the browser flips a checkbox.
- * Earlier we tried inline onclick="event.stopPropagation()", which only
- * works against bubble-phase listeners; a capture-phase document listener
- * still beats it.
- *
- * pointerdown fires before click and is rarely intercepted. We toggle the
- * checkbox programmatically on pointerdown and call preventDefault to
- * suppress the subsequent click event entirely. Space-key still works for
- * keyboard accessibility because a focused checkbox dispatches its own
- * synthetic click that doesn't go through the document hijacker.
- *
- * v4.1.1: every toggle on this page now uses Bootstrap 5's form-check
- * form-switch markup, with our `aica-toggle` class kept on the input so
- * this handler still binds. Replaces the legacy Bootstrap-4
- * custom-control / custom-switch markup that Moodle 4.x's bundled CSS
- * dropped — that markup rendered a styled pill but the input was
- * effectively invisible and unclickable.
- */
-(function() {
-    'use strict';
-    function attach(cb) {
-        if (cb.dataset.aicaToggleBound === '1') {
-            return;
-        }
-        cb.dataset.aicaToggleBound = '1';
-        var pointerHandler = function(e) {
-            // Only respond to primary button (left click / single touch).
-            if (e.button !== undefined && e.button !== 0) {
-                return;
-            }
-            e.preventDefault();
-            e.stopPropagation();
-            cb.checked = !cb.checked;
-            cb.dispatchEvent(new Event('change', {bubbles: true}));
-        };
-        cb.addEventListener('pointerdown', pointerHandler);
-        // Also intercept clicks on the wrapping label / sibling label[for=].
-        var label = cb.closest('label');
-        if (label && label.dataset.aicaLabelBound !== '1') {
-            label.dataset.aicaLabelBound = '1';
-            label.addEventListener('pointerdown', pointerHandler);
-        }
-        if (cb.id) {
-            document.querySelectorAll('label[for="' + cb.id + '"]').forEach(function(forLabel) {
-                if (forLabel.dataset.aicaLabelBound === '1') {
-                    return;
-                }
-                forLabel.dataset.aicaLabelBound = '1';
-                forLabel.addEventListener('pointerdown', pointerHandler);
-            });
-        }
-    }
-    function attachAll() {
-        // Pedagogy toggles + (v4.0/M3) the four older switches now also on
-        // .aica-toggle so they share the same smartedu-bypass handler.
-        document.querySelectorAll('input.aica-toggle[type="checkbox"]').forEach(attach);
-    }
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', attachAll);
-    } else {
-        attachAll();
-    }
-})();
-</script>
 
 <?php
 echo $OUTPUT->footer();
