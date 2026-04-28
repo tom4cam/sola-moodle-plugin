@@ -39,6 +39,8 @@ You have access to:
 
 Student names have been replaced with pseudonyms like "Student 4217."
 
+Each transcript line begins with a citation token of the form [#NNN] where NNN is the message id. When you make a specific factual claim that came from a particular message, append the relevant citation token(s) immediately after the claim, e.g. "Students struggle with regex anchors [#1287][#1304]." Use citations when citing what a student said, what SOLA replied, or specific feedback. Do not invent ids; only use ids you actually see in the transcript block.
+
 Your job is to answer the admin's questions about patterns, themes, engagement, quality, cost, and provider performance based on the data provided. Be specific: cite student pseudonyms, course names, and provider names when relevant. If the data is insufficient to answer a question, say so.
 
 Do not attempt to identify real students. Do not fabricate data.
@@ -379,7 +381,7 @@ PROMPT;
                 $text = substr($text, 0, 2000) . '... [truncated]';
             }
 
-            $line = "[{$date}] {$who}: {$text}\n";
+            $line = "[#{$msg->id}] [{$date}] {$who}: {$text}\n";
             $totalchars += strlen($line);
             if ($totalchars > $maxchars) {
                 $truncated = true;

@@ -1,0 +1,278 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/courses_admin
+
+    SOLA per-course management — admin-only. Enable/disable AI Assistant
+    and Usability Testing on each course, in bulk or one at a time.
+
+    Example context (json):
+    {
+        "sesskey": "abc123",
+        "form_action": "https://example.invalid/local/ai_course_assistant/courses_admin.php",
+        "analytics_url": "#",
+        "settings_url": "#",
+        "has_courses": false,
+        "enabled_count": 0,
+        "total_count": 0
+    }
+}}
+<div class="local-ai-course-assistant-courses-admin">
+
+    <div class="mb-3 d-flex flex-wrap align-items-center" style="gap:8px">
+        <a href="{{analytics_url}}" class="btn btn-sm btn-outline-secondary">{{#str}}courses_admin:back_to_analytics, local_ai_course_assistant{{/str}}</a>
+        <a href="{{settings_url}}" class="btn btn-sm btn-outline-secondary">{{#str}}courses_admin:plugin_settings, local_ai_course_assistant{{/str}}</a>
+        <span class="text-muted" style="margin-left:auto;font-size:13px">
+            {{#str}}courses_admin:enabled_count, local_ai_course_assistant, { "enabled": "{{enabled_count}}", "total": "{{total_count}}" }{{/str}}
+        </span>
+    </div>
+
+    <h3>{{#str}}courses_admin:title, local_ai_course_assistant{{/str}}</h3>
+    <p class="text-muted">{{#str}}courses_admin:lede, local_ai_course_assistant{{/str}}</p>
+
+    {{#has_courses}}
+    <div class="d-flex align-items-center mb-2 flex-wrap" style="gap:8px">
+        <input type="text" id="sola-course-search" class="form-control form-control-sm" style="max-width:260px"
+               placeholder="{{#str}}courses_admin:search_placeholder, local_ai_course_assistant{{/str}}"
+               aria-label="{{#str}}courses_admin:search_placeholder, local_ai_course_assistant{{/str}}" autofocus>
+        <select id="sola-filter-status" class="form-control form-control-sm" style="max-width:200px"
+                aria-label="{{#str}}courses_admin:filter_status, local_ai_course_assistant{{/str}}">
+            <option value="">{{#str}}courses_admin:filter_status, local_ai_course_assistant{{/str}}</option>
+            <option value="enabled">{{#str}}courses_admin:filter_enabled, local_ai_course_assistant{{/str}}</option>
+            <option value="disabled">{{#str}}courses_admin:filter_disabled, local_ai_course_assistant{{/str}}</option>
+        </select>
+        <select id="sola-filter-ut" class="form-control form-control-sm" style="max-width:200px"
+                aria-label="{{#str}}courses_admin:filter_ut, local_ai_course_assistant{{/str}}">
+            <option value="">{{#str}}courses_admin:filter_ut, local_ai_course_assistant{{/str}}</option>
+            <option value="on">{{#str}}courses_admin:filter_ut_on, local_ai_course_assistant{{/str}}</option>
+            <option value="off">{{#str}}courses_admin:filter_ut_off, local_ai_course_assistant{{/str}}</option>
+            <option value="inherit">{{#str}}courses_admin:filter_ut_inherit, local_ai_course_assistant{{/str}}</option>
+        </select>
+    </div>
+
+    <div class="card mb-2 bg-light" id="sola-bulk-bar">
+        <div class="card-body py-2 px-3 d-flex align-items-center flex-wrap" style="gap:8px">
+            <label class="mb-0" style="font-weight:600;font-size:13px">
+                <input type="checkbox" id="sola-select-all"> {{#str}}courses_admin:select_all, local_ai_course_assistant{{/str}}
+            </label>
+            <span id="sola-selected-count" class="text-muted" style="font-size:13px">{{#str}}courses_admin:selected_zero, local_ai_course_assistant{{/str}}</span>
+            <span class="mx-1" style="border-left:1px solid #ccc;height:20px"></span>
+
+            <span style="font-size:13px;font-weight:600">{{#str}}courses_admin:ai_assistant, local_ai_course_assistant{{/str}}:</span>
+            <button type="button" class="btn btn-sm btn-outline-success sola-bulk-action" data-action="bulktoggle" data-enabled="1">
+                {{#str}}courses_admin:enable, local_ai_course_assistant{{/str}}
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger sola-bulk-action" data-action="bulktoggle" data-enabled="0">
+                {{#str}}courses_admin:disable, local_ai_course_assistant{{/str}}
+            </button>
+
+            <span class="mx-1" style="border-left:1px solid #ccc;height:20px"></span>
+
+            <span style="font-size:13px;font-weight:600">{{#str}}courses_admin:usability_testing, local_ai_course_assistant{{/str}}:</span>
+            <button type="button" class="btn btn-sm btn-outline-success sola-bulk-action" data-action="bulktoggleut" data-utvalue="1">
+                {{#str}}courses_admin:enable, local_ai_course_assistant{{/str}}
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger sola-bulk-action" data-action="bulktoggleut" data-utvalue="0">
+                {{#str}}courses_admin:disable, local_ai_course_assistant{{/str}}
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary sola-bulk-action" data-action="bulktoggleut" data-utvalue="">
+                {{#str}}courses_admin:inherit, local_ai_course_assistant{{/str}}
+            </button>
+        </div>
+    </div>
+
+    <form method="post" action="{{form_action}}" id="sola-bulk-form" style="display:none">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="action" id="sola-bulk-form-action" value="">
+        <input type="hidden" name="scope" value="selected">
+        <input type="hidden" name="selected_ids" id="sola-bulk-form-ids" value="">
+        <input type="hidden" name="enabled" id="sola-bulk-form-enabled" value="">
+        <input type="hidden" name="utvalue" id="sola-bulk-form-utvalue" value="">
+    </form>
+
+    <div class="card mb-4">
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0" id="sola-course-table">
+                <thead>
+                    <tr>
+                        <th style="width:40px" class="text-center"></th>
+                        <th class="sola-sortable" data-sort="name" style="cursor:pointer">
+                            {{#str}}courses_admin:column_course, local_ai_course_assistant{{/str}}
+                            <span class="sola-sort-icon">&#8597;</span>
+                        </th>
+                        <th class="text-center sola-sortable" data-sort="sola" style="width:140px;cursor:pointer">
+                            {{#str}}courses_admin:ai_assistant, local_ai_course_assistant{{/str}}
+                            <span class="sola-sort-icon">&#8597;</span>
+                        </th>
+                        <th class="text-center sola-sortable" data-sort="ut" style="width:160px;cursor:pointer">
+                            {{#str}}courses_admin:usability_testing, local_ai_course_assistant{{/str}}
+                            <span class="sola-sort-icon">&#8597;</span>
+                        </th>
+                        <th class="text-center sola-sortable" data-sort="data" style="width:100px;cursor:pointer">
+                            {{#str}}courses_admin:column_has_data, local_ai_course_assistant{{/str}}
+                            <span class="sola-sort-icon">&#8597;</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#courses}}
+                    <tr data-courseid="{{id}}"
+                        data-sola="{{#enabled}}enabled{{/enabled}}{{^enabled}}disabled{{/enabled}}"
+                        data-ut="{{#ut_on}}on{{/ut_on}}{{#ut_off}}off{{/ut_off}}{{#ut_inherit}}inherit{{/ut_inherit}}"
+                        data-hasdata="{{#has_data}}1{{/has_data}}{{^has_data}}0{{/has_data}}">
+                        <td class="text-center">
+                            <input type="checkbox" class="sola-row-check" value="{{id}}" aria-label="{{fullname}}">
+                        </td>
+                        <td>
+                            {{#has_data}}
+                            <a href="{{analytics_url}}">
+                                <strong>{{fullname}}</strong>
+                            </a>
+                            {{/has_data}}
+                            {{^has_data}}
+                            {{fullname}}
+                            {{/has_data}}
+                            <small class="text-muted ml-1">({{shortname}})</small>
+                        </td>
+                        <td class="text-center">
+                            <form method="post" action="{{form_action}}" style="display:inline">
+                                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                <input type="hidden" name="action" value="toggle">
+                                <input type="hidden" name="togglecourseid" value="{{id}}">
+                                {{#enabled}}
+                                <input type="hidden" name="enabled" value="0">
+                                <button type="submit" class="btn btn-sm btn-success" title="{{#str}}courses_admin:click_to_disable, local_ai_course_assistant{{/str}}">
+                                    {{#str}}courses_admin:enabled, local_ai_course_assistant{{/str}}
+                                </button>
+                                {{/enabled}}
+                                {{^enabled}}
+                                <input type="hidden" name="enabled" value="1">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="{{#str}}courses_admin:click_to_enable, local_ai_course_assistant{{/str}}">
+                                    {{#str}}courses_admin:disabled, local_ai_course_assistant{{/str}}
+                                </button>
+                                {{/enabled}}
+                            </form>
+                        </td>
+                        <td class="text-center">
+                            <form method="post" action="{{form_action}}" style="display:inline">
+                                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                <input type="hidden" name="action" value="toggleut">
+                                <input type="hidden" name="togglecourseid" value="{{id}}">
+                                {{#ut_on}}
+                                <input type="hidden" name="utvalue" value="">
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    {{#str}}courses_admin:on, local_ai_course_assistant{{/str}}
+                                </button>
+                                {{/ut_on}}
+                                {{#ut_off}}
+                                <input type="hidden" name="utvalue" value="1">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    {{#str}}courses_admin:off, local_ai_course_assistant{{/str}}
+                                </button>
+                                {{/ut_off}}
+                                {{#ut_inherit}}
+                                <input type="hidden" name="utvalue" value="{{#ut_effective}}0{{/ut_effective}}{{^ut_effective}}1{{/ut_effective}}">
+                                <button type="submit" class="btn btn-sm {{#ut_effective}}btn-outline-success{{/ut_effective}}{{^ut_effective}}btn-outline-secondary{{/ut_effective}}">
+                                    {{#ut_effective}}{{#str}}courses_admin:global_on, local_ai_course_assistant{{/str}}{{/ut_effective}}{{^ut_effective}}{{#str}}courses_admin:global_off, local_ai_course_assistant{{/str}}{{/ut_effective}}
+                                </button>
+                                {{/ut_inherit}}
+                            </form>
+                        </td>
+                        <td class="text-center">
+                            {{#has_data}}<span class="badge badge-info">{{#str}}courses_admin:yes, local_ai_course_assistant{{/str}}</span>{{/has_data}}
+                            {{^has_data}}<span class="text-muted">&mdash;</span>{{/has_data}}
+                        </td>
+                    </tr>
+                    {{/courses}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{/has_courses}}
+    {{^has_courses}}
+    <p class="text-muted">{{#str}}courses_admin:no_courses, local_ai_course_assistant{{/str}}</p>
+    {{/has_courses}}
+
+</div>
+
+{{#js}}
+(function() {
+    var search = document.getElementById('sola-course-search');
+    var filterStatus = document.getElementById('sola-filter-status');
+    var filterUt = document.getElementById('sola-filter-ut');
+    var rows = document.querySelectorAll('#sola-course-table tbody tr');
+    var selectAll = document.getElementById('sola-select-all');
+    var selectedCount = document.getElementById('sola-selected-count');
+
+    function applyFilters() {
+        var q = search ? search.value.toLowerCase() : '';
+        var s = filterStatus ? filterStatus.value : '';
+        var u = filterUt ? filterUt.value : '';
+        rows.forEach(function(r) {
+            var name = r.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            var matchSearch = !q || name.indexOf(q) !== -1;
+            var matchStatus = !s || r.dataset.sola === s;
+            var matchUt = !u || r.dataset.ut === u;
+            r.style.display = (matchSearch && matchStatus && matchUt) ? '' : 'none';
+        });
+    }
+    if (search) search.addEventListener('input', applyFilters);
+    if (filterStatus) filterStatus.addEventListener('change', applyFilters);
+    if (filterUt) filterUt.addEventListener('change', applyFilters);
+
+    function updateSelectedCount() {
+        var checks = document.querySelectorAll('.sola-row-check:checked');
+        if (selectedCount) {
+            selectedCount.textContent = '(' + checks.length + ' selected)';
+        }
+    }
+    document.querySelectorAll('.sola-row-check').forEach(function(c) {
+        c.addEventListener('change', updateSelectedCount);
+    });
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            document.querySelectorAll('.sola-row-check').forEach(function(c) {
+                if (c.closest('tr').style.display !== 'none') {
+                    c.checked = selectAll.checked;
+                }
+            });
+            updateSelectedCount();
+        });
+    }
+
+    document.querySelectorAll('.sola-bulk-action').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var checks = document.querySelectorAll('.sola-row-check:checked');
+            if (!checks.length) {
+                alert('Select at least one course first.');
+                return;
+            }
+            var ids = Array.prototype.map.call(checks, function(c) { return c.value; }).join(',');
+            var form = document.getElementById('sola-bulk-form');
+            document.getElementById('sola-bulk-form-action').value = btn.dataset.action;
+            document.getElementById('sola-bulk-form-ids').value = ids;
+            if (btn.dataset.enabled !== undefined) {
+                document.getElementById('sola-bulk-form-enabled').value = btn.dataset.enabled;
+            }
+            if (btn.dataset.utvalue !== undefined) {
+                document.getElementById('sola-bulk-form-utvalue').value = btn.dataset.utvalue;
+            }
+            form.submit();
+        });
+    });
+})();
+{{/js}}

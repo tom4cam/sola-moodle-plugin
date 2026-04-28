@@ -1231,76 +1231,56 @@ if ($hassiteconfig) {
         ''
     ));
 
-    // Learning Radar Scheduled Reports.
+    // Learning Radar Scheduled Reports — moved to a dedicated UI in v4.2.
+    // The legacy single-schedule settings (metaai_cron_*) are now migrated
+    // into the multi-schedule table on upgrade. This block keeps only the
+    // anomaly-digest options in admin settings; per-query schedules live on
+    // the analytics page.
     $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/metaai_cron_heading',
-        'Learning Radar Scheduled Reports',
-        'Configure automated Learning Radar analysis of anonymized student conversation data. Reports are emailed on the selected schedule.'
+        'local_ai_course_assistant/anomaly_digest_heading',
+        'Learning Radar — anomaly digest',
+        'Daily check that compares rolling windows of negative ratings, token spend, and integrity flags. '
+        . 'When a metric exceeds the configured threshold, a digest is sent to the configured channels. '
+        . 'For per-query scheduled reports, use the Schedules panel on the SOLA Analytics page.'
     ));
 
     $settings->add(new admin_setting_configcheckbox(
-        'local_ai_course_assistant/metaai_cron_enabled',
-        'Enable scheduled reports',
-        'Run a recurring Learning Radar query and email the anonymized results.',
+        'local_ai_course_assistant/anomaly_digest_enabled',
+        'Enable anomaly digest',
+        'Run the daily anomaly digest task. Quiet by default — only fires when a metric crosses the threshold.',
         0
     ));
 
-    $settings->add(new admin_setting_configselect(
-        'local_ai_course_assistant/metaai_cron_frequency',
-        'Report frequency',
-        'How often to run the query. Daily runs every day, weekly runs on Mondays, monthly runs on the 1st.',
-        'weekly',
-        ['daily' => 'Daily', 'weekly' => 'Weekly', 'monthly' => 'Monthly']
-    ));
-
-    $settings->add(new admin_setting_configtextarea(
-        'local_ai_course_assistant/metaai_cron_query',
-        'Report query',
-        'The question to ask the AI about student conversations. Example: "Summarize the top themes, common questions, and engagement patterns from student conversations this period."',
-        ''
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/anomaly_digest_threshold_pct',
+        'Alert threshold (%)',
+        'Percent change between the recent and prior window that triggers an alert. Default: 50.',
+        '50',
+        PARAM_INT
     ));
 
     $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/metaai_cron_provider',
-        'Report LLM provider',
-        'Provider ID for the report (e.g., openai, claude). Must match a provider configured in the comparison providers field or the primary provider. Leave blank for the primary provider.',
-        ''
+        'local_ai_course_assistant/anomaly_digest_recipient_email',
+        'Recipient email',
+        'Email address that receives the anomaly digest. Leave blank to use the site admin.',
+        '',
+        PARAM_EMAIL
     ));
 
     $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/metaai_cron_model',
-        'Report LLM model',
-        'Model name for the report. Leave blank for the provider default.',
-        ''
+        'local_ai_course_assistant/anomaly_digest_slack_webhook',
+        'Slack incoming webhook URL',
+        'Optional Slack incoming webhook URL. The digest is posted as a Slack block message.',
+        '',
+        PARAM_URL
     ));
 
     $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/metaai_cron_email',
-        'Report recipient email',
-        'Email address to receive the report. Leave blank to send to the site admin.',
-        ''
-    ));
-
-    $settings->add(new admin_setting_configselect(
-        'local_ai_course_assistant/metaai_cron_format',
-        'Report format',
-        'How the report is delivered. "Text in email body" sends the AI response as plain text. "CSV attachment" sends a CSV file. All student data is anonymized in both formats.',
-        'text',
-        ['text' => 'Text in email body', 'csv' => 'CSV attachment']
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/metaai_cron_courseids',
-        'Report course scope',
-        'Comma-separated list of course IDs to include in the scheduled report. Leave blank for all courses. Example: "2,5,12".',
-        ''
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/metaai_cron_filterprovider',
-        'Report provider filter',
-        'Only include conversations handled by this LLM provider. Leave blank for all providers. Example: "openai" or "claude".',
-        ''
+        'local_ai_course_assistant/anomaly_digest_teams_webhook',
+        'Microsoft Teams incoming webhook URL',
+        'Optional Teams incoming webhook URL. The digest is posted as an Office 365 connector card.',
+        '',
+        PARAM_URL
     ));
 
     // Analytics export (Redash).
@@ -1364,6 +1344,13 @@ if ($hassiteconfig) {
     $ADMIN->add('local_ai_course_assistant', $settings);
 
     // ── External admin pages (tools / editors) ──────────────────────────────
+
+    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
+        'local_ai_course_assistant_courses',
+        get_string('courses_admin:title', 'local_ai_course_assistant'),
+        new moodle_url('/local/ai_course_assistant/courses_admin.php'),
+        'moodle/site:config'
+    ));
 
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_starters',

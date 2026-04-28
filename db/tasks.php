@@ -111,4 +111,16 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '1',  // Mondays at 09:15 server time.
     ],
+    [
+        // v4.2 — Daily anomaly digest. Quiet by default; only fires when the
+        // configured metrics exceed the threshold. Runs at 07:00 server time
+        // so the digest lands before most admins start work.
+        'classname' => \local_ai_course_assistant\task\run_anomaly_digest::class,
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '7',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];

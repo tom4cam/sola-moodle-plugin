@@ -69,66 +69,10 @@ if ($action === 'togglenames' && confirm_sesskey()) {
 }
 $show_real_names = !empty($_SESSION['sola_show_real_names']);
 
-// ── Handle SOLA enable/disable toggle POST ──────────────────────────────────
-if ($action === 'toggle' && confirm_sesskey()) {
-    $togglecourseid = required_param('togglecourseid', PARAM_INT);
-    $enabled = required_param('enabled', PARAM_INT);
-    set_config('sola_enabled_course_' . $togglecourseid, $enabled ? '1' : '0', 'local_ai_course_assistant');
-    redirect(new moodle_url('/local/ai_course_assistant/analytics.php',
-        ['courseid' => $courseid, 'range' => $range]));
-}
-
-// ── Handle per-course user testing toggle POST ──────────────────────────────
-if ($action === 'toggleut' && confirm_sesskey()) {
-    $togglecourseid = required_param('togglecourseid', PARAM_INT);
-    $utvalue = required_param('utvalue', PARAM_RAW);
-    // '' = inherit global, '1' = force on, '0' = force off.
-    if ($utvalue === '') {
-        unset_config('sola_usertesting_course_' . $togglecourseid, 'local_ai_course_assistant');
-    } else {
-        set_config('sola_usertesting_course_' . $togglecourseid, $utvalue, 'local_ai_course_assistant');
-    }
-    redirect(new moodle_url('/local/ai_course_assistant/analytics.php',
-        ['courseid' => $courseid, 'range' => $range]));
-}
-
-// ── Handle bulk actions (SOLA enable/disable, user testing enable/disable) ──
-if ($action === 'bulktoggle' && confirm_sesskey()) {
-    $enabled = required_param('enabled', PARAM_INT);
-    $scope = optional_param('scope', 'all', PARAM_ALPHA); // 'all' or 'selected'.
-    $selected_ids = optional_param('selected_ids', '', PARAM_RAW);
-    if ($scope === 'selected' && !empty($selected_ids)) {
-        $ids = array_map('intval', explode(',', $selected_ids));
-    } else {
-        $ids = array_map(function($c) { return (int)$c->id; },
-            $DB->get_records_sql("SELECT c.id FROM {course} c WHERE c.id > 1 AND c.visible = 1"));
-    }
-    foreach ($ids as $cid) {
-        set_config('sola_enabled_course_' . $cid, $enabled ? '1' : '0', 'local_ai_course_assistant');
-    }
-    redirect(new moodle_url('/local/ai_course_assistant/analytics.php',
-        ['courseid' => $courseid, 'range' => $range]));
-}
-
-if ($action === 'bulktoggleut' && confirm_sesskey()) {
-    $utvalue = required_param('utvalue', PARAM_RAW);
-    $scope = optional_param('scope', 'all', PARAM_ALPHA);
-    $selected_ids = optional_param('selected_ids', '', PARAM_RAW);
-    if ($scope === 'selected' && !empty($selected_ids)) {
-        $ids = array_map('intval', explode(',', $selected_ids));
-    } else {
-        $ids = array_map(function($c) { return (int)$c->id; },
-            $DB->get_records_sql("SELECT c.id FROM {course} c WHERE c.id > 1 AND c.visible = 1"));
-    }
-    foreach ($ids as $cid) {
-        if ($utvalue === '') {
-            unset_config('sola_usertesting_course_' . $cid, 'local_ai_course_assistant');
-        } else {
-            set_config('sola_usertesting_course_' . $cid, $utvalue, 'local_ai_course_assistant');
-        }
-    }
-    redirect(new moodle_url('/local/ai_course_assistant/analytics.php',
-        ['courseid' => $courseid, 'range' => $range]));
+// Per-course enable/disable + UT toggles moved to courses_admin.php in v4.2.
+// Any legacy POST that lands here is redirected so old bookmarks still work.
+if (in_array($action, ['toggle', 'toggleut', 'bulktoggle', 'bulktoggleut'], true)) {
+    redirect(new moodle_url('/local/ai_course_assistant/courses_admin.php'));
 }
 
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/analytics.php',
@@ -140,17 +84,7 @@ $PAGE->set_pagelayout('admin');
 
 $since = $range > 0 ? time() - ($range * 86400) : 0;
 
-// ── Build course list with stats ────────────────────────────────────────────
-// Get all courses that have at least one SOLA message.
-$courses_with_data = $DB->get_records_sql(
-    "SELECT DISTINCT m.courseid, c.fullname, c.shortname
-       FROM {local_ai_course_assistant_msgs} m
-       JOIN {course} c ON c.id = m.courseid
-      WHERE c.id > 1
-      ORDER BY c.fullname ASC"
-);
-
-// Also get all visible courses (for the enable/disable toggle even if no data yet).
+// ── Visible courses for the per-course drill-down dropdown ──────────────────
 $all_courses = $DB->get_records_sql(
     "SELECT c.id, c.fullname, c.shortname
        FROM {course} c
@@ -158,50 +92,14 @@ $all_courses = $DB->get_records_sql(
       ORDER BY c.fullname ASC"
 );
 
-// Merge: courses with data + all visible courses.
-$course_list = [];
-foreach ($all_courses as $c) {
-    $has_data = isset($courses_with_data[$c->id]);
-    $is_enabled = \local_ai_course_assistant\course_config_manager::is_enabled_for_course((int) $c->id);
-    $ut_val = get_config('local_ai_course_assistant', 'sola_usertesting_course_' . $c->id);
-    // User testing state: '' = inherit, '1' = on, '0' = off.
-    $ut_state = ($ut_val === '1') ? 'on' : (($ut_val === '0') ? 'off' : 'inherit');
-    $ut_global = (bool) get_config('local_ai_course_assistant', 'usertesting_enabled');
-    $ut_effective = ($ut_val === '1') || ($ut_val !== '0' && $ut_global);
-    $course_list[] = [
-        'id'        => (int) $c->id,
-        'fullname'  => $c->fullname,
-        'shortname' => $c->shortname,
-        'has_data'  => $has_data,
-        'enabled'   => $is_enabled,
-        'selected'  => ((int) $c->id === $courseid),
-        'ut_on'     => $ut_state === 'on',
-        'ut_off'    => $ut_state === 'off',
-        'ut_inherit'=> $ut_state === 'inherit',
-        'ut_effective' => $ut_effective,
-        'sesskey'   => sesskey(),
-        'range'     => $range,
-        'courseid_param' => $courseid,
-        'form_action' => (new \moodle_url('/local/ai_course_assistant/analytics.php'))->out(false),
-    ];
-}
-
-// ── Cross-course summary stats ──────────────────────────────────────────────
-$total_msgs_all = $DB->count_records_sql(
-    "SELECT COUNT(m.id) FROM {local_ai_course_assistant_msgs} m
-       JOIN {course} c ON c.id = m.courseid WHERE c.id > 1"
-);
-$active_students_all = $DB->count_records_sql(
-    "SELECT COUNT(DISTINCT m.userid) FROM {local_ai_course_assistant_msgs} m
-       JOIN {course} c ON c.id = m.courseid WHERE c.id > 1 AND m.role = 'user'"
-);
-$active_courses = count($courses_with_data);
+// ── Header summary (small inline stat, not the old card grid) ───────────────
 $enabled_courses = 0;
-foreach ($course_list as $cl) {
-    if ($cl['enabled']) {
+foreach ($all_courses as $c) {
+    if (\local_ai_course_assistant\course_config_manager::is_enabled_for_course((int) $c->id)) {
         $enabled_courses++;
     }
 }
+$total_courses = count($all_courses);
 
 // ── Per-course analytics (if a course is selected) ──────────────────────────
 $course_data = null;
@@ -424,18 +322,74 @@ if ($courseid > 0) {
     }
 }
 
+// ── Past Learning Radar queries (most recent 50, paired by conversation) ────
+$radarpastraw = $DB->get_records_sql(
+    "SELECT id, conversationid, role, message, prompt_tokens, completion_tokens,
+            model_name, provider, interaction_type, timecreated
+       FROM {local_ai_course_assistant_msgs}
+      WHERE interaction_type IN ('meta', 'meta_scheduled')
+      ORDER BY conversationid ASC, id ASC"
+);
+$radar_past = [];
+$pendinguser = null;
+foreach ($radarpastraw as $row) {
+    if ($row->role === 'user') {
+        $pendinguser = $row;
+        continue;
+    }
+    if ($row->role === 'assistant' && $pendinguser !== null
+            && (int) $pendinguser->conversationid === (int) $row->conversationid) {
+        $radar_past[] = [
+            'id'        => (int) $row->id,
+            'query'     => mb_substr((string) $pendinguser->message, 0, 200),
+            'response'  => mb_substr((string) $row->message, 0, 280),
+            'provider'  => $row->provider ?: '—',
+            'model'     => $row->model_name ?: '—',
+            'scheduled' => $row->interaction_type === 'meta_scheduled',
+            'date'      => userdate($row->timecreated, '%Y-%m-%d %H:%M'),
+            'asked_at'  => (int) $pendinguser->timecreated,
+        ];
+        $pendinguser = null;
+    }
+}
+usort($radar_past, function ($a, $b) {
+    return $b['asked_at'] - $a['asked_at'];
+});
+$radar_past = array_slice($radar_past, 0, 50);
+
+// ── Existing schedules for the panel below the chat ─────────────────────────
+$radar_schedules = [];
+try {
+    foreach (\local_ai_course_assistant\radar_schedule_manager::all(false) as $s) {
+        $statusclass = '';
+        if ($s->last_status === 'success') {
+            $statusclass = 'success';
+        } else if ($s->last_status === 'error') {
+            $statusclass = 'danger';
+        }
+        $radar_schedules[] = [
+            'id'                => (int) $s->id,
+            'name'              => $s->name,
+            'frequency'         => $s->frequency,
+            'enabled'           => (int) $s->enabled === 1,
+            'recipient'         => $s->recipient_email ?: '',
+            'has_slack'         => !empty($s->slack_webhook),
+            'has_teams'         => !empty($s->teams_webhook),
+            'last_run'          => $s->last_run !== null ? userdate((int) $s->last_run) : '',
+            'last_status'       => $s->last_status ?: '',
+            'last_status_class' => $statusclass,
+        ];
+    }
+} catch (\Throwable $e) {
+    // Fresh installs may not have the table yet on the very first request.
+    $radar_schedules = [];
+}
+
 // ── Build template data ─────────────────────────────────────────────────────
 $templatedata = [
-    // Cross-course summary.
-    'total_messages_all'  => $total_msgs_all,
-    'active_students_all' => $active_students_all,
-    'active_courses'      => $active_courses,
-    'enabled_courses'     => $enabled_courses,
-    'total_courses'       => count($course_list),
-
-    // Course list for selector + toggle table.
-    'courses'     => $course_list,
-    'has_courses' => !empty($course_list),
+    // Header summary line (small inline counts, not card grid).
+    'enabled_courses' => $enabled_courses,
+    'total_courses'   => $total_courses,
 
     // Per-course analytics (null if none selected).
     'has_course_selected' => ($course_data !== null),
@@ -453,7 +407,6 @@ $templatedata = [
     'url_all' => (new moodle_url('/local/ai_course_assistant/analytics.php',
         ['courseid' => $courseid, 'range' => 0]))->out(false),
 
-    // Toggle form helpers.
     'sesskey'        => sesskey(),
     'form_action'    => (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(false),
     'courseid_param' => $courseid,
@@ -465,6 +418,14 @@ $templatedata = [
         ['category' => 'local_ai_course_assistant']))->out(false),
     'analytics_base_url' => (new moodle_url('/local/ai_course_assistant/analytics.php',
         ['range' => $range]))->out(false),
+    'courses_admin_url' => (new moodle_url('/local/ai_course_assistant/courses_admin.php'))->out(false),
+    'radar_schedule_url' => (new moodle_url('/local/ai_course_assistant/radar_schedule.php'))->out(false),
+    'radar_export_url' => (new moodle_url('/local/ai_course_assistant/radar_export.php'))->out(false),
+    'radar_cite_url' => (new moodle_url('/local/ai_course_assistant/radar_cite.php'))->out(false),
+    'redash_pull_url' => (new moodle_url('/local/ai_course_assistant/redash_export.php', [
+        'apikey' => get_config('local_ai_course_assistant', 'redash_api_key') ?: '',
+    ]))->out(false),
+    'has_redash_key' => !empty(get_config('local_ai_course_assistant', 'redash_api_key')),
 
     // CSV export (uses the Redash endpoint with the configured API key).
     'export_csv_url' => (new moodle_url('/local/ai_course_assistant/redash_export.php', [
@@ -472,6 +433,15 @@ $templatedata = [
         'courseid' => $courseid,
         'since' => $since,
     ]))->out(false),
+
+    // Past Learning Radar queries (most recent 50).
+    'radar_past' => $radar_past,
+    'has_radar_past' => !empty($radar_past),
+
+    // Existing scheduled queries.
+    'radar_schedules' => $radar_schedules,
+    'has_radar_schedules' => !empty($radar_schedules),
+    'radar_schedule_count' => count($radar_schedules),
 
     // Anonymization toggle.
     'show_real_names' => $show_real_names,
@@ -612,6 +582,57 @@ $templatedata = [
 
         return $chips;
     })(),
+
+    // Suggested starter questions: a fixed set of useful queries shown
+    // before any data-derived metric chips. Helps admins discover what
+    // Learning Radar can answer without staring at a blank input.
+    'learning_radar_starters' => [
+        ['label' => 'Top topics students struggle with',
+         'query' => 'Which topics have the highest off-topic rate or generate the most clarification requests across all courses?'],
+        ['label' => 'Best provider per dollar',
+         'query' => 'Compare cost-per-helpful-answer across providers using rating signal as the helpful proxy. Which provider gives the best satisfaction per dollar this month?'],
+        ['label' => 'Where students bounce',
+         'query' => 'Identify courses where conversation drop-off is highest after the first 2 turns. What pattern explains the drop?'],
+        ['label' => 'Most-frustrated students',
+         'query' => 'Find anonymized students whose recent feedback shifted from positive to negative this week. What triggered the change?'],
+        ['label' => 'Courses ready for instructor review',
+         'query' => 'Which courses have accumulated the most negative ratings or integrity flags this period and would benefit from instructional designer review?'],
+        ['label' => 'Trending questions',
+         'query' => 'List the 10 most frequently asked questions this week, and how SOLA answered them on average.'],
+        ['label' => 'Voice mode breakdown',
+         'query' => 'Profile voice mode usage: which courses, which topics, and what is the average session length?'],
+        ['label' => 'Quiet courses',
+         'query' => 'Which courses have SOLA enabled but very low engagement? What might be missing in those courses to drive more use?'],
+    ],
+
+    // LLM provider list reused by the schedule modal and compare mode.
+    'meta_ai_providers_json' => json_encode((function () {
+        $providers = [];
+        $configprovider = get_config('local_ai_course_assistant', 'provider') ?: 'openai';
+        $configmodel = get_config('local_ai_course_assistant', 'model') ?: '';
+        $providers[] = ['id' => $configprovider, 'label' => ucfirst($configprovider) . ' (primary)',
+            'models' => $configmodel ? [$configmodel] : []];
+        $seen = [$configprovider => true];
+        $compraw = get_config('local_ai_course_assistant', 'comparison_providers') ?: '';
+        foreach (explode("\n", $compraw) as $line) {
+            $line = trim($line);
+            if ($line === '' || $line[0] === '#') {
+                continue;
+            }
+            $parts = array_map('trim', explode('|', $line));
+            if (count($parts) < 2) {
+                continue;
+            }
+            $pid = strtolower($parts[0]);
+            if (!empty($seen[$pid])) {
+                continue;
+            }
+            $seen[$pid] = true;
+            $models = !empty($parts[2]) ? array_values(array_filter(array_map('trim', explode(',', $parts[2])))) : [];
+            $providers[] = ['id' => $pid, 'label' => ucfirst($pid), 'models' => $models];
+        }
+        return $providers;
+    })()),
 ];
 
 // Load Chart.js and analytics dashboard AMD module.

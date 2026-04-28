@@ -941,3 +941,40 @@ $string['sandbox:output_heading'] = 'Output';
 $string['sandbox:privacy_note'] = 'Code and output stay in your browser. Nothing is sent to any server. The runtime is loaded from a public CDN the first time only and is cached for subsequent visits.';
 $string['sandbox:toggle'] = 'Enable the Python sandbox for this course';
 $string['sandbox:toggle_help'] = 'Adds a learner-facing page where students can write and run Python entirely in their browser via Pyodide. Off by default. Enable for courses with code work; leave off for courses without.';
+
+// v4.2: courses_admin page.
+$string['courses_admin:title']             = 'AI Course Assistant — Courses';
+$string['courses_admin:lede']              = 'Enable or disable AI Assistant per course, manage Usability Testing, or run bulk actions across many courses.';
+$string['courses_admin:back_to_analytics'] = '← Back to Analytics';
+$string['courses_admin:plugin_settings']   = 'Plugin Settings';
+$string['courses_admin:enabled_count']     = '{$a->enabled} of {$a->total} courses have AI Assistant enabled';
+$string['courses_admin:search_placeholder']= 'Search courses…';
+$string['courses_admin:filter_status']     = 'AI Assistant status';
+$string['courses_admin:filter_enabled']    = 'Enabled';
+$string['courses_admin:filter_disabled']   = 'Disabled';
+$string['courses_admin:filter_ut']         = 'Usability Testing';
+$string['courses_admin:filter_ut_on']      = 'UT On';
+$string['courses_admin:filter_ut_off']     = 'UT Off';
+$string['courses_admin:filter_ut_inherit'] = 'UT Inherit';
+$string['courses_admin:select_all']        = 'Select all';
+$string['courses_admin:selected_zero']     = '(0 selected)';
+$string['courses_admin:ai_assistant']      = 'AI Assistant';
+$string['courses_admin:usability_testing'] = 'Usability Testing';
+$string['courses_admin:enable']            = 'Enable';
+$string['courses_admin:disable']           = 'Disable';
+$string['courses_admin:inherit']           = 'Inherit';
+$string['courses_admin:column_course']     = 'Course';
+$string['courses_admin:column_has_data']   = 'Has Data';
+$string['courses_admin:enabled']           = 'Enabled';
+$string['courses_admin:disabled']          = 'Disabled';
+$string['courses_admin:click_to_enable']   = 'Click to enable';
+$string['courses_admin:click_to_disable']  = 'Click to disable';
+$string['courses_admin:on']                = 'On';
+$string['courses_admin:off']               = 'Off';
+$string['courses_admin:global_on']         = 'Global: On';
+$string['courses_admin:global_off']        = 'Global: Off';
+$string['courses_admin:yes']               = 'Yes';
+$string['courses_admin:no_courses']        = 'No visible courses on this site yet.';
+
+// v4.2: anomaly digest scheduled task.
+$string['task:run_anomaly_digest'] = 'Run SOLA anomaly digest';

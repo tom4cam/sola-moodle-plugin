@@ -442,5 +442,36 @@
         <INDEX NAME="user_course_review" UNIQUE="false" FIELDS="userid, courseid, next_review"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_ai_course_assistant_radar_sched" COMMENT="Multiple scheduled Learning Radar queries">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Friendly name for this scheduled query"/>
+        <FIELD NAME="query" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The question to ask the LLM"/>
+        <FIELD NAME="provider" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="model" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="frequency" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="weekly" SEQUENCE="false" COMMENT="daily, weekly, monthly"/>
+        <FIELD NAME="recipient_email" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Optional email recipient"/>
+        <FIELD NAME="slack_webhook" TYPE="char" LENGTH="500" NOTNULL="false" SEQUENCE="false" COMMENT="Optional Slack incoming webhook URL"/>
+        <FIELD NAME="teams_webhook" TYPE="char" LENGTH="500" NOTNULL="false" SEQUENCE="false" COMMENT="Optional Microsoft Teams incoming webhook URL"/>
+        <FIELD NAME="format" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="text" SEQUENCE="false" COMMENT="text, csv, json, markdown"/>
+        <FIELD NAME="courseids" TYPE="char" LENGTH="500" NOTNULL="false" SEQUENCE="false" COMMENT="Optional comma-separated course IDs"/>
+        <FIELD NAME="filterprovider" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Optional LLM provider filter"/>
+        <FIELD NAME="range_days" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Optional date-range override; null = derive from frequency"/>
+        <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="last_run" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="last_status" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="success or error"/>
+        <FIELD NAME="last_error" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="creator" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="creator_fk" TYPE="foreign" FIELDS="creator" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="enabled_frequency" UNIQUE="false" FIELDS="enabled, frequency"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

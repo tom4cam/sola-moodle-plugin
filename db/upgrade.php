@@ -696,5 +696,68 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026042700, 'local', 'ai_course_assistant');
     }
 
+    // v4.2.0: multiple Learning Radar scheduled queries (replaces the single
+    // metaai_cron_* config). Existing single-schedule config is migrated into
+    // the first row of the new table.
+    if ($oldversion < 2026042800) {
+        $table = new xmldb_table('local_ai_course_assistant_radar_sched');
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+            $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL);
+            $table->add_field('query', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL);
+            $table->add_field('provider', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+            $table->add_field('model', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+            $table->add_field('frequency', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'weekly');
+            $table->add_field('recipient_email', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+            $table->add_field('slack_webhook', XMLDB_TYPE_CHAR, '500', null, null, null, null);
+            $table->add_field('teams_webhook', XMLDB_TYPE_CHAR, '500', null, null, null, null);
+            $table->add_field('format', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'text');
+            $table->add_field('courseids', XMLDB_TYPE_CHAR, '500', null, null, null, null);
+            $table->add_field('filterprovider', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+            $table->add_field('range_days', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('enabled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+            $table->add_field('last_run', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('last_status', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+            $table->add_field('last_error', XMLDB_TYPE_TEXT, null, null, null, null, null);
+            $table->add_field('creator', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $table->add_key('creator_fk', XMLDB_KEY_FOREIGN, ['creator'], 'user', ['id']);
+            $table->add_index('enabled_frequency', XMLDB_INDEX_NOTUNIQUE, ['enabled', 'frequency']);
+            $dbman->create_table($table);
+        }
+
+        // Migrate the legacy single-schedule config into the new table if a
+        // query was configured. metaai_cron_enabled determines whether the
+        // imported row is enabled. Keep the config rows intact so a downgrade
+        // would still work without losing the schedule definition.
+        $legacyquery = get_config('local_ai_course_assistant', 'metaai_cron_query');
+        if (!empty($legacyquery)) {
+            $existing = $DB->count_records('local_ai_course_assistant_radar_sched');
+            if ($existing === 0) {
+                $admin = get_admin();
+                $now = time();
+                $row = new \stdClass();
+                $row->name = 'Legacy scheduled report';
+                $row->query = (string) $legacyquery;
+                $row->provider = (string) (get_config('local_ai_course_assistant', 'metaai_cron_provider') ?: '');
+                $row->model = (string) (get_config('local_ai_course_assistant', 'metaai_cron_model') ?: '');
+                $row->frequency = (string) (get_config('local_ai_course_assistant', 'metaai_cron_frequency') ?: 'weekly');
+                $row->recipient_email = (string) (get_config('local_ai_course_assistant', 'metaai_cron_email') ?: '');
+                $row->format = (string) (get_config('local_ai_course_assistant', 'metaai_cron_format') ?: 'text');
+                $row->courseids = (string) (get_config('local_ai_course_assistant', 'metaai_cron_courseids') ?: '');
+                $row->filterprovider = (string) (get_config('local_ai_course_assistant', 'metaai_cron_filterprovider') ?: '');
+                $row->enabled = (int) (get_config('local_ai_course_assistant', 'metaai_cron_enabled') ?: 0);
+                $row->creator = (int) $admin->id;
+                $row->timecreated = $now;
+                $row->timemodified = $now;
+                $DB->insert_record('local_ai_course_assistant_radar_sched', $row);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026042800, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

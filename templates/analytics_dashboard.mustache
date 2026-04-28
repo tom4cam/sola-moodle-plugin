@@ -80,271 +80,265 @@
     </div>
     {{/student_mode}}
 
-    {{! ═══ Cross-Course Summary ═══ }}
-    <h3>AI Course Assistant Overview</h3>
-    <div class="card-deck mb-4">
-        <div class="card">
-            <div class="card-body text-center">
-                <h5 class="card-title text-muted">Courses with AI Assistant</h5>
-                <p class="display-4">{{enabled_courses}}<small style="font-size:0.4em"> / {{total_courses}}</small></p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body text-center">
-                <h5 class="card-title text-muted">Active Courses</h5>
-                <p class="display-4">{{active_courses}}</p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body text-center">
-                <h5 class="card-title text-muted">Total Messages</h5>
-                <p class="display-4">{{total_messages_all}}</p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body text-center">
-                <h5 class="card-title text-muted">Active Students</h5>
-                <p class="display-4">{{active_students_all}}</p>
-            </div>
-        </div>
-    </div>
+    {{! ═══ Header summary line ═══ }}
+    <p class="text-muted small mb-3">
+        {{enabled_courses}} of {{total_courses}} courses have AI Assistant enabled —
+        <a href="{{courses_admin_url}}">manage course enrollment &rarr;</a>
+    </p>
 
-    {{! ═══ Learning Radar ═══ }}
-    {{#has_meta_ai_providers}}
-    {{! Metric chips — at-a-glance numbers; click to submit a templated query to Learning Radar. v3.9.8+. }}
-    {{#learning_radar_chips.0}}
-    <div class="learning-radar-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
-        {{#learning_radar_chips}}
-        <button type="button"
-                class="learning-radar-chip btn btn-sm btn-outline-secondary"
-                data-query="{{query}}"
-                style="text-align:left;padding:8px 12px;background:#fff;border:1px solid #dee2e6;border-radius:6px;min-width:160px;cursor:pointer">
-            <div style="font-size:20px;font-weight:600;color:#212529;line-height:1.1">{{value}}</div>
-            <div style="font-size:11px;color:#6c757d;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px">{{label}}</div>
-        </button>
-        {{/learning_radar_chips}}
-    </div>
-    {{/learning_radar_chips.0}}
-    <div class="card mb-4" id="ai-analysis-chat-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Learning Radar <small class="text-muted" style="font-size:12px">(query anonymized student data)</small></h5>
-            <button class="btn btn-sm btn-outline-secondary" type="button" data-toggle="collapse" data-target="#ai-analysis-body" aria-expanded="false" aria-controls="ai-analysis-body">Expand</button>
+    {{! ═══ Learning Radar (always visible — no collapse) ═══ }}
+    <div class="card mb-4 learning-radar" id="learning-radar"
+         data-sse-url="{{meta_ai_sse_url}}"
+         data-export-url="{{radar_export_url}}"
+         data-schedule-url="{{radar_schedule_url}}"
+         data-cite-url="{{radar_cite_url}}"
+         data-redash-url="{{redash_pull_url}}"
+         data-has-redash="{{#has_redash_key}}1{{/has_redash_key}}{{^has_redash_key}}0{{/has_redash_key}}"
+         data-sesskey="{{sesskey}}"
+         data-courseid="{{courseid_param}}"
+         data-range="{{range}}"
+         data-providers='{{{meta_ai_providers_json}}}'>
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap" style="gap:8px">
+            <h4 class="mb-0">Learning Radar
+                <small class="text-muted" style="font-size:13px">— ask questions about anonymized student data</small>
+            </h4>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="radar-share" title="Copy a link that pre-fills this query for another admin">
+                    &#128279; Copy share link
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="radar-toggle-schedules"
+                        data-bs-toggle="collapse" data-bs-target="#radar-schedules-body" aria-controls="radar-schedules-body" aria-expanded="false">
+                    &#9881; Schedules (<span id="radar-schedule-count">{{radar_schedule_count}}</span>)
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="radar-toggle-history"
+                        data-bs-toggle="collapse" data-bs-target="#radar-history-body" aria-controls="radar-history-body" aria-expanded="false">
+                    &#128240; History
+                </button>
+            </div>
         </div>
-        <div class="collapse" id="ai-analysis-body">
+        <div class="card-body">
+
+            {{! Suggested starters (curated, always shown) }}
+            <div class="text-muted small mb-1">Try a question:</div>
+            <div class="learning-radar-starters" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+                {{#learning_radar_starters}}
+                <button type="button" class="learning-radar-starter btn btn-sm btn-outline-primary"
+                        data-query="{{query}}"
+                        style="font-size:12px;padding:4px 10px;border-radius:14px">
+                    {{label}}
+                </button>
+                {{/learning_radar_starters}}
+            </div>
+
+            {{! Live metric chips (data-derived, click-to-query) }}
+            {{#learning_radar_chips.0}}
+            <div class="text-muted small mb-1">Or click a metric to dig in:</div>
+            <div class="learning-radar-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+                {{#learning_radar_chips}}
+                <button type="button"
+                        class="learning-radar-chip btn btn-sm btn-outline-secondary"
+                        data-query="{{query}}"
+                        style="text-align:left;padding:8px 12px;background:#fff;border:1px solid #dee2e6;border-radius:6px;min-width:160px;cursor:pointer">
+                    <div style="font-size:18px;font-weight:600;color:#212529;line-height:1.1">{{value}}</div>
+                    <div style="font-size:11px;color:#6c757d;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px">{{label}}</div>
+                </button>
+                {{/learning_radar_chips}}
+            </div>
+            {{/learning_radar_chips.0}}
+
+            {{! Provider/model/scope/range row }}
+            <div class="d-flex flex-wrap align-items-end mb-2" style="gap:8px">
+                <div>
+                    <label for="ai-analysis-provider" class="small text-muted mb-0">Provider</label>
+                    <select id="ai-analysis-provider" class="form-control form-control-sm" style="width:180px"></select>
+                </div>
+                <div>
+                    <label for="ai-analysis-model" class="small text-muted mb-0">Model</label>
+                    <select id="ai-analysis-model" class="form-control form-control-sm" style="width:200px"></select>
+                </div>
+                <div>
+                    <label for="ai-analysis-scope" class="small text-muted mb-0">Data scope</label>
+                    <select id="ai-analysis-scope" class="form-control form-control-sm" style="width:200px">
+                        <option value="all">All courses</option>
+                        <option value="current" {{#courseid_param}}selected{{/courseid_param}}>Current course only</option>
+                        <option value="custom">Specific course IDs...</option>
+                        <option value="byprovider">By LLM provider used...</option>
+                    </select>
+                </div>
+                <div id="ai-analysis-scope-detail" style="display:none">
+                    <label for="ai-analysis-scope-value" class="small text-muted mb-0">Course IDs or provider</label>
+                    <input type="text" id="ai-analysis-scope-value" class="form-control form-control-sm" style="width:200px" placeholder="e.g. 2,5,12 or openai">
+                </div>
+                <div>
+                    <label for="ai-analysis-range" class="small text-muted mb-0">Range</label>
+                    <select id="ai-analysis-range-select" class="form-control form-control-sm" style="width:140px">
+                        <option value="1">Last 24 hours</option>
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                        <option value="0">All time</option>
+                    </select>
+                </div>
+                <div class="form-check ml-2" style="margin-top:18px">
+                    <input class="form-check-input" type="checkbox" id="ai-analysis-compare">
+                    <label class="form-check-label small" for="ai-analysis-compare" title="Run the same query against a second provider/model">
+                        Compare 2 models
+                    </label>
+                </div>
+            </div>
+
+            {{! Compare-mode second provider/model (shown only when toggle is on) }}
+            <div class="d-flex flex-wrap align-items-end mb-2" style="gap:8px;display:none" id="ai-analysis-compare-row">
+                <div>
+                    <label for="ai-analysis-provider-b" class="small text-muted mb-0">Provider B</label>
+                    <select id="ai-analysis-provider-b" class="form-control form-control-sm" style="width:180px"></select>
+                </div>
+                <div>
+                    <label for="ai-analysis-model-b" class="small text-muted mb-0">Model B</label>
+                    <select id="ai-analysis-model-b" class="form-control form-control-sm" style="width:200px"></select>
+                </div>
+                <div class="text-muted small" style="margin-left:auto">⚠ Compare runs 2 queries — cost will roughly double.</div>
+            </div>
+
+            {{! Two side-by-side message panes (right hidden when not comparing) }}
+            <div id="ai-analysis-panes" style="display:flex;gap:8px;margin-bottom:12px">
+                <div id="ai-analysis-messages" style="flex:1;max-height:420px;overflow-y:auto;border:1px solid #dee2e6;border-radius:6px;padding:12px;background:#f8f9fa;font-size:14px;min-width:0">
+                    <p class="text-muted mb-0" style="font-size:13px">All data is anonymized. Pick a starter above, click a metric, or type a question.</p>
+                </div>
+                <div id="ai-analysis-messages-b" style="display:none;flex:1;max-height:420px;overflow-y:auto;border:1px solid #dee2e6;border-radius:6px;padding:12px;background:#f8f9fa;font-size:14px;min-width:0"></div>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="ai-analysis-input" class="form-control"
+                       placeholder="Ask about student data, trends, costs, feedback...">
+                <div class="input-group-append" style="display:flex;flex-wrap:wrap;gap:0">
+                    <button class="btn btn-primary" id="ai-analysis-send" type="button">Send</button>
+                    <button class="btn btn-outline-secondary dropdown-toggle" id="radar-export-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        Export
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" id="radar-export-menu">
+                        <li><h6 class="dropdown-header">Download</h6></li>
+                        <li><a class="dropdown-item" data-export="json" href="#">JSON</a></li>
+                        <li><a class="dropdown-item" data-export="csv" href="#">CSV</a></li>
+                        <li><a class="dropdown-item" data-export="markdown" href="#">Markdown</a></li>
+                        <li><a class="dropdown-item" data-export="pdf" href="#">PDF (print)</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">Send</h6></li>
+                        <li><a class="dropdown-item" data-send="email" href="#">Email&hellip;</a></li>
+                        <li><a class="dropdown-item" data-send="slack" href="#">Slack webhook&hellip;</a></li>
+                        <li><a class="dropdown-item" data-send="teams" href="#">Teams webhook&hellip;</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">Redash</h6></li>
+                        <li><a class="dropdown-item" data-redash href="#">Copy Redash pull URL</a></li>
+                    </ul>
+                    <button class="btn btn-outline-secondary" id="radar-schedule-this" type="button"
+                            title="Save this query as a recurring scheduled report">
+                        &#128338; Schedule&hellip;
+                    </button>
+                </div>
+            </div>
+            <div class="text-muted small mt-1" id="radar-cost-estimate" aria-live="polite"></div>
+        </div>
+
+        {{! Saved schedules — collapsed by default }}
+        <div class="collapse border-top" id="radar-schedules-body">
+            <div class="card-body" id="radar-schedules-pane">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Scheduled Queries</h5>
+                    <button class="btn btn-sm btn-outline-primary" id="radar-new-schedule" type="button">+ New schedule</button>
+                </div>
+                {{#has_radar_schedules}}
+                <table class="table table-sm" id="radar-schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Frequency</th>
+                            <th>Channels</th>
+                            <th>Last run</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#radar_schedules}}
+                        <tr data-id="{{id}}">
+                            <td><strong>{{name}}</strong></td>
+                            <td>{{frequency}}</td>
+                            <td>
+                                {{#recipient}}<span class="badge bg-secondary me-1" title="{{recipient}}">email</span>{{/recipient}}
+                                {{#has_slack}}<span class="badge bg-secondary me-1">slack</span>{{/has_slack}}
+                                {{#has_teams}}<span class="badge bg-secondary me-1">teams</span>{{/has_teams}}
+                            </td>
+                            <td>{{last_run}}</td>
+                            <td>
+                                {{#last_status_class}}<span class="badge bg-{{last_status_class}}-subtle">{{last_status}}</span>{{/last_status_class}}
+                                {{^last_status}}—{{/last_status}}
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-secondary radar-sched-edit" data-id="{{id}}">Edit</button>
+                                <button class="btn btn-sm btn-outline-{{#enabled}}warning{{/enabled}}{{^enabled}}success{{/enabled}} radar-sched-toggle"
+                                        data-id="{{id}}" data-enabled="{{#enabled}}0{{/enabled}}{{^enabled}}1{{/enabled}}">
+                                    {{#enabled}}Pause{{/enabled}}{{^enabled}}Enable{{/enabled}}
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger radar-sched-delete" data-id="{{id}}">Delete</button>
+                            </td>
+                        </tr>
+                        {{/radar_schedules}}
+                    </tbody>
+                </table>
+                {{/has_radar_schedules}}
+                {{^has_radar_schedules}}
+                <p class="text-muted mb-0">No scheduled queries yet. Run a query above and click "Schedule" to set one up.</p>
+                {{/has_radar_schedules}}
+            </div>
+        </div>
+
+        {{! Past queries — collapsed by default, searchable }}
+        <div class="collapse border-top" id="radar-history-body">
             <div class="card-body">
-                <div class="d-flex flex-wrap align-items-end mb-2" style="gap:8px">
-                    <div>
-                        <label for="ai-analysis-provider" class="small text-muted mb-0">LLM to query with</label>
-                        <select id="ai-analysis-provider" class="form-control form-control-sm" style="width:180px">
-                            {{#meta_ai_providers}}
-                            <option value="{{id}}" data-models="{{models_json}}">{{label}}</option>
-                            {{/meta_ai_providers}}
-                        </select>
-                    </div>
-                    <div>
-                        <label for="ai-analysis-model" class="small text-muted mb-0">Model</label>
-                        <select id="ai-analysis-model" class="form-control form-control-sm" style="width:200px"></select>
-                    </div>
-                    <div>
-                        <label for="ai-analysis-scope" class="small text-muted mb-0">Data scope</label>
-                        <select id="ai-analysis-scope" class="form-control form-control-sm" style="width:200px">
-                            <option value="all">All courses</option>
-                            <option value="current" {{#courseid_param}}selected{{/courseid_param}}>Current course only</option>
-                            <option value="custom">Specific course IDs...</option>
-                            <option value="byprovider">By LLM provider used...</option>
-                        </select>
-                    </div>
-                    <div id="ai-analysis-scope-detail" style="display:none">
-                        <label for="ai-analysis-scope-value" class="small text-muted mb-0">Course IDs or provider</label>
-                        <input type="text" id="ai-analysis-scope-value" class="form-control form-control-sm" style="width:200px" placeholder="e.g. 2,5,12 or openai">
-                    </div>
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap" style="gap:8px">
+                    <h5 class="mb-0">Past Queries</h5>
+                    <input type="text" id="radar-history-search" class="form-control form-control-sm" style="max-width:280px"
+                           placeholder="Search query text&hellip;" aria-label="Search past queries">
                 </div>
-                <div id="ai-analysis-messages" style="max-height:400px;overflow-y:auto;border:1px solid #dee2e6;border-radius:6px;padding:12px;margin-bottom:12px;background:#f8f9fa;font-size:14px">
-                    <p class="text-muted mb-0" style="font-size:13px">Ask about student conversations, feedback, provider performance, token costs, or learning trends. All data is anonymized. Try: "Which provider gives the best student satisfaction?" or "What topics do students struggle with most?"</p>
-                </div>
-                <div class="input-group">
-                    <input type="text" id="ai-analysis-input" class="form-control" placeholder="Ask about student data, trends, costs, feedback...">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary" id="ai-analysis-send" type="button">Send</button>
-                        <button class="btn btn-outline-secondary" id="ai-analysis-download" type="button" title="Download last response as CSV">&#8615; CSV</button>
-                    </div>
-                </div>
-                <input type="hidden" id="ai-analysis-sse-url" value="{{meta_ai_sse_url}}">
-                <input type="hidden" id="ai-analysis-sesskey" value="{{sesskey}}">
-                <input type="hidden" id="ai-analysis-courseid" value="{{courseid_param}}">
-                <input type="hidden" id="ai-analysis-range" value="{{range}}">
+                {{#has_radar_past}}
+                <table class="table table-sm table-striped" id="radar-history-table">
+                    <thead>
+                        <tr>
+                            <th>When</th>
+                            <th>Query</th>
+                            <th>Provider</th>
+                            <th>Type</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#radar_past}}
+                        <tr data-id="{{id}}" data-query="{{query}}">
+                            <td><small class="text-muted">{{date}}</small></td>
+                            <td><div style="max-width:480px">{{query}}</div></td>
+                            <td><small>{{provider}}<br>{{model}}</small></td>
+                            <td>
+                                {{#scheduled}}<span class="badge bg-info-subtle">scheduled</span>{{/scheduled}}
+                                {{^scheduled}}<span class="badge bg-secondary-subtle">ad-hoc</span>{{/scheduled}}
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-secondary radar-history-rerun" data-id="{{id}}">Re-run</button>
+                            </td>
+                        </tr>
+                        {{/radar_past}}
+                    </tbody>
+                </table>
+                {{/has_radar_past}}
+                {{^has_radar_past}}
+                <p class="text-muted mb-0">No queries run yet.</p>
+                {{/has_radar_past}}
             </div>
         </div>
     </div>
-    {{/has_meta_ai_providers}}
 
-    {{! ═══ Course List with Enable/Disable Toggles ═══ }}
-    <h3>Courses</h3>
-    <p class="text-muted">Enable or disable AI Assistant per course. Click a course name to view detailed analytics.</p>
-
-    {{#has_courses}}
-    {{! Search + filter bar }}
-    <div class="d-flex align-items-center mb-2 flex-wrap" style="gap:8px">
-        <input type="text" id="sola-course-search" class="form-control form-control-sm" style="max-width:260px"
-               placeholder="Search courses..." aria-label="Filter course list" autofocus>
-        <select id="sola-filter-status" class="form-control form-control-sm" style="max-width:160px" aria-label="Filter by AI Assistant status">
-            <option value="">All AI Assistant Status</option>
-            <option value="enabled">AI Assistant Enabled</option>
-            <option value="disabled">AI Assistant Disabled</option>
-        </select>
-        <select id="sola-filter-ut" class="form-control form-control-sm" style="max-width:180px" aria-label="Filter by user testing">
-            <option value="">All Usability Testing</option>
-            <option value="on">UT On</option>
-            <option value="off">UT Off</option>
-            <option value="inherit">UT Inherit</option>
-        </select>
-    </div>
-    <p id="sola-default-limit-msg" class="text-muted mb-2" style="font-size:13px;display:none"></p>
-
-    {{! Bulk action bar }}
-    <div class="card mb-2 bg-light" id="sola-bulk-bar">
-        <div class="card-body py-2 px-3 d-flex align-items-center flex-wrap" style="gap:8px">
-            <label class="mb-0" style="font-weight:600;font-size:13px">
-                <input type="checkbox" id="sola-select-all"> Select all
-            </label>
-            <span id="sola-selected-count" class="text-muted" style="font-size:13px">(0 selected)</span>
-            <span class="mx-1" style="border-left:1px solid #ccc;height:20px"></span>
-
-            <span style="font-size:13px;font-weight:600">AI Assistant:</span>
-            <button type="button" class="btn btn-sm btn-outline-success sola-bulk-action" data-action="bulktoggle" data-enabled="1">
-                Enable
-            </button>
-            <button type="button" class="btn btn-sm btn-outline-danger sola-bulk-action" data-action="bulktoggle" data-enabled="0">
-                Disable
-            </button>
-
-            <span class="mx-1" style="border-left:1px solid #ccc;height:20px"></span>
-
-            <span style="font-size:13px;font-weight:600">Usability Testing:</span>
-            <button type="button" class="btn btn-sm btn-outline-success sola-bulk-action" data-action="bulktoggleut" data-utvalue="1">
-                Enable
-            </button>
-            <button type="button" class="btn btn-sm btn-outline-danger sola-bulk-action" data-action="bulktoggleut" data-utvalue="0">
-                Disable
-            </button>
-            <button type="button" class="btn btn-sm btn-outline-secondary sola-bulk-action" data-action="bulktoggleut" data-utvalue="">
-                Inherit
-            </button>
-        </div>
-    </div>
-
-    {{! Hidden form for bulk submissions }}
-    <form method="post" action="{{form_action}}" id="sola-bulk-form" style="display:none">
-        <input type="hidden" name="sesskey" value="{{sesskey}}">
-        <input type="hidden" name="action" id="sola-bulk-form-action" value="">
-        <input type="hidden" name="courseid" value="{{courseid_param}}">
-        <input type="hidden" name="range" value="{{range}}">
-        <input type="hidden" name="scope" value="selected">
-        <input type="hidden" name="selected_ids" id="sola-bulk-form-ids" value="">
-        <input type="hidden" name="enabled" id="sola-bulk-form-enabled" value="">
-        <input type="hidden" name="utvalue" id="sola-bulk-form-utvalue" value="">
-    </form>
-
-    <div class="card mb-4">
-        <div class="card-body p-0">
-            <table class="table table-striped mb-0" id="sola-course-table">
-                <thead>
-                    <tr>
-                        <th style="width:40px" class="text-center"></th>
-                        <th class="sola-sortable" data-sort="name" style="cursor:pointer">
-                            Course <span class="sola-sort-icon">&#8597;</span>
-                        </th>
-                        <th class="text-center sola-sortable" data-sort="sola" style="width:120px;cursor:pointer">
-                            AI Assistant <span class="sola-sort-icon">&#8597;</span>
-                        </th>
-                        <th class="text-center sola-sortable" data-sort="ut" style="width:140px;cursor:pointer">
-                            Usability Testing <span class="sola-sort-icon">&#8597;</span>
-                        </th>
-                        <th class="text-center sola-sortable" data-sort="data" style="width:100px;cursor:pointer">
-                            Has Data <span class="sola-sort-icon">&#8597;</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#courses}}
-                    <tr data-courseid="{{id}}"
-                        data-sola="{{#enabled}}enabled{{/enabled}}{{^enabled}}disabled{{/enabled}}"
-                        data-ut="{{#ut_on}}on{{/ut_on}}{{#ut_off}}off{{/ut_off}}{{#ut_inherit}}inherit{{/ut_inherit}}"
-                        data-hasdata="{{#has_data}}1{{/has_data}}{{^has_data}}0{{/has_data}}">
-                        <td class="text-center">
-                            <input type="checkbox" class="sola-row-check" value="{{id}}">
-                        </td>
-                        <td>
-                            {{#has_data}}
-                            <a href="{{form_action}}?courseid={{id}}&amp;range={{range}}">
-                                <strong>{{fullname}}</strong>
-                            </a>
-                            {{/has_data}}
-                            {{^has_data}}
-                            {{fullname}}
-                            {{/has_data}}
-                            <small class="text-muted ml-1">({{shortname}})</small>
-                        </td>
-                        <td class="text-center">
-                            <form method="post" action="{{form_action}}" style="display:inline">
-                                <input type="hidden" name="sesskey" value="{{sesskey}}">
-                                <input type="hidden" name="action" value="toggle">
-                                <input type="hidden" name="togglecourseid" value="{{id}}">
-                                <input type="hidden" name="courseid" value="{{courseid_param}}">
-                                <input type="hidden" name="range" value="{{range}}">
-                                {{#enabled}}
-                                <input type="hidden" name="enabled" value="0">
-                                <button type="submit" class="btn btn-sm btn-success" title="Click to disable">
-                                    Enabled
-                                </button>
-                                {{/enabled}}
-                                {{^enabled}}
-                                <input type="hidden" name="enabled" value="1">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Click to enable">
-                                    Disabled
-                                </button>
-                                {{/enabled}}
-                            </form>
-                        </td>
-                        <td class="text-center">
-                            <form method="post" action="{{form_action}}" style="display:inline">
-                                <input type="hidden" name="sesskey" value="{{sesskey}}">
-                                <input type="hidden" name="action" value="toggleut">
-                                <input type="hidden" name="togglecourseid" value="{{id}}">
-                                <input type="hidden" name="courseid" value="{{courseid_param}}">
-                                <input type="hidden" name="range" value="{{range}}">
-                                {{#ut_on}}
-                                <input type="hidden" name="utvalue" value="">
-                                <button type="submit" class="btn btn-sm btn-success" title="On (per-course) — click to inherit global">
-                                    On
-                                </button>
-                                {{/ut_on}}
-                                {{#ut_off}}
-                                <input type="hidden" name="utvalue" value="1">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Off (per-course) — click to enable">
-                                    Off
-                                </button>
-                                {{/ut_off}}
-                                {{#ut_inherit}}
-                                <input type="hidden" name="utvalue" value="{{#ut_effective}}0{{/ut_effective}}{{^ut_effective}}1{{/ut_effective}}">
-                                <button type="submit" class="btn btn-sm {{#ut_effective}}btn-outline-success{{/ut_effective}}{{^ut_effective}}btn-outline-secondary{{/ut_effective}}"
-                                        title="Inheriting global ({{#ut_effective}}on{{/ut_effective}}{{^ut_effective}}off{{/ut_effective}}) — click to override">
-                                    {{#ut_effective}}Global: On{{/ut_effective}}{{^ut_effective}}Global: Off{{/ut_effective}}
-                                </button>
-                                {{/ut_inherit}}
-                            </form>
-                        </td>
-                        <td class="text-center">
-                            {{#has_data}}<span class="badge badge-info">Yes</span>{{/has_data}}
-                            {{^has_data}}<span class="text-muted">&mdash;</span>{{/has_data}}
-                        </td>
-                    </tr>
-                    {{/courses}}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {{/has_courses}}
+    {{! Citation popover (created on first hover) is appended to body by JS. }}
 
     {{! ═══ Per-Course Analytics (if selected) ═══ }}
     {{#has_course_selected}}
@@ -769,198 +763,13 @@
     {{/has_course_selected}}
 
     {{^has_course_selected}}
-    <div class="alert alert-info mt-3">Select a course above to view detailed analytics.</div>
+    <div class="alert alert-info mt-3">
+        Pick a course from the tabs above to drill into its analytics, or
+        <a href="{{courses_admin_url}}">manage course enrollment</a> to
+        enable SOLA on more courses.
+    </div>
     {{/has_course_selected}}
 </div>
-
-{{#has_courses}}
-{{#js}}
-(function() {
-    // ── Course table: search, filter, sort, checkboxes, bulk actions ──
-    var searchBox = document.getElementById('sola-course-search');
-    var filterStatus = document.getElementById('sola-filter-status');
-    var filterUt = document.getElementById('sola-filter-ut');
-    var courseTable = document.getElementById('sola-course-table');
-    var selectAll = document.getElementById('sola-select-all');
-    var selectedCount = document.getElementById('sola-selected-count');
-    var bulkForm = document.getElementById('sola-bulk-form');
-
-    function getRows() {
-        return courseTable ? Array.prototype.slice.call(courseTable.querySelectorAll('tbody tr')) : [];
-    }
-
-    function applyFilters() {
-        var q = (searchBox ? searchBox.value : '').toLowerCase();
-        var sf = filterStatus ? filterStatus.value : '';
-        var uf = filterUt ? filterUt.value : '';
-        var rows = getRows();
-        for (var i = 0; i < rows.length; i++) {
-            var r = rows[i];
-            var matchText = !q || r.textContent.toLowerCase().indexOf(q) !== -1;
-            var matchSola = !sf || r.getAttribute('data-sola') === sf;
-            var matchUt = !uf || r.getAttribute('data-ut') === uf;
-            r.style.display = (matchText && matchSola && matchUt) ? '' : 'none';
-        }
-        updateCount();
-    }
-
-    function updateCount() {
-        if (!selectedCount) return;
-        var checks = courseTable ? courseTable.querySelectorAll('.sola-row-check:checked') : [];
-        selectedCount.textContent = '(' + checks.length + ' selected)';
-    }
-
-    function getSelectedIds() {
-        var ids = [];
-        if (!courseTable) return ids;
-        var checks = courseTable.querySelectorAll('.sola-row-check:checked');
-        for (var i = 0; i < checks.length; i++) {
-            ids.push(checks[i].value);
-        }
-        return ids;
-    }
-
-    // Default: limit visible courses to 25 when no search/filter is active.
-    var MAX_DEFAULT_ROWS = 25;
-    var defaultLimitMsg = document.getElementById('sola-default-limit-msg');
-
-    function enforceDefaultLimit() {
-        var q = (searchBox ? searchBox.value : '');
-        var sf = filterStatus ? filterStatus.value : '';
-        var uf = filterUt ? filterUt.value : '';
-        var hasFilter = q || sf || uf;
-        if (hasFilter) {
-            if (defaultLimitMsg) defaultLimitMsg.style.display = 'none';
-            return;
-        }
-        var rows = getRows();
-        var visibleCount = 0;
-        for (var i = 0; i < rows.length; i++) {
-            if (rows[i].style.display !== 'none') {
-                visibleCount++;
-                if (visibleCount > MAX_DEFAULT_ROWS) {
-                    rows[i].style.display = 'none';
-                }
-            }
-        }
-        if (defaultLimitMsg) {
-            defaultLimitMsg.style.display = rows.length > MAX_DEFAULT_ROWS ? '' : 'none';
-            defaultLimitMsg.textContent = 'Showing ' + Math.min(MAX_DEFAULT_ROWS, rows.length) + ' of ' + rows.length + ' courses. Use the search box or filters to see all.';
-        }
-    }
-
-    var origApplyFilters = applyFilters;
-    applyFilters = function() {
-        origApplyFilters();
-        enforceDefaultLimit();
-    };
-
-    if (searchBox) searchBox.addEventListener('input', applyFilters);
-    if (filterStatus) filterStatus.addEventListener('change', applyFilters);
-    if (filterUt) filterUt.addEventListener('change', applyFilters);
-
-    // Apply default limit on page load.
-    applyFilters();
-
-    // Select all checkbox.
-    if (selectAll && courseTable) {
-        selectAll.addEventListener('change', function() {
-            var checked = selectAll.checked;
-            var rows = getRows();
-            for (var i = 0; i < rows.length; i++) {
-                if (rows[i].style.display !== 'none') {
-                    var cb = rows[i].querySelector('.sola-row-check');
-                    if (cb) cb.checked = checked;
-                }
-            }
-            updateCount();
-        });
-    }
-
-    // Individual checkbox updates.
-    if (courseTable) {
-        courseTable.addEventListener('change', function(e) {
-            if (e.target.classList.contains('sola-row-check')) {
-                updateCount();
-                if (selectAll && !e.target.checked) selectAll.checked = false;
-            }
-        });
-    }
-
-    // Bulk action buttons.
-    var bulkBtns = document.querySelectorAll('.sola-bulk-action');
-    for (var b = 0; b < bulkBtns.length; b++) {
-        bulkBtns[b].addEventListener('click', function() {
-            var ids = getSelectedIds();
-            var action = this.getAttribute('data-action');
-            var label = action === 'bulktoggle' ? 'AI Assistant' : 'Usability Testing';
-
-            if (ids.length === 0) {
-                if (!confirm('No courses selected. Apply to ALL courses?')) return;
-                document.getElementById('sola-bulk-form').querySelector('[name="scope"]').value = 'all';
-            } else {
-                if (!confirm('Apply ' + label + ' change to ' + ids.length + ' selected course(s)?')) return;
-                document.getElementById('sola-bulk-form').querySelector('[name="scope"]').value = 'selected';
-                document.getElementById('sola-bulk-form-ids').value = ids.join(',');
-            }
-
-            document.getElementById('sola-bulk-form-action').value = action;
-            if (action === 'bulktoggle') {
-                document.getElementById('sola-bulk-form-enabled').value = this.getAttribute('data-enabled');
-            } else {
-                document.getElementById('sola-bulk-form-utvalue').value = this.getAttribute('data-utvalue');
-            }
-            bulkForm.submit();
-        });
-    }
-
-    // Sortable columns.
-    var sortDir = {};
-    var sortHeaders = courseTable ? courseTable.querySelectorAll('.sola-sortable') : [];
-    for (var h = 0; h < sortHeaders.length; h++) {
-        sortHeaders[h].addEventListener('click', function() {
-            var col = this.getAttribute('data-sort');
-            sortDir[col] = sortDir[col] === 'asc' ? 'desc' : 'asc';
-            var dir = sortDir[col];
-            var tbody = courseTable.querySelector('tbody');
-            var rows = getRows();
-
-            rows.sort(function(a, b) {
-                var va, vb;
-                if (col === 'name') {
-                    va = a.cells[1].textContent.trim().toLowerCase();
-                    vb = b.cells[1].textContent.trim().toLowerCase();
-                } else if (col === 'sola') {
-                    va = a.getAttribute('data-sola');
-                    vb = b.getAttribute('data-sola');
-                } else if (col === 'ut') {
-                    va = a.getAttribute('data-ut');
-                    vb = b.getAttribute('data-ut');
-                } else if (col === 'data') {
-                    va = a.getAttribute('data-hasdata');
-                    vb = b.getAttribute('data-hasdata');
-                }
-                if (va < vb) return dir === 'asc' ? -1 : 1;
-                if (va > vb) return dir === 'asc' ? 1 : -1;
-                return 0;
-            });
-
-            for (var i = 0; i < rows.length; i++) {
-                tbody.appendChild(rows[i]);
-            }
-
-            // Update sort icons.
-            var icons = courseTable.querySelectorAll('.sola-sort-icon');
-            for (var j = 0; j < icons.length; j++) {
-                icons[j].innerHTML = '&#8597;';
-            }
-            this.querySelector('.sola-sort-icon').innerHTML = dir === 'asc' ? '&#9650;' : '&#9660;';
-        });
-    }
-})();
-
-{{/js}}
-{{/has_courses}}
 
 {{#has_course_selected}}
 {{#course.has_data}}
@@ -1078,230 +887,7 @@
 {{/course.has_data}}
 {{/has_course_selected}}
 
-{{! ═══ Learning Radar JS ═══ }}
-{{#has_meta_ai_providers}}
+{{! ═══ Learning Radar AMD module bootstrap ═══ }}
 {{#js}}
-(function() {
-    var providerSelect = document.getElementById('ai-analysis-provider');
-    var modelSelect = document.getElementById('ai-analysis-model');
-    var messagesDiv = document.getElementById('ai-analysis-messages');
-    var inputField = document.getElementById('ai-analysis-input');
-    var sendBtn = document.getElementById('ai-analysis-send');
-    var downloadBtn = document.getElementById('ai-analysis-download');
-    var sseUrl = document.getElementById('ai-analysis-sse-url');
-    var sesskey = document.getElementById('ai-analysis-sesskey');
-    var courseidEl = document.getElementById('ai-analysis-courseid');
-    var rangeEl = document.getElementById('ai-analysis-range');
-    var scopeSelect = document.getElementById('ai-analysis-scope');
-    var scopeDetail = document.getElementById('ai-analysis-scope-detail');
-    var scopeValue = document.getElementById('ai-analysis-scope-value');
-
-    if (!providerSelect || !modelSelect || !messagesDiv || !inputField || !sendBtn) return;
-
-    var chatHistory = [];
-    var lastResponse = '';
-
-    // Scope selector: show/hide detail input.
-    if (scopeSelect) {
-        scopeSelect.addEventListener('change', function() {
-            var v = scopeSelect.value;
-            if (v === 'custom' || v === 'byprovider') {
-                scopeDetail.style.display = '';
-                scopeValue.placeholder = v === 'custom' ? 'Course IDs (e.g. 2,5,12)' : 'Provider (e.g. openai, claude)';
-            } else {
-                scopeDetail.style.display = 'none';
-            }
-        });
-    }
-
-    // CSV download of last response.
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', function() {
-            if (!lastResponse) { alert('No response to download yet.'); return; }
-            var csv = 'Field,Value\nQuery,"' + (inputField.value || '').replace(/"/g, '""') + '"\nResponse,"' + lastResponse.replace(/"/g, '""') + '"\nDate,"' + new Date().toISOString() + '"\nNote,"All student data is anonymized."\n';
-            var blob = new Blob([csv], {type: 'text/csv'});
-            var a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'sola_ai_analysis_' + Date.now() + '.csv';
-            a.click();
-        });
-    }
-
-    function populateModels() {
-        var opt = providerSelect.options[providerSelect.selectedIndex];
-        var models = [];
-        try { models = JSON.parse(opt.getAttribute('data-models') || '[]'); } catch (e) {}
-        modelSelect.innerHTML = '';
-        if (!models.length) {
-            var o = document.createElement('option');
-            o.value = '';
-            o.textContent = '(provider default)';
-            modelSelect.appendChild(o);
-        }
-        for (var i = 0; i < models.length; i++) {
-            var o = document.createElement('option');
-            o.value = models[i];
-            o.textContent = models[i];
-            modelSelect.appendChild(o);
-        }
-    }
-    providerSelect.addEventListener('change', populateModels);
-    populateModels();
-
-    function appendMessage(role, text) {
-        var div = document.createElement('div');
-        div.style.cssText = 'margin-bottom:10px;padding:8px 12px;border-radius:8px;max-width:90%;font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word;';
-        if (role === 'user') {
-            div.style.cssText += 'background:#023e8a;color:#fff;margin-left:auto;text-align:right;';
-        } else {
-            div.style.cssText += 'background:#fff;border:1px solid #dee2e6;';
-        }
-        div.textContent = text;
-        // Clear the placeholder if it exists
-        var placeholder = messagesDiv.querySelector('.text-muted');
-        if (placeholder) placeholder.remove();
-        messagesDiv.appendChild(div);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        return div;
-    }
-
-    function sendQuery() {
-        var query = inputField.value.trim();
-        if (!query) return;
-
-        appendMessage('user', query);
-        chatHistory.push({ role: 'user', content: query });
-        inputField.value = '';
-        sendBtn.disabled = true;
-        inputField.disabled = true;
-
-        var responseDiv = appendMessage('assistant', '');
-        var fullText = '';
-
-        var params = new URLSearchParams();
-        params.append('sesskey', sesskey ? sesskey.value : '');
-        params.append('query', query);
-        params.append('provider', providerSelect.value);
-        params.append('model', modelSelect.value);
-        params.append('range', rangeEl ? rangeEl.value : '30');
-        params.append('history', JSON.stringify(chatHistory.slice(0, -1)));
-
-        // Scope filters.
-        var scope = scopeSelect ? scopeSelect.value : 'all';
-        if (scope === 'current') {
-            params.append('courseid', courseidEl ? courseidEl.value : '0');
-        } else if (scope === 'custom') {
-            params.append('courseids', scopeValue ? scopeValue.value : '');
-        } else if (scope === 'byprovider') {
-            params.append('filterprovider', scopeValue ? scopeValue.value : '');
-        }
-        // scope === 'all' sends no filter (all courses).
-
-        var url = sseUrl ? sseUrl.value : '';
-        fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: params.toString()
-        }).then(function(resp) {
-            var reader = resp.body.getReader();
-            var decoder = new TextDecoder();
-            var buffer = '';
-            function read() {
-                return reader.read().then(function(result) {
-                    if (result.done) {
-                        // Strip [SOLA_NEXT]...[/SOLA_NEXT] block from the visible
-                        // response and render the 4 pipe-delimited suggestions
-                        // as clickable chips that repopulate the query input.
-                        var nextMatch = fullText.match(/\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/);
-                        var suggestions = [];
-                        if (nextMatch) {
-                            fullText = fullText.replace(nextMatch[0], '').trim();
-                            responseDiv.textContent = fullText;
-                            suggestions = nextMatch[1].split('||').map(function(s) { return s.trim(); }).filter(Boolean);
-                        }
-                        if (suggestions.length > 0) {
-                            var chipRow = document.createElement('div');
-                            chipRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px;';
-                            suggestions.forEach(function(txt) {
-                                var chip = document.createElement('button');
-                                chip.type = 'button';
-                                chip.textContent = txt;
-                                chip.className = 'btn btn-sm btn-outline-primary';
-                                chip.style.cssText = 'font-size:12px;padding:4px 10px;border-radius:14px;white-space:normal;text-align:left;';
-                                chip.addEventListener('click', function() {
-                                    inputField.value = txt;
-                                    sendQuery();
-                                });
-                                chipRow.appendChild(chip);
-                            });
-                            messagesDiv.appendChild(chipRow);
-                            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                        }
-                        chatHistory.push({ role: 'assistant', content: fullText });
-                        lastResponse = fullText;
-                        sendBtn.disabled = false;
-                        inputField.disabled = false;
-                        inputField.focus();
-                        return;
-                    }
-                    buffer += decoder.decode(result.value, { stream: true });
-                    var lines = buffer.split('\n');
-                    buffer = lines.pop();
-                    for (var i = 0; i < lines.length; i++) {
-                        var line = lines[i].trim();
-                        if (line.indexOf('data: ') === 0) {
-                            try {
-                                var payload = JSON.parse(line.substring(6));
-                                if (payload.token) {
-                                    fullText += payload.token;
-                                    responseDiv.textContent = fullText;
-                                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                                }
-                                if (payload.message) {
-                                    responseDiv.textContent = 'Error: ' + payload.message;
-                                }
-                                if (payload.full && !fullText) {
-                                    fullText = payload.full;
-                                    responseDiv.textContent = fullText;
-                                }
-                            } catch (e) {}
-                        }
-                    }
-                    return read();
-                });
-            }
-            return read();
-        }).catch(function(err) {
-            responseDiv.textContent = 'Error: ' + (err.message || 'Network error');
-            sendBtn.disabled = false;
-            inputField.disabled = false;
-        });
-    }
-
-    sendBtn.addEventListener('click', sendQuery);
-    inputField.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendQuery();
-        }
-    });
-
-    // Metric chips: clicking a chip at the top of the Learning Radar opens the
-    // chat card (if collapsed), fills the query, and sends. v3.9.8+.
-    var chipButtons = document.querySelectorAll('.learning-radar-chip');
-    chipButtons.forEach(function(chip) {
-        chip.addEventListener('click', function() {
-            var q = chip.getAttribute('data-query') || '';
-            if (!q) return;
-            var body = document.getElementById('ai-analysis-body');
-            if (body && !body.classList.contains('show')) {
-                var toggle = document.querySelector('[data-target="#ai-analysis-body"]');
-                if (toggle) { toggle.click(); }
-            }
-            inputField.value = q;
-            setTimeout(function() { sendQuery(); }, 150);
-        });
-    });
-})();
+require(['local_ai_course_assistant/learning_radar'], function(LR) { LR.init(); });
 {{/js}}
-{{/has_meta_ai_providers}}

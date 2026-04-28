@@ -19,13 +19,21 @@ namespace local_ai_course_assistant\task;
 use local_ai_course_assistant\conversation_manager;
 use local_ai_course_assistant\meta_ai_data_builder;
 use local_ai_course_assistant\provider\base_provider;
+use local_ai_course_assistant\radar_delivery;
+use local_ai_course_assistant\radar_schedule_manager;
 
 /**
- * Scheduled task that runs a Learning Radar analytics query and emails
- * the anonymized result to the configured admin address.
+ * Scheduled task that runs every Learning Radar saved schedule whose
+ * frequency matches today (daily / weekly / monthly).
+ *
+ * Each schedule produces an anonymized analytics answer, which is delivered
+ * to whichever channels the schedule has configured: email recipient,
+ * Slack incoming webhook, Microsoft Teams incoming webhook. The query and
+ * response are persisted with interaction_type='meta_scheduled' so they
+ * surface in Redash exports and the Learning Radar history.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025 AI Course Assistant
+ * @copyright  2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class run_meta_ai_query extends \core\task\scheduled_task {
@@ -35,78 +43,127 @@ class run_meta_ai_query extends \core\task\scheduled_task {
     }
 
     public function execute(): void {
-        if (!get_config('local_ai_course_assistant', 'metaai_cron_enabled')) {
-            mtrace('  Learning Radar cron: disabled, skipping.');
+        $schedules = radar_schedule_manager::all(true);
+        if (empty($schedules)) {
+            mtrace('  Learning Radar cron: no schedules configured.');
             return;
         }
 
-        $frequency = get_config('local_ai_course_assistant', 'metaai_cron_frequency') ?: 'weekly';
-        if (!$this->should_run_today($frequency)) {
-            mtrace("  Learning Radar cron: frequency={$frequency}, not scheduled for today, skipping.");
+        foreach ($schedules as $sched) {
+            if (!radar_schedule_manager::should_run_today($sched->frequency)) {
+                continue;
+            }
+            try {
+                $this->run_schedule($sched);
+                radar_schedule_manager::record_run((int) $sched->id, 'success');
+            } catch (\Throwable $e) {
+                mtrace('  Learning Radar cron ERROR (#' . $sched->id . '): ' . $e->getMessage());
+                radar_schedule_manager::record_run((int) $sched->id, 'error', $e->getMessage());
+            }
+        }
+        mtrace('  Learning Radar cron: done.');
+    }
+
+    /**
+     * Execute one schedule end-to-end: build context, call LLM, deliver,
+     * persist for export.
+     *
+     * @param \stdClass $sched Row from local_ai_course_assistant_radar_sched.
+     * @return void
+     */
+    private function run_schedule(\stdClass $sched): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/lib/filelib.php');
+
+        $query = (string) $sched->query;
+        if ($query === '') {
+            mtrace('  Learning Radar cron: schedule #' . $sched->id . ' has no query, skipping.');
             return;
         }
 
-        $query = get_config('local_ai_course_assistant', 'metaai_cron_query');
-        if (empty($query)) {
-            mtrace('  Learning Radar cron: no query configured, skipping.');
-            return;
-        }
-
-        $providerid = get_config('local_ai_course_assistant', 'metaai_cron_provider') ?: '';
-        $model = get_config('local_ai_course_assistant', 'metaai_cron_model') ?: '';
-        $email = get_config('local_ai_course_assistant', 'metaai_cron_email') ?: '';
-
-        if (empty($email)) {
-            $admin = get_admin();
-            $email = $admin->email;
-        }
-
-        $rangedays = $this->frequency_to_days($frequency);
+        $rangedays = !empty($sched->range_days)
+            ? (int) $sched->range_days
+            : radar_schedule_manager::frequency_to_days($sched->frequency);
         $since = time() - ($rangedays * 86400);
 
-        // Scope filters from admin settings.
-        $scopecourses = get_config('local_ai_course_assistant', 'metaai_cron_courseids') ?: '';
-        $scopeprovider = get_config('local_ai_course_assistant', 'metaai_cron_filterprovider') ?: '';
         $courseids = [];
-        if (!empty($scopecourses)) {
-            $courseids = array_filter(array_map('intval', explode(',', $scopecourses)));
+        if (!empty($sched->courseids)) {
+            $courseids = array_filter(array_map('intval', explode(',', (string) $sched->courseids)));
         }
+        $filterprovider = (string) ($sched->filterprovider ?? '');
 
-        mtrace("  Learning Radar cron: building context (last {$rangedays} days, "
-            . (empty($courseids) ? "all courses" : "courses " . implode(',', $courseids))
-            . ($scopeprovider ? ", provider={$scopeprovider}" : "") . ")...");
-        $systemprompt = meta_ai_data_builder::build_system_prompt($courseids, $since, $scopeprovider);
+        mtrace("  Learning Radar cron #{$sched->id}: building context (last {$rangedays}d, "
+            . (empty($courseids) ? 'all courses' : 'courses ' . implode(',', $courseids))
+            . ($filterprovider ? ", provider={$filterprovider}" : '') . ').');
+        $systemprompt = meta_ai_data_builder::build_system_prompt($courseids, $since, $filterprovider);
+
+        $providerid = (string) ($sched->provider ?? '');
+        $modelid = (string) ($sched->model ?? '');
+        if ($providerid !== '') {
+            $llm = base_provider::create_for_comparison($providerid, $modelid);
+        } else {
+            $llm = base_provider::create_from_config(0);
+        }
 
         $messages = [['role' => 'user', 'content' => $query]];
+        mtrace("  Learning Radar cron #{$sched->id}: calling LLM (provider={$providerid}, model={$modelid})...");
+        $response = $llm->chat_completion($systemprompt, $messages);
 
-        mtrace("  Learning Radar cron: calling LLM (provider={$providerid}, model={$model})...");
-        try {
-            global $CFG;
-            require_once($CFG->dirroot . '/lib/filelib.php');
-
-            if (!empty($providerid)) {
-                $llm = base_provider::create_for_comparison($providerid, $model);
-            } else {
-                $llm = base_provider::create_from_config(0);
-            }
-
-            $response = $llm->chat_completion($systemprompt, $messages);
-        } catch (\Throwable $e) {
-            mtrace('  Learning Radar cron ERROR: ' . $e->getMessage());
-            return;
+        $meta = [
+            'frequency' => $sched->frequency,
+            'range_days' => $rangedays,
+            'provider' => $providerid !== '' ? $providerid : 'primary',
+            'model' => $modelid !== '' ? $modelid : 'default',
+        ];
+        if (!empty($sched->courseids)) {
+            $meta['courses'] = $sched->courseids;
+        }
+        if ($filterprovider !== '') {
+            $meta['provider_filter'] = $filterprovider;
         }
 
-        $format = get_config('local_ai_course_assistant', 'metaai_cron_format') ?: 'text';
-        mtrace("  Learning Radar cron: sending {$format} report to {$email}...");
-        $this->send_report($email, $query, $response, $frequency, $format);
+        $delivered = false;
+        if (!empty($sched->recipient_email)) {
+            mtrace("  Learning Radar cron #{$sched->id}: emailing {$sched->recipient_email}...");
+            $delivered = radar_delivery::send_email(
+                (string) $sched->recipient_email,
+                $query,
+                $response,
+                (string) ($sched->format ?: 'text'),
+                'Scheduled (' . $sched->frequency . ')',
+                $meta
+            ) || $delivered;
+        }
+        if (!empty($sched->slack_webhook)) {
+            mtrace("  Learning Radar cron #{$sched->id}: posting to Slack webhook...");
+            $delivered = radar_delivery::send_slack((string) $sched->slack_webhook, $query, $response, $meta) || $delivered;
+        }
+        if (!empty($sched->teams_webhook)) {
+            mtrace("  Learning Radar cron #{$sched->id}: posting to Teams webhook...");
+            $delivered = radar_delivery::send_teams((string) $sched->teams_webhook, $query, $response, $meta) || $delivered;
+        }
 
-        // Persist the query+response so the run is exportable via Redash
-        // (interaction_type='meta_scheduled'). Non-fatal on failure.
+        if (!$delivered) {
+            // Fall back to the site admin so the report does not vanish.
+            $admin = get_admin();
+            mtrace("  Learning Radar cron #{$sched->id}: no destination delivered; falling back to admin email.");
+            radar_delivery::send_email(
+                (string) $admin->email,
+                $query,
+                $response,
+                (string) ($sched->format ?: 'text'),
+                'Scheduled (' . $sched->frequency . ')',
+                $meta
+            );
+        }
+
+        // Persist for export. Approximate token counts from char length since
+        // not every provider surfaces a usage block on chat_completion.
         try {
             $admin = get_admin();
             $approxprompt = (int) ceil((strlen($systemprompt) + strlen($query)) / 4);
             $approxcompletion = (int) ceil(strlen($response) / 4);
-            $persistedmodel = $model !== '' ? $model : 'unknown';
+            $persistedmodel = $modelid !== '' ? $modelid : 'unknown';
             $persistedprovider = $providerid !== '' ? $providerid
                 : (get_config('local_ai_course_assistant', 'provider') ?: 'unknown');
             conversation_manager::record_meta_query(
@@ -117,79 +174,11 @@ class run_meta_ai_query extends \core\task\scheduled_task {
                 $persistedmodel,
                 $approxprompt,
                 $approxcompletion,
-                true /* scheduled */
+                true
             );
         } catch (\Throwable $persisterr) {
-            mtrace('  Learning Radar cron: persistence failed (non-fatal): ' . $persisterr->getMessage());
-        }
-
-        mtrace('  Learning Radar cron: done.');
-    }
-
-    private function should_run_today(string $frequency): bool {
-        $dow = (int) date('N');
-        $dom = (int) date('j');
-        switch ($frequency) {
-            case 'daily':
-                return true;
-            case 'weekly':
-                return $dow === 1;
-            case 'monthly':
-                return $dom === 1;
-            default:
-                return false;
-        }
-    }
-
-    private function frequency_to_days(string $frequency): int {
-        switch ($frequency) {
-            case 'daily':   return 1;
-            case 'weekly':  return 7;
-            case 'monthly': return 30;
-            default:        return 7;
-        }
-    }
-
-    private function send_report(string $email, string $query, string $response, string $frequency, string $format = 'text'): void {
-        $admin = get_admin();
-        $recipient = \core_user::get_user_by_email($email);
-        if (!$recipient) {
-            $recipient = $admin;
-        }
-
-        $subject = 'SOLA Learning Radar Report (' . ucfirst($frequency) . ')';
-        $disclaimer = "All student data in this report is anonymized. Student names have been "
-            . "replaced with pseudonyms (e.g., Student 4217). Do not attempt to identify "
-            . "real students from this data.";
-
-        if ($format === 'csv') {
-            global $CFG;
-            $csvpath = $CFG->tempdir . '/sola_report_' . time() . '.csv';
-            $fp = fopen($csvpath, 'w');
-            fputcsv($fp, ['Field', 'Value']);
-            fputcsv($fp, ['Report Type', 'SOLA Learning Radar']);
-            fputcsv($fp, ['Frequency', ucfirst($frequency)]);
-            fputcsv($fp, ['Date', userdate(time(), '%Y-%m-%d %H:%M')]);
-            fputcsv($fp, ['Query', $query]);
-            fputcsv($fp, ['Response', $response]);
-            fputcsv($fp, ['Disclaimer', $disclaimer]);
-            fclose($fp);
-
-            $body = "Your SOLA Learning Radar report is attached as a CSV file.\n\n" . $disclaimer;
-            email_to_user($recipient, $admin, $subject, $body, '', $csvpath, 'sola_ai_analysis_report.csv');
-            @unlink($csvpath);
-        } else {
-            $body = "Learning Radar Report\n"
-                . "========================\n\n"
-                . "Frequency: " . ucfirst($frequency) . "\n"
-                . "Date: " . userdate(time(), '%Y-%m-%d %H:%M') . "\n"
-                . "Query: " . $query . "\n\n"
-                . "Response\n"
-                . "--------\n\n"
-                . $response . "\n\n"
-                . "---\n" . $disclaimer . "\n";
-
-            email_to_user($recipient, $admin, $subject, $body);
+            mtrace('  Learning Radar cron #' . $sched->id . ': persistence failed (non-fatal): '
+                . $persisterr->getMessage());
         }
     }
 }
