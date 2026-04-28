@@ -230,9 +230,15 @@
             r.style.display = (matchSearch && matchStatus && matchUt) ? '' : 'none';
         });
     }
-    if (search) search.addEventListener('input', applyFilters);
-    if (filterStatus) filterStatus.addEventListener('change', applyFilters);
-    if (filterUt) filterUt.addEventListener('change', applyFilters);
+    if (search) {
+        search.addEventListener('input', applyFilters);
+    }
+    if (filterStatus) {
+        filterStatus.addEventListener('change', applyFilters);
+    }
+    if (filterUt) {
+        filterUt.addEventListener('change', applyFilters);
+    }
 
     function updateSelectedCount() {
         var checks = document.querySelectorAll('.sola-row-check:checked');
@@ -261,7 +267,9 @@
                 alert('Select at least one course first.');
                 return;
             }
-            var ids = Array.prototype.map.call(checks, function(c) { return c.value; }).join(',');
+            var ids = Array.prototype.map.call(checks, function(c) {
+                return c.value;
+            }).join(',');
             var form = document.getElementById('sola-bulk-form');
             document.getElementById('sola-bulk-form-action').value = btn.dataset.action;
             document.getElementById('sola-bulk-form-ids').value = ids;

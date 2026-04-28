@@ -170,7 +170,7 @@
                     <input type="text" id="ai-analysis-scope-value" class="form-control form-control-sm" style="width:200px" placeholder="e.g. 2,5,12 or openai">
                 </div>
                 <div>
-                    <label for="ai-analysis-range" class="small text-muted mb-0">Range</label>
+                    <label for="ai-analysis-range-select" class="small text-muted mb-0">Range</label>
                     <select id="ai-analysis-range-select" class="form-control form-control-sm" style="width:140px">
                         <option value="1">Last 24 hours</option>
                         <option value="7">Last 7 days</option>
@@ -889,5 +889,7 @@
 
 {{! ═══ Learning Radar AMD module bootstrap ═══ }}
 {{#js}}
-require(['local_ai_course_assistant/learning_radar'], function(LR) { LR.init(); });
+require(['local_ai_course_assistant/learning_radar'], function(LR) {
+    LR.init();
+});
 {{/js}}
