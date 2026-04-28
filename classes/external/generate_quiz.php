@@ -61,6 +61,7 @@ class generate_quiz extends external_api {
      * @param string $topic Topic string, '__guided__' for AI-guided, '__adaptive__' for
      *                      mastery-targeted (v4.0 / M1), or empty for current page.
      * @param int $cmid Course module ID for current-page mode (0 if not applicable).
+     * @param string $difficulty Difficulty target: easy, medium, hard, or auto. Default medium.
      * @return array Quiz data with success flag, error message, topic, and questions.
      */
     public static function execute(int $courseid, int $count = 3, string $topic = '__guided__', int $cmid = 0, string $difficulty = 'medium'): array {
@@ -343,6 +344,7 @@ class generate_quiz extends external_api {
      * Return the strict JSON output instructions for the AI.
      *
      * @param int $count Number of quiz questions to request.
+     * @param string $difficulty Difficulty target (easy, medium, hard, auto). Default medium.
      * @return string Prompt instructions for quiz generation.
      */
     private static function get_quiz_format_instructions(int $count, string $difficulty = 'medium'): string {
