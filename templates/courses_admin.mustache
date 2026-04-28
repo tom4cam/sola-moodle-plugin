@@ -264,7 +264,9 @@
         btn.addEventListener('click', function() {
             var checks = document.querySelectorAll('.sola-row-check:checked');
             if (!checks.length) {
-                alert('Select at least one course first.');
+                // The "(N selected)" indicator already shows the state;
+                // silently no-op rather than firing an alert (which the
+                // ESLint no-alert rule rejects in Moodle's CI).
                 return;
             }
             var ids = Array.prototype.map.call(checks, function(c) {
