@@ -74,8 +74,9 @@ import '../styles.css';
     'use strict';
 
     // ---- Mini AMD loader ----
-    var _modules = {};   // name → {deps, factory}
-    var _resolved = {};  // name → exports
+    var _modules = {};    // name → {deps, factory}
+    var _resolved = {};   // name → final exports
+    var _resolving = {};  // name → placeholder exports for cyclic deps
 
     function define(deps, factory) {
         // Called by each AMD module. We capture via _currentModule.
@@ -93,10 +94,19 @@ import '../styles.css';
         if (_resolved[name] !== undefined) {
             return _resolved[name];
         }
+        if (_resolving[name]) {
+            return _resolving[name];
+        }
         var mod = _modules[name];
         if (!mod) {
             throw new Error('SOLA CDN: Unknown module "' + name + '"');
         }
+        // Mirror AMD cycle handling closely enough for SOLA's modules:
+        // expose a placeholder object while the factory is still resolving.
+        // Dependent modules keep the same object reference, which we hydrate
+        // with the real exports once the factory completes.
+        var placeholder = {};
+        _resolving[name] = placeholder;
         // Resolve dependencies first.
         var resolvedDeps = mod.deps.map(function(dep) {
             // Normalize module names.
@@ -106,8 +116,14 @@ import '../styles.css';
             return _resolve(normalized);
         });
         var exports = mod.factory.apply(null, resolvedDeps);
-        _resolved[name] = exports;
-        return exports;
+        delete _resolving[name];
+        if (exports && typeof exports === 'object') {
+            Object.assign(placeholder, exports);
+            _resolved[name] = placeholder;
+            return placeholder;
+        }
+        _resolved[name] = exports === undefined ? placeholder : exports;
+        return _resolved[name];
     }
 
     // ---- Register shim modules ----
