@@ -35,6 +35,59 @@ jobs:
         working-directory: cdn
         run: npm run build
 
+      - name: Audit bundle for off-allowlist URLs
+        # v4.4.0: belt-and-braces guard introduced after the IBL AI / Raison
+        # incident on 2026-04-29, where a third-party widget got bundled into
+        # entry-bundle.js and shipped to every install with no review point.
+        # Greps the built sola.min.js for any https?:// URL and fails the
+        # build if anything appears that is not prefix-matched by a line in
+        # cdn/bundle-allowlist.txt. A new URL in the bundle = a new line in
+        # the allowlist (which is PR-reviewable).
+        working-directory: cdn
+        run: |
+          set -e
+          BUNDLE=dist/sola.min.js
+          ALLOW=bundle-allowlist.txt
+          if [ ! -f "$BUNDLE" ]; then
+            echo "::error::Built bundle $BUNDLE not found"
+            exit 1
+          fi
+          if [ ! -f "$ALLOW" ]; then
+            echo "::error::Allowlist $ALLOW not found"
+            exit 1
+          fi
+          # Extract every https?:// URL from the bundle (sort -u for readability).
+          grep -oE 'https?://[a-zA-Z0-9._/?#%=&:-]+' "$BUNDLE" | sort -u > /tmp/found_urls.txt || true
+          # Strip comments and blank lines from the allowlist.
+          grep -v -E '^[[:space:]]*(#|$)' "$ALLOW" > /tmp/allow_prefixes.txt || true
+          # An URL is OK if any allowlist line is a prefix of it.
+          : > /tmp/unknown_urls.txt
+          while IFS= read -r url; do
+            ok=0
+            while IFS= read -r prefix; do
+              case "$url" in
+                "$prefix"*) ok=1; break ;;
+              esac
+            done < /tmp/allow_prefixes.txt
+            if [ "$ok" = 0 ]; then
+              echo "$url" >> /tmp/unknown_urls.txt
+            fi
+          done < /tmp/found_urls.txt
+          echo "All URLs found in bundle:"
+          cat /tmp/found_urls.txt | sed 's/^/  /'
+          if [ -s /tmp/unknown_urls.txt ]; then
+            echo ""
+            echo "::error::Bundle contains URLs not in cdn/bundle-allowlist.txt:"
+            sed 's/^/  /' /tmp/unknown_urls.txt
+            echo ""
+            echo "If these URLs are legitimate, add prefix lines to cdn/bundle-allowlist.txt"
+            echo "in the same PR that introduced them. The allowlist exists to make every"
+            echo "new third-party load in the CDN bundle a reviewable change."
+            exit 1
+          fi
+          echo ""
+          echo "Bundle URL audit clean."
+
       - name: Write manifest
         working-directory: cdn/dist
         run: |

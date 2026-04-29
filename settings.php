@@ -1540,6 +1540,22 @@ if ($hassiteconfig) {
         PARAM_RAW
     ));
 
+    // v4.4.0: Optional Content-Security-Policy header on course pages where
+    // the SOLA widget is active. Default off — admin opts in. Defense-in-
+    // depth against arbitrary scripts pasted into Site administration →
+    // Appearance → Additional HTML (the IBL AI / Raison incident).
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/csp_course_pages_mode',
+        get_string('settings:csp_course_pages_mode', 'local_ai_course_assistant'),
+        get_string('settings:csp_course_pages_mode_desc', 'local_ai_course_assistant'),
+        'off',
+        [
+            'off'         => get_string('settings:csp_mode_off', 'local_ai_course_assistant'),
+            'report-only' => get_string('settings:csp_mode_report_only', 'local_ai_course_assistant'),
+            'enforce'     => get_string('settings:csp_mode_enforce', 'local_ai_course_assistant'),
+        ]
+    ));
+
     // v4.1.1: Active-learners-online indicator scope. Default 'global' (the
     // anti-loneliness default — a global count rarely hits zero, so the
     // indicator actually appears on small courses). Set to 'course' to

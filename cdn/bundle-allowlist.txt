@@ -1,0 +1,23 @@
+# SOLA CDN bundle URL allowlist
+#
+# Every external URL that appears in cdn/dist/sola.min.js must match one of
+# the prefixes below. The audit step in .github/workflows/cdn-deploy.yml
+# greps the built bundle for `https?://...` patterns and fails the build if
+# anything not on this list is found.
+#
+# Why this exists: without this guard, a bundled third-party widget (the
+# "IBL AI" / "Raison" incident on 2026-04-29) can ship to every Saylor and
+# downstream Moodle install in a single CDN deploy, with no review point.
+# The allowlist makes that decision explicit and PR-reviewable: a new URL
+# in the bundle = a new line in this file.
+#
+# Format: one URL prefix per line. Comments start with `#`. Blank lines OK.
+# A bundle URL passes if the line below is a prefix of the URL (string
+# match, not regex).
+#
+# Curate ruthlessly. Empty (other than comments) is the strongest signal.
+
+# SVG namespace constant. Used as a string identifier, not a network URL.
+# Not actually fetched by browsers; kept here so the audit step does not
+# false-positive on it.
+http://www.w3.org/2000/svg

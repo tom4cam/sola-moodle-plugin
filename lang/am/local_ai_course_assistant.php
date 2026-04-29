@@ -1007,3 +1007,10 @@ $string['settings:redash_data_source_id_desc']= 'Numeric id of the Redash JSON d
 $string['instructor_dashboard:nav_back_course']  = '← Back to course';
 $string['instructor_dashboard:nav_settings']     = 'AI Course Assistant settings';
 $string['instructor_dashboard:nav_analytics']    = 'AI Course Assistant analytics';
+
+// v4.4.0: course-page CSP setting.
+$string['settings:csp_course_pages_mode']      = 'Course-page Content-Security-Policy';
+$string['settings:csp_course_pages_mode_desc'] = 'Optional CSP header on course pages where the AI Course Assistant widget is active. <strong>Off</strong>: no header (default). <strong>Report-only</strong>: send <code>Content-Security-Policy-Report-Only</code> — browsers log violations but do not block. Useful for a one-week observation pass. <strong>Enforce</strong>: send <code>Content-Security-Policy</code> — browsers block off-allowlist iframe sources, fetches, and other risky loads. Helps contain the impact of arbitrary scripts pasted into Additional HTML site config (the IBL AI / Raison incident on 2026-04-29). Does not affect SOLA endpoints, which always send a stricter CSP.';
+$string['settings:csp_mode_off']               = 'Off (no header on course pages)';
+$string['settings:csp_mode_report_only']       = 'Report-only (log violations, do not block)';
+$string['settings:csp_mode_enforce']           = 'Enforce (block off-allowlist loads)';

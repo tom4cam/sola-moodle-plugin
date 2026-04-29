@@ -36,4 +36,14 @@ $callbacks = [
         'hook' => \core\hook\user\deleted::class,
         'callback' => \local_ai_course_assistant\hook_callbacks::class . '::on_user_deleted',
     ],
+    [
+        // v4.4.0: Optional Content-Security-Policy on course pages where the
+        // SOLA widget is active. Off by default; admin opts in via the
+        // csp_course_pages_mode setting (off / report-only / enforce).
+        // Defense-in-depth against the IBL AI / Raison incident on
+        // 2026-04-29 where a rogue third-party widget got injected via the
+        // additionalhtmlfooter config and ran with no network restrictions.
+        'hook' => \core\hook\output\before_http_headers::class,
+        'callback' => \local_ai_course_assistant\hook_callbacks::class . '::send_csp_for_course_page',
+    ],
 ];

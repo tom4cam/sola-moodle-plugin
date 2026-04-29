@@ -45,6 +45,118 @@ class hook_callbacks {
     }
 
     /**
+     * v4.4.0: Send a Content-Security-Policy header on course pages where
+     * SOLA is active. Default off — admin must flip the
+     * csp_course_pages_mode setting to 'report-only' or 'enforce' to turn
+     * it on.
+     *
+     * Why: this is defense-in-depth against the IBL AI / Raison incident on
+     * 2026-04-29, where a rogue third-party widget got injected through the
+     * additionalhtmlfooter config and ran with no network restrictions. A
+     * CSP at this layer would not have stopped the inline `<script>` from
+     * executing (Moodle requires `'unsafe-inline'` site-wide), but it would
+     * have blocked the rogue iframe from `mentorai.iblai.app` and the
+     * outbound auth call to `services.iblai.app` — leaving a quietly
+     * broken bubble instead of a stack-overflow loop and exfil-capable
+     * widget.
+     *
+     * Same gates as the widget injection: course/module page, plugin on,
+     * SOLA enabled for course, not edit mode, not in a hidden category.
+     *
+     * @param \core\hook\output\before_http_headers $hook
+     */
+    public static function send_csp_for_course_page(\core\hook\output\before_http_headers $hook): void {
+        try {
+            $mode = (string) (get_config('local_ai_course_assistant', 'csp_course_pages_mode') ?: 'off');
+            if ($mode !== 'report-only' && $mode !== 'enforce') {
+                return;
+            }
+            if (!self::widget_would_render_here()) {
+                return;
+            }
+            if (headers_sent()) {
+                return;
+            }
+
+            // Course-page CSP. Looser than the SOLA-endpoint CSP because we
+            // are sharing the page with arbitrary other Moodle plugins,
+            // theme JS, and admin-pasted Additional HTML. Goal is not to
+            // lock the page down, only to block the worst third-party
+            // exfil and iframe-injection vectors.
+            $cdnurl = (string) (get_config('local_ai_course_assistant', 'cdn_url') ?: '');
+            $cdnhost = '';
+            if ($cdnurl !== '') {
+                $parts = parse_url($cdnurl);
+                if (!empty($parts['scheme']) && !empty($parts['host'])) {
+                    $cdnhost = $parts['scheme'] . '://' . $parts['host']
+                        . (!empty($parts['port']) ? ':' . (int) $parts['port'] : '');
+                }
+            }
+            $cdnsrc = $cdnhost !== '' ? ' ' . $cdnhost : '';
+            $csp = "default-src 'self'; "
+                 . "script-src 'self' 'unsafe-inline' 'unsafe-eval'" . $cdnsrc . "; "
+                 . "style-src 'self' 'unsafe-inline'" . $cdnsrc . "; "
+                 . "img-src 'self' data: blob: https:; "
+                 . "media-src 'self' blob: https:; "
+                 . "font-src 'self' data: https:; "
+                 . "connect-src 'self'" . $cdnsrc . " wss: https:; "
+                 . "frame-src 'self'" . $cdnsrc . " https://www.youtube.com https://player.vimeo.com; "
+                 . "frame-ancestors 'self';";
+
+            $headername = $mode === 'enforce'
+                ? 'Content-Security-Policy'
+                : 'Content-Security-Policy-Report-Only';
+            header($headername . ': ' . $csp);
+        } catch (\Throwable $e) {
+            debugging('SOLA course-page CSP send skipped: ' . $e->getMessage(),
+                DEBUG_DEVELOPER, $e->getTrace());
+        }
+    }
+
+    /**
+     * Replicate the gate logic of {@see do_inject_chat_widget()} so the CSP
+     * hook only fires on the same pages the widget would inject on. Kept
+     * read-only and side-effect-free; safe to call from before_http_headers.
+     *
+     * @return bool
+     */
+    private static function widget_would_render_here(): bool {
+        global $PAGE, $USER;
+
+        if (!get_config('local_ai_course_assistant', 'enabled')) {
+            return false;
+        }
+        $context = $PAGE->context ?? null;
+        if (!$context) {
+            return false;
+        }
+        if ($context->contextlevel !== CONTEXT_COURSE && $context->contextlevel !== CONTEXT_MODULE) {
+            return false;
+        }
+        if (($PAGE->pagelayout ?? '') === 'admin') {
+            return false;
+        }
+        if ($PAGE->url instanceof \moodle_url
+                && strpos($PAGE->url->get_path(), '/local/ai_course_assistant/') === 0) {
+            return false;
+        }
+        $coursecontext = $context->contextlevel === CONTEXT_MODULE
+            ? $context->get_course_context()
+            : $context;
+        $courseid = (int) $coursecontext->instanceid;
+        if ($courseid === SITEID) {
+            return false;
+        }
+        if (!has_capability('local/ai_course_assistant:use', $coursecontext)) {
+            return false;
+        }
+        if (!course_config_manager::is_enabled_for_course($courseid)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Cascade SOLA data deletion when a Moodle user is hard-deleted.
      *
      * Invokes the plugin's conversation manager and the Privacy API manager so
