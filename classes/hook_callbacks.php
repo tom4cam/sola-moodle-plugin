@@ -539,6 +539,12 @@ class hook_callbacks {
         $offsetx = (int)(get_config('local_ai_course_assistant', 'position_offset_x') ?: 95);
         $offsety = (int)(get_config('local_ai_course_assistant', 'position_offset_y') ?: 20);
 
+        // Talking avatar availability — pedagogy default + configured driver.
+        $talkingavatardriver = \local_ai_course_assistant\talking_avatar\provider_factory::make();
+        $talkingavatarenabled = \local_ai_course_assistant\feature_flags::resolve('talking_avatar', $courseid)
+            && $talkingavatardriver !== null
+            && $talkingavatardriver->is_configured();
+
         // Voice mode availability (global flags only; per-course control via starter toggles).
         $realtimeenabled = (bool)get_config('local_ai_course_assistant', 'realtime_enabled');
         $realtimeapikey = get_config('local_ai_course_assistant', 'realtime_apikey');
@@ -671,6 +677,7 @@ class hook_callbacks {
             'quizlocked'         => $quizlocked,
             'realtimeenabled'         => $realtimeenabled,
             'ellpronunciationenabled' => $realtimeenabled,
+            'talkingavatarenabled'    => $talkingavatarenabled,
             'ttsurl'             => $ttsurl,
             'avatarcolor'        => get_config('local_ai_course_assistant', 'avatar_color') ?: '#152233',
             'avatarfill'         => get_config('local_ai_course_assistant', 'avatar_fill') ?: '#ffffff',

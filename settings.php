@@ -339,18 +339,49 @@ if ($hassiteconfig) {
         PARAM_RAW
     ));
 
-    // v4.8.1: Talking Avatar (placeholder configuration). The provider
-    // integration is intentionally vendor-neutral — admins paste in their
-    // own provider URL + API key once the institution has selected one
-    // (Hedra, HeyGen, D-ID, Tavus, etc., pricing/architecture decision
-    // pending). Default empty: feature surfaces an "configure a provider"
-    // notice in the widget when the per-course toggle is on but config is
-    // missing. SSRF-checked on every outbound call.
+    // v4.9.0: Talking Avatar driver selection + per-provider config.
+    // SOLA ships drivers for D-ID, HeyGen, Tavus (the three most cost-
+    // effective real-time avatar vendors as of 2026-04) and Synthesia
+    // Agents (newest entrant; iframable embed_url). Operators pick one in
+    // the dropdown and fill in just that provider's API key + persona id;
+    // the v4.8.1 placeholder fields below remain readable so an admin
+    // mid-upgrade does not have to re-enter the key. SSRF-checked on
+    // every outbound call.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/talking_avatar_heading',
         get_string('settings:talking_avatar_heading', 'local_ai_course_assistant'),
         get_string('settings:talking_avatar_heading_desc', 'local_ai_course_assistant')
     ));
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/talking_avatar_provider',
+        get_string('settings:talking_avatar_provider', 'local_ai_course_assistant'),
+        get_string('settings:talking_avatar_provider_desc', 'local_ai_course_assistant'),
+        '',
+        [
+            ''          => get_string('settings:talking_avatar_provider_none', 'local_ai_course_assistant'),
+            'did'       => get_string('settings:talking_avatar_provider_did', 'local_ai_course_assistant'),
+            'heygen'    => get_string('settings:talking_avatar_provider_heygen', 'local_ai_course_assistant'),
+            'tavus'     => get_string('settings:talking_avatar_provider_tavus', 'local_ai_course_assistant'),
+            'synthesia' => get_string('settings:talking_avatar_provider_synthesia', 'local_ai_course_assistant'),
+        ]
+    ));
+    foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
+        $settings->add(new admin_setting_configpasswordunmask(
+            'local_ai_course_assistant/' . $tap . '_api_key',
+            get_string('settings:talking_avatar_' . $tap . '_api_key', 'local_ai_course_assistant'),
+            get_string('settings:talking_avatar_' . $tap . '_api_key_desc', 'local_ai_course_assistant'),
+            ''
+        ));
+        $settings->add(new admin_setting_configtext(
+            'local_ai_course_assistant/' . $tap . '_persona_id',
+            get_string('settings:talking_avatar_' . $tap . '_persona_id', 'local_ai_course_assistant'),
+            get_string('settings:talking_avatar_' . $tap . '_persona_id_desc', 'local_ai_course_assistant'),
+            '',
+            PARAM_TEXT
+        ));
+    }
+    // v4.8.1 fields kept readable as a fallback for upgrades; hidden in
+    // settings UI is unnecessary because the new driver fields are above.
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/talking_avatar_provider_url',
         get_string('settings:talking_avatar_provider_url', 'local_ai_course_assistant'),

@@ -5144,3 +5144,58 @@ a.aica-history-panel__source:hover {
     outline: 3px solid #ffeb3b !important;
     outline-offset: 2px !important;
 }
+
+/* v4.9.0: Talking avatar overlay panel */
+.aica-talking-avatar-panel {
+    position: absolute;
+    inset: 56px 0 0 0;
+    background: #000;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+.aica-talking-avatar-panel__close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    color: #111;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 1;
+}
+.aica-talking-avatar-panel__close:hover {
+    background: #fff;
+}
+.aica-talking-avatar-panel__loading,
+.aica-talking-avatar-panel__error {
+    margin: 0;
+    padding: 16px;
+    font-size: 14px;
+    text-align: center;
+}
+.aica-talking-avatar-panel__frame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+.local-ai-course-assistant__btn-talking-avatar {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px 6px;
+    color: inherit;
+    display: inline-flex;
+    align-items: center;
+}
+.local-ai-course-assistant__btn-talking-avatar[aria-pressed="true"] {
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+}

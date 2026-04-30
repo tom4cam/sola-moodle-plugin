@@ -1758,6 +1758,15 @@ define([
             });
         }
 
+        // Talking avatar header toggle. Opens or closes an iframe surface fed
+        // by talking_avatar_session.php.
+        const avatarBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-talking-avatar') : null;
+        if (avatarBtn) {
+            avatarBtn.addEventListener('click', function() {
+                UI.toggleTalkingAvatar(courseId, navigator.language ? navigator.language.split('-')[0] : 'en');
+            });
+        }
+
         // Feedback buttons (header + footer).
         const feedbackHandler = function() {
             UI.showFeedbackPanel(function(rating, comment, deviceInfo) {

@@ -5802,10 +5802,76 @@ define([
         parent.appendChild(card);
     };
 
+    /**
+     * Open or close a talking-avatar iframe surface inside the drawer.
+     * Calls talking_avatar_session.php for the embed_url; on failure shows
+     * a non-blocking notification.
+     *
+     * @param {number} courseId
+     * @param {string} lang Two-letter ISO 639-1 language hint.
+     */
+    function toggleTalkingAvatar(courseId, lang) {
+        if (!drawer) {
+            return;
+        }
+        let panel = drawer.querySelector('.aica-talking-avatar-panel');
+        if (panel) {
+            panel.remove();
+            return;
+        }
+        panel = document.createElement('div');
+        panel.className = 'aica-talking-avatar-panel';
+        panel.setAttribute('role', 'region');
+        panel.setAttribute('aria-label', 'Talking avatar');
+        panel.innerHTML =
+            '<button class="aica-talking-avatar-panel__close" type="button" aria-label="Close avatar">&times;</button>' +
+            '<div class="aica-talking-avatar-panel__loading">Loading avatar...</div>';
+        drawer.appendChild(panel);
+        const closeBtn = panel.querySelector('.aica-talking-avatar-panel__close');
+        closeBtn.addEventListener('click', function() { panel.remove(); });
+
+        const sesskey = (root && root.dataset.sesskey) || (M && M.cfg && M.cfg.sesskey) || '';
+        const params = new URLSearchParams();
+        params.set('sesskey', sesskey);
+        params.set('courseid', String(courseId));
+        params.set('lang', lang || 'en');
+
+        fetch(M.cfg.wwwroot + '/local/ai_course_assistant/talking_avatar_session.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: params.toString(),
+            credentials: 'same-origin',
+        }).then(function(r) {
+            return r.json();
+        }).then(function(json) {
+            const loading = panel.querySelector('.aica-talking-avatar-panel__loading');
+            if (loading) { loading.remove(); }
+            if (!json || !json.ok || !json.embed_url) {
+                const msg = document.createElement('p');
+                msg.className = 'aica-talking-avatar-panel__error';
+                msg.textContent = (json && json.error) || 'Talking avatar failed to start.';
+                panel.appendChild(msg);
+                return;
+            }
+            const frame = document.createElement('iframe');
+            frame.className = 'aica-talking-avatar-panel__frame';
+            frame.src = json.embed_url;
+            frame.allow = 'microphone; camera; autoplay';
+            frame.title = 'SOLA talking avatar';
+            panel.appendChild(frame);
+        }).catch(function() {
+            const loading = panel.querySelector('.aica-talking-avatar-panel__loading');
+            if (loading) {
+                loading.textContent = 'Talking avatar failed to start.';
+            }
+        });
+    }
+
     return {
         initUI: initUI,
         appendIntroCard: appendIntroCard,
         isOpen: isOpen,
+        toggleTalkingAvatar: toggleTalkingAvatar,
         toggleDrawer: toggleDrawer,
         closeDrawer: closeDrawer,
         addMessage: addMessage,
