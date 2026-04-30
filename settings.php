@@ -327,6 +327,35 @@ if ($hassiteconfig) {
         . '<p class="text-muted mt-1" style="font-size:13px;">Cross-course usage analytics, enable/disable AI per course, student feedback, and Learning Radar.</p>'
     ));
 
+    // v3.9.28: SSRF trusted-endpoints allowlist. Operators running a self-hosted
+    // LLM (Ollama, vLLM, etc.) on the same VPC as Moodle can list those exact
+    // hostnames here to bypass the loopback/private-IP and https-only checks
+    // in security::is_safe_provider_url(). Default empty.
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/ssrf_trusted_endpoints',
+        get_string('settings:ssrf_trusted_endpoints', 'local_ai_course_assistant'),
+        get_string('settings:ssrf_trusted_endpoints_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW
+    ));
+
+    // v3.9.13: xAI Realtime WebSocket proxy settings. When configured,
+    // xAI voice routes through services/xai_rt_proxy instead of opening a
+    // direct browser connection to api.x.ai with the master key.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/xai_proxy_url',
+        get_string('settings:xai_proxy_url', 'local_ai_course_assistant'),
+        get_string('settings:xai_proxy_url_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_URL
+    ));
+    $settings->add(new admin_setting_configpasswordunmask(
+        'local_ai_course_assistant/xai_proxy_jwt_secret',
+        get_string('settings:xai_proxy_jwt_secret', 'local_ai_course_assistant'),
+        get_string('settings:xai_proxy_jwt_secret_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
     // ── Section: Content & RAG ──────────────────────────────────────────────
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_content_anchor',
@@ -532,45 +561,6 @@ if ($hassiteconfig) {
         'Transcript URL pattern',
         'Regex that matches transcript anchor URLs. The indexer picks the nearest matching anchor (above or below) to each detected iframe and pairs them. Leave blank to disable transcript pairing.',
         ""
-    ));
-
-    // Mastery tracking tunables. Per-course opt-in lives on the Objectives admin page.
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/mastery_heading',
-        'Mastery tracking',
-        'Tunables for the mastery-tracking feature (learning objectives). Per-course opt-in lives on each course\'s Learning Objectives page, not here.'
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_threshold',
-        'Mastery threshold (0-1)',
-        'Score at or above which an objective counts as mastered. Minimum attempts gate (3) still applies.',
-        '0.85',
-        PARAM_FLOAT
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_window',
-        'Rolling window size',
-        'How many most-recent attempts feed the mastery estimator. Higher = more stable, slower to react.',
-        '8',
-        PARAM_INT
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_classifier_threshold',
-        'Conversation classifier min confidence',
-        'Classifier confidence threshold (0-1). Turns below this are not recorded.',
-        '0.70',
-        PARAM_FLOAT
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_classifier_weight',
-        'Conversation attempt weight',
-        'Weight applied to conversation-derived attempts relative to quiz answers (1.0). Lower = noisier signal counts less.',
-        '0.30',
-        PARAM_FLOAT
     ));
 
     // Student attachments (images + PDFs) on chat messages.
@@ -815,6 +805,38 @@ if ($hassiteconfig) {
         '',
         '<a href="' . $integrityurl->out() . '" class="btn btn-sm btn-outline-secondary">'
         . get_string('integrity:view_results', 'local_ai_course_assistant') . ' &rarr;</a>'
+    ));
+
+    // v3.9.12: data retention controls.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/audit_retention_days',
+        get_string('settings:audit_retention_days', 'local_ai_course_assistant'),
+        get_string('settings:audit_retention_days_desc', 'local_ai_course_assistant'),
+        '365',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/conversation_retention_days',
+        get_string('settings:conversation_retention_days', 'local_ai_course_assistant'),
+        get_string('settings:conversation_retention_days_desc', 'local_ai_course_assistant'),
+        '730',
+        PARAM_INT
+    ));
+
+    // v4.4.0: Optional Content-Security-Policy header on course pages where
+    // the SOLA widget is active. Default off — admin opts in. Defense-in-
+    // depth against arbitrary scripts pasted into Site administration →
+    // Appearance → Additional HTML (the IBL AI / Raison incident).
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/csp_course_pages_mode',
+        get_string('settings:csp_course_pages_mode', 'local_ai_course_assistant'),
+        get_string('settings:csp_course_pages_mode_desc', 'local_ai_course_assistant'),
+        'off',
+        [
+            'off'         => get_string('settings:csp_mode_off', 'local_ai_course_assistant'),
+            'report-only' => get_string('settings:csp_mode_report_only', 'local_ai_course_assistant'),
+            'enforce'     => get_string('settings:csp_mode_enforce', 'local_ai_course_assistant'),
+        ]
     ));
 
     // ── Section: Engagement ─────────────────────────────────────────────────
@@ -1075,6 +1097,108 @@ if ($hassiteconfig) {
         . '" class="btn btn-sm btn-outline-primary">Open Task Editor</a>'
     ));
 
+    // v4.1.1: Active-learners-online indicator scope. Default 'global' (the
+    // anti-loneliness default — a global count rarely hits zero, so the
+    // indicator actually appears on small courses). Set to 'course' to
+    // restore the v4.1.0 per-course behaviour.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/active_learners_scope',
+        get_string('settings:active_learners_scope', 'local_ai_course_assistant'),
+        get_string('settings:active_learners_scope_desc', 'local_ai_course_assistant'),
+        'global',
+        [
+            'global' => get_string('settings:active_learners_scope_global', 'local_ai_course_assistant'),
+            'course' => get_string('settings:active_learners_scope_course', 'local_ai_course_assistant'),
+        ]
+    ));
+
+    // v4.5.0: Pedagogy defaults. Each setting here is a site-wide default
+    // that applies to every course unless the per-course override is set.
+    // Per-course override remains authoritative — admins can still force a
+    // single course on or off independent of the global default. Default
+    // off so upgrade is a no-op.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/pedagogy_defaults_heading',
+        get_string('settings:pedagogy_defaults_heading', 'local_ai_course_assistant'),
+        get_string('settings:pedagogy_defaults_heading_desc', 'local_ai_course_assistant')
+    ));
+    foreach ([
+        'mastery_enabled'         => 'pedagogy:mastery',
+        'socratic_mode_enabled'   => 'pedagogy:socratic_mode',
+        'worked_examples_enabled' => 'pedagogy:worked_examples',
+        'flashcards_enabled'      => 'pedagogy:flashcards',
+        'code_sandbox_enabled'    => 'pedagogy:code_sandbox',
+        'essay_feedback_enabled'  => 'pedagogy:essay_feedback',
+    ] as $key => $stringkey) {
+        $settings->add(new admin_setting_configcheckbox(
+            'local_ai_course_assistant/' . $key,
+            get_string($stringkey, 'local_ai_course_assistant'),
+            get_string($stringkey . '_desc', 'local_ai_course_assistant'),
+            0
+        ));
+    }
+
+    // v3.9.17: mastery tracking tunables. Per-course enable toggles live
+    // on the per-course Objectives admin page; these are the site-wide
+    // knobs that govern mastery math and the classifier behavior.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/mastery_heading',
+        get_string('settings:mastery_heading', 'local_ai_course_assistant'),
+        get_string('settings:mastery_heading_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_threshold',
+        get_string('settings:mastery_threshold', 'local_ai_course_assistant'),
+        get_string('settings:mastery_threshold_desc', 'local_ai_course_assistant'),
+        '0.85',
+        PARAM_RAW
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_window',
+        get_string('settings:mastery_window', 'local_ai_course_assistant'),
+        get_string('settings:mastery_window_desc', 'local_ai_course_assistant'),
+        '8',
+        PARAM_INT
+    ));
+
+    // v4.0 / M4 — Mastery decay model. Default off in v4.0; planned default-on
+    // in v4.1 once tuning data is in. Read-side only; no schema change.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/mastery_decay_enabled',
+        get_string('settings:mastery_decay_enabled', 'local_ai_course_assistant'),
+        get_string('settings:mastery_decay_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_decay_half_life_days',
+        get_string('settings:mastery_decay_half_life_days', 'local_ai_course_assistant'),
+        get_string('settings:mastery_decay_half_life_days_desc', 'local_ai_course_assistant'),
+        '30',
+        PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_classifier_model',
+        get_string('settings:mastery_classifier_model', 'local_ai_course_assistant'),
+        get_string('settings:mastery_classifier_model_desc', 'local_ai_course_assistant'),
+        'gpt-4o-mini',
+        PARAM_RAW_TRIMMED
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_classifier_weight',
+        get_string('settings:mastery_classifier_weight', 'local_ai_course_assistant'),
+        get_string('settings:mastery_classifier_weight_desc', 'local_ai_course_assistant'),
+        '0.3',
+        PARAM_RAW
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_classifier_threshold',
+        get_string('settings:mastery_classifier_threshold', 'local_ai_course_assistant'),
+        get_string('settings:mastery_classifier_threshold_desc', 'local_ai_course_assistant'),
+        '0.7',
+        PARAM_RAW
+    ));
+
     // ── Section: Branding & UI ──────────────────────────────────────────────
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_branding_anchor',
@@ -1208,6 +1332,40 @@ if ($hassiteconfig) {
         get_string('settings:avatar_fill', 'local_ai_course_assistant'),
         get_string('settings:avatar_fill_desc', 'local_ai_course_assistant'),
         '#ffffff'
+    ));
+
+    // v3.9.15: white-label contact points surfaced on the privacy notice.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/contact_email',
+        get_string('settings:contact_email', 'local_ai_course_assistant'),
+        get_string('settings:contact_email_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_EMAIL
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/dpo_email',
+        get_string('settings:dpo_email', 'local_ai_course_assistant'),
+        get_string('settings:dpo_email_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_EMAIL
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/privacy_external_url',
+        get_string('settings:privacy_external_url', 'local_ai_course_assistant'),
+        get_string('settings:privacy_external_url_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_URL
+    ));
+
+    // v3.9.16: admin-editable privacy notice override. If populated, this HTML
+    // replaces the default branded notice rendered by privacy.php. Lets
+    // Saylor (or any rebranded install) finalize the legal-reviewed notice
+    // text in the admin UI without touching code.
+    $settings->add(new admin_setting_confightmleditor(
+        'local_ai_course_assistant/privacy_notice_override',
+        get_string('settings:privacy_notice_override', 'local_ai_course_assistant'),
+        get_string('settings:privacy_notice_override_desc', 'local_ai_course_assistant'),
+        ''
     ));
 
     // ── Section: Integrations & Delivery ────────────────────────────────────
@@ -1476,203 +1634,6 @@ if ($hassiteconfig) {
             \local_ai_course_assistant\branding::short_name()),
         new moodle_url('/local/ai_course_assistant/vendor_dpa.php'),
         'moodle/site:config'
-    ));
-
-    // v3.9.15: white-label contact points surfaced on the privacy notice.
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/contact_email',
-        get_string('settings:contact_email', 'local_ai_course_assistant'),
-        get_string('settings:contact_email_desc', 'local_ai_course_assistant'),
-        '',
-        PARAM_EMAIL
-    ));
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/dpo_email',
-        get_string('settings:dpo_email', 'local_ai_course_assistant'),
-        get_string('settings:dpo_email_desc', 'local_ai_course_assistant'),
-        '',
-        PARAM_EMAIL
-    ));
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/privacy_external_url',
-        get_string('settings:privacy_external_url', 'local_ai_course_assistant'),
-        get_string('settings:privacy_external_url_desc', 'local_ai_course_assistant'),
-        '',
-        PARAM_URL
-    ));
-
-    // v3.9.16: admin-editable privacy notice override. If populated, this HTML
-    // replaces the default branded notice rendered by privacy.php. Lets
-    // Saylor (or any rebranded install) finalize the legal-reviewed notice
-    // text in the admin UI without touching code.
-    $settings->add(new admin_setting_confightmleditor(
-        'local_ai_course_assistant/privacy_notice_override',
-        get_string('settings:privacy_notice_override', 'local_ai_course_assistant'),
-        get_string('settings:privacy_notice_override_desc', 'local_ai_course_assistant'),
-        ''
-    ));
-
-    // v3.9.12: data retention controls.
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/audit_retention_days',
-        get_string('settings:audit_retention_days', 'local_ai_course_assistant'),
-        get_string('settings:audit_retention_days_desc', 'local_ai_course_assistant'),
-        '365',
-        PARAM_INT
-    ));
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/conversation_retention_days',
-        get_string('settings:conversation_retention_days', 'local_ai_course_assistant'),
-        get_string('settings:conversation_retention_days_desc', 'local_ai_course_assistant'),
-        '730',
-        PARAM_INT
-    ));
-
-    // v3.9.28: SSRF trusted-endpoints allowlist. Operators running a self-hosted
-    // LLM (Ollama, vLLM, etc.) on the same VPC as Moodle can list those exact
-    // hostnames here to bypass the loopback/private-IP and https-only checks
-    // in security::is_safe_provider_url(). Default empty.
-    $settings->add(new admin_setting_configtextarea(
-        'local_ai_course_assistant/ssrf_trusted_endpoints',
-        get_string('settings:ssrf_trusted_endpoints', 'local_ai_course_assistant'),
-        get_string('settings:ssrf_trusted_endpoints_desc', 'local_ai_course_assistant'),
-        '',
-        PARAM_RAW
-    ));
-
-    // v4.5.0: Pedagogy defaults. Each setting here is a site-wide default
-    // that applies to every course unless the per-course override is set.
-    // Per-course override remains authoritative — admins can still force a
-    // single course on or off independent of the global default. Default
-    // off so upgrade is a no-op.
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/pedagogy_defaults_heading',
-        get_string('settings:pedagogy_defaults_heading', 'local_ai_course_assistant'),
-        get_string('settings:pedagogy_defaults_heading_desc', 'local_ai_course_assistant')
-    ));
-    foreach ([
-        'mastery_enabled'         => 'pedagogy:mastery',
-        'socratic_mode_enabled'   => 'pedagogy:socratic_mode',
-        'worked_examples_enabled' => 'pedagogy:worked_examples',
-        'flashcards_enabled'      => 'pedagogy:flashcards',
-        'code_sandbox_enabled'    => 'pedagogy:code_sandbox',
-        'essay_feedback_enabled'  => 'pedagogy:essay_feedback',
-    ] as $key => $stringkey) {
-        $settings->add(new admin_setting_configcheckbox(
-            'local_ai_course_assistant/' . $key,
-            get_string($stringkey, 'local_ai_course_assistant'),
-            get_string($stringkey . '_desc', 'local_ai_course_assistant'),
-            0
-        ));
-    }
-
-    // v4.4.0: Optional Content-Security-Policy header on course pages where
-    // the SOLA widget is active. Default off — admin opts in. Defense-in-
-    // depth against arbitrary scripts pasted into Site administration →
-    // Appearance → Additional HTML (the IBL AI / Raison incident).
-    $settings->add(new admin_setting_configselect(
-        'local_ai_course_assistant/csp_course_pages_mode',
-        get_string('settings:csp_course_pages_mode', 'local_ai_course_assistant'),
-        get_string('settings:csp_course_pages_mode_desc', 'local_ai_course_assistant'),
-        'off',
-        [
-            'off'         => get_string('settings:csp_mode_off', 'local_ai_course_assistant'),
-            'report-only' => get_string('settings:csp_mode_report_only', 'local_ai_course_assistant'),
-            'enforce'     => get_string('settings:csp_mode_enforce', 'local_ai_course_assistant'),
-        ]
-    ));
-
-    // v4.1.1: Active-learners-online indicator scope. Default 'global' (the
-    // anti-loneliness default — a global count rarely hits zero, so the
-    // indicator actually appears on small courses). Set to 'course' to
-    // restore the v4.1.0 per-course behaviour.
-    $settings->add(new admin_setting_configselect(
-        'local_ai_course_assistant/active_learners_scope',
-        get_string('settings:active_learners_scope', 'local_ai_course_assistant'),
-        get_string('settings:active_learners_scope_desc', 'local_ai_course_assistant'),
-        'global',
-        [
-            'global' => get_string('settings:active_learners_scope_global', 'local_ai_course_assistant'),
-            'course' => get_string('settings:active_learners_scope_course', 'local_ai_course_assistant'),
-        ]
-    ));
-
-    // v3.9.13: xAI Realtime WebSocket proxy settings. When configured,
-    // xAI voice routes through services/xai_rt_proxy instead of opening a
-    // direct browser connection to api.x.ai with the master key.
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/xai_proxy_url',
-        get_string('settings:xai_proxy_url', 'local_ai_course_assistant'),
-        get_string('settings:xai_proxy_url_desc', 'local_ai_course_assistant'),
-        '',
-        PARAM_URL
-    ));
-    $settings->add(new admin_setting_configpasswordunmask(
-        'local_ai_course_assistant/xai_proxy_jwt_secret',
-        get_string('settings:xai_proxy_jwt_secret', 'local_ai_course_assistant'),
-        get_string('settings:xai_proxy_jwt_secret_desc', 'local_ai_course_assistant'),
-        ''
-    ));
-
-    // v3.9.17: mastery tracking tunables. Per-course enable toggles live
-    // on the per-course Objectives admin page; these are the site-wide
-    // knobs that govern mastery math and the classifier behavior.
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/mastery_heading',
-        get_string('settings:mastery_heading', 'local_ai_course_assistant'),
-        get_string('settings:mastery_heading_desc', 'local_ai_course_assistant')
-    ));
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_threshold',
-        get_string('settings:mastery_threshold', 'local_ai_course_assistant'),
-        get_string('settings:mastery_threshold_desc', 'local_ai_course_assistant'),
-        '0.85',
-        PARAM_RAW
-    ));
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_window',
-        get_string('settings:mastery_window', 'local_ai_course_assistant'),
-        get_string('settings:mastery_window_desc', 'local_ai_course_assistant'),
-        '8',
-        PARAM_INT
-    ));
-
-    // v4.0 / M4 — Mastery decay model. Default off in v4.0; planned default-on
-    // in v4.1 once tuning data is in. Read-side only; no schema change.
-    $settings->add(new admin_setting_configcheckbox(
-        'local_ai_course_assistant/mastery_decay_enabled',
-        get_string('settings:mastery_decay_enabled', 'local_ai_course_assistant'),
-        get_string('settings:mastery_decay_enabled_desc', 'local_ai_course_assistant'),
-        0
-    ));
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_decay_half_life_days',
-        get_string('settings:mastery_decay_half_life_days', 'local_ai_course_assistant'),
-        get_string('settings:mastery_decay_half_life_days_desc', 'local_ai_course_assistant'),
-        '30',
-        PARAM_INT
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_classifier_model',
-        get_string('settings:mastery_classifier_model', 'local_ai_course_assistant'),
-        get_string('settings:mastery_classifier_model_desc', 'local_ai_course_assistant'),
-        'gpt-4o-mini',
-        PARAM_RAW_TRIMMED
-    ));
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_classifier_weight',
-        get_string('settings:mastery_classifier_weight', 'local_ai_course_assistant'),
-        get_string('settings:mastery_classifier_weight_desc', 'local_ai_course_assistant'),
-        '0.3',
-        PARAM_RAW
-    ));
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_classifier_threshold',
-        get_string('settings:mastery_classifier_threshold', 'local_ai_course_assistant'),
-        get_string('settings:mastery_classifier_threshold_desc', 'local_ai_course_assistant'),
-        '0.7',
-        PARAM_RAW
     ));
 
     // Catalyst's fork carries a whatsapp_test.php admin tool that calls

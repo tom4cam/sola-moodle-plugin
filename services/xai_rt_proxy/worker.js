@@ -83,9 +83,17 @@ export default {
         const url = new URL(request.url);
 
         if (request.method === 'GET' && url.pathname === '/health') {
+            // Report the URL the route handler actually fetches against, not
+            // the raw env var. CF Workers fetch() needs http(s):// for WS
+            // upgrades (see line ~120 below) so the route normalises ws/wss
+            // → http/https on every request. /health does the same so
+            // operators see the real upstream, not a confusing wss:// from
+            // a default fallback that never fires.
+            let upstream = env.XAI_REALTIME_URL || 'wss://api.x.ai/v1/realtime';
+            upstream = upstream.replace(/^wss:\/\//, 'https://').replace(/^ws:\/\//, 'http://');
             return textResponse(200, JSON.stringify({
                 ok: true,
-                upstream: env.XAI_REALTIME_URL || 'wss://api.x.ai/v1/realtime',
+                upstream,
             }));
         }
         if (url.pathname !== '/rt') {
