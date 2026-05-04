@@ -371,6 +371,30 @@ class context_builder {
         // headroom alongside the existing learner + behavior sections.
         $budget = (int) (get_config('local_ai_course_assistant', 'prompt_budget_chars') ?: 12000);
         $assembled = prompt_builder::assemble($sections, $budget);
+
+        // v5.0.0 patch 14 (Tomi UT round 7 follow-up): couple the SAFETY-tail
+        // page_grounding_reminder to the CONTEXT current_page_content section
+        // it references. Under heavy budget pressure (e.g. a long custom
+        // admin systemprompt), current_page_content can be dropped while
+        // page_grounding_reminder is exempt and stays. The reminder then
+        // tells the model "quote from the passage above" with no passage
+        // present — the model correctly refuses with "I cannot help" and
+        // the learner sees an unhelpful answer.
+        //
+        // Fix: if the reminder landed but the page content did not, reassemble
+        // without the reminder. This frees ~386 chars of budget for other
+        // sections too, so the side effect is positive.
+        if (!empty($assembled['breakdown']['page_grounding_reminder']['used'])
+                && empty($assembled['breakdown']['current_page_content']['used'])) {
+            $sections = array_values(array_filter(
+                $sections,
+                static function ($s) {
+                    return $s->name !== 'page_grounding_reminder';
+                }
+            ));
+            $assembled = prompt_builder::assemble($sections, $budget);
+        }
+
         $prompt = $assembled['prompt'];
 
         // Stash the breakdown so the optional debug log can render it
