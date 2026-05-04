@@ -26,6 +26,41 @@ namespace local_ai_course_assistant;
 class study_planner {
 
     /**
+     * Minimum acceptable hours per week. Below this the plan is functionally
+     * a no-op (one Pomodoro a week is not a study plan); learners hitting
+     * this floor are usually mis-typing or speaking to STT in seconds.
+     */
+    public const MIN_HOURS_PER_WEEK = 0.5;
+
+    /**
+     * Maximum acceptable hours per week. The Saylor population is part-time
+     * working learners; 60 is already an aggressive ceiling and catches the
+     * "168 hours per week" fat-finger / unit-confusion case. Per-course, so
+     * a learner taking 5 courses can still book 300 weekly hours total if
+     * they really mean it.
+     */
+    public const MAX_HOURS_PER_WEEK = 60;
+
+    /**
+     * Lang-string keys for the rotating study-tip pool. Lookups go through
+     * get_string() so translators reach all eight tips. Previously the
+     * pool was a hardcoded English array, leaking English copy into the
+     * non-English reminder emails.
+     *
+     * @var string[]
+     */
+    private const STUDY_TIP_KEYS = [
+        'studytip:pomodoro',
+        'studytip:review_notes',
+        'studytip:active_recall',
+        'studytip:summarise',
+        'studytip:mix_modes',
+        'studytip:tackle_hard_first',
+        'studytip:connect_concepts',
+        'studytip:short_breaks',
+    ];
+
+    /**
      * Get or create a study plan for a user in a course.
      *
      * @param int $userid
@@ -182,19 +217,11 @@ class study_planner {
             $visiblesections = [];
         }
 
-        // Study tips pool.
-        $tips = [
-            'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.',
-            'Review your notes from the last session before starting new material.',
-            'Test yourself on what you learned recently — active recall strengthens memory.',
-            'Take a few minutes to summarize what you\'ve learned in your own words.',
-            'Mix different types of study: reading, practice problems, and teaching concepts to others.',
-            'Start with the most challenging topic while your energy is highest.',
-            'Create connections between new concepts and what you already know.',
-            'Take short breaks to stay focused — a refreshed mind learns better.',
-        ];
-
-        $tip = $tips[array_rand($tips)];
+        // v5.0.0 patch 12: study tips moved from a hardcoded English array
+        // to lang strings so non-English reminder emails reach learners in
+        // their language. Pool is keyed via the STUDY_TIP_KEYS const above.
+        $key = self::STUDY_TIP_KEYS[array_rand(self::STUDY_TIP_KEYS)];
+        $tip = get_string($key, 'local_ai_course_assistant');
 
         if (!empty($visiblesections)) {
             $section = $visiblesections[array_rand($visiblesections)];

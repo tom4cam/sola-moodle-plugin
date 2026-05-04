@@ -77,6 +77,27 @@ class update_study_plan extends external_api {
         self::validate_context($context);
         require_capability('local/ai_course_assistant:use', $context);
 
+        // v5.0.0 patch 12: range-validate hours_per_week. The prior code
+        // accepted any float, so a learner who fat-fingered "100" or "0"
+        // (or a model that hallucinated "168 hours per week" because they
+        // were dictating in seconds) saved nonsense and then got reminders
+        // built around it. Clamp to a defensible academic range and surface
+        // a friendly error to the chat surface so the learner can correct.
+        $hours = (float) $params['hours_per_week'];
+        if ($hours < study_planner::MIN_HOURS_PER_WEEK
+                || $hours > study_planner::MAX_HOURS_PER_WEEK) {
+            throw new \moodle_exception(
+                'studyplan:hours_out_of_range',
+                'local_ai_course_assistant',
+                '',
+                (object) [
+                    'min' => study_planner::MIN_HOURS_PER_WEEK,
+                    'max' => study_planner::MAX_HOURS_PER_WEEK,
+                    'got' => $hours,
+                ]
+            );
+        }
+
         $plandata = json_decode($params['plan_data'], true) ?: [];
 
         study_planner::save_plan(

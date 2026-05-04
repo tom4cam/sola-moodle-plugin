@@ -303,6 +303,31 @@ Keep up the great work!
 
 ---
 To stop receiving these reminders, click here: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
+// v5.0.0 patch 12: study-tip pool moved from a hardcoded English array in
+// study_planner.php to lang strings so non-English reminder emails reach
+// learners in their language. Picked at random per turn.
+$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
+$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
+$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+$string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
+$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
+$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
+$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
+$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
+// v5.0.0 patch 12: range-validation error for hours_per_week.
+$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell SOLA a different number and it will save your plan.';
 $string['reminder:whatsapp_body'] = 'Study Reminder for {$a->coursename}: {$a->message} (Opt out: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Today\'s study focus: ';
 

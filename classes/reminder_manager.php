@@ -220,17 +220,31 @@ class reminder_manager {
         // which leaked the hardcoded placeholder into the learner's inbox.
         // Pick the variant template based on whether we actually have hours
         // to report — translators localise both, no placeholder leakage.
+        // v5.0.0 patch 12: when preferred_days or preferred_time are set on
+        // the plan, use the richer "with prefs" template so the email
+        // surfaces the full plan (hours + days + time-of-day) rather than
+        // hours alone — the learner sees what they actually told us.
         $plan = study_planner::get_plan($reminder->userid, $reminder->courseid);
         $hashours = $plan && (float) $plan->hours_per_week > 0;
+        $hasprefs = $hashours
+            && ((!empty($plan->preferred_days)) || (!empty($plan->preferred_time)));
 
         $bodydata = (object) [
             'firstname' => $user->firstname,
             'coursename' => $course->fullname,
             'message' => $message,
             'hours_per_week' => $hashours ? $plan->hours_per_week : '',
+            'preferred_days' => $hasprefs ? trim((string) $plan->preferred_days) : '',
+            'preferred_time' => $hasprefs ? trim((string) $plan->preferred_time) : '',
             'unsubscribe_url' => $unsubscribeurl->out(false),
         ];
-        $stringkey = $hashours ? 'reminder:email_body' : 'reminder:email_body_no_hours';
+        if ($hasprefs) {
+            $stringkey = 'reminder:email_body_with_prefs';
+        } else if ($hashours) {
+            $stringkey = 'reminder:email_body';
+        } else {
+            $stringkey = 'reminder:email_body_no_hours';
+        }
         $body = get_string($stringkey, 'local_ai_course_assistant', $bodydata);
 
         $noreplyuser = \core_user::get_noreply_user();
