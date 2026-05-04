@@ -3767,14 +3767,19 @@ define([
         content.className = 'aica-settings-panel__content';
 
         // v4.3.0: First-open intro card. Shown once per session per browser
-        // until the learner dismisses it. Helps with the "I don't know what
-        // these settings do" feedback from v3.4.7 production UT.
+        // until the learner dismisses it.
+        // v5.1.5: copy refresh — the previous text referenced an "AI helper"
+        // section that never existed under that label (old tour string from
+        // a pre-v4 rename that was never updated). Rewritten to stay
+        // generic across the actual sections that render (Language,
+        // Coaching Style, Avatar, Accessibility, SOLA Voice, etc.) so
+        // future section renames do not falsify the tour again.
         appendIntroCard(content, 'aica-intro-settings',
             'Settings tour',
-            'Pick a language, choose an avatar, and set your voice preference. '
-            + 'Changes here only affect how SOLA appears for you. The "AI helper" '
-            + 'section near the bottom is optional — leave it on the default if '
-            + 'you are not sure.');
+            'Pick a language, choose an avatar, set how SOLA explains things, '
+            + 'and tune voice and accessibility options. Changes here only affect '
+            + 'how SOLA appears for you. Every setting has a sensible default — '
+            + 'feel free to tweak only the ones that help you, and revisit later.');
 
         // ── Language (top of settings) ──
         const langSection = document.createElement('div');
@@ -4152,47 +4157,12 @@ define([
             content.appendChild(voiceSection);
         }
 
-        // ── Saved Responses ──
-        const bmarks = getBookmarks();
-        const savedSection = document.createElement('div');
-        savedSection.className = 'aica-settings-panel__section';
-        const savedHead = document.createElement('h3');
-        savedHead.className = 'aica-settings-panel__section-title';
-        savedHead.textContent = 'Saved responses (' + bmarks.length + ')';
-        savedSection.appendChild(savedHead);
-
-        if (bmarks.length === 0) {
-            const noSaved = document.createElement('p');
-            noSaved.className = 'aica-settings-panel__empty-note';
-            noSaved.textContent = 'Bookmark any SOLA response using the \u2605 icon on a message.';
-            savedSection.appendChild(noSaved);
-        } else {
-            bmarks.slice().reverse().forEach(function(b) {
-                const item = document.createElement('div');
-                item.className = 'aica-settings-panel__bookmark-item';
-
-                const excerpt = document.createElement('p');
-                excerpt.className = 'aica-settings-panel__bookmark-text';
-                const trimmed = (b.text || '').replace(/\s+/g, ' ').trim();
-                excerpt.textContent = trimmed.length > 120 ? trimmed.slice(0, 117) + '\u2026' : trimmed;
-                item.appendChild(excerpt);
-
-                const removeBtn = document.createElement('button');
-                removeBtn.type = 'button';
-                removeBtn.className = 'aica-settings-panel__bookmark-remove';
-                removeBtn.setAttribute('aria-label', 'Remove bookmark');
-                removeBtn.textContent = '\u00d7';
-                removeBtn.addEventListener('click', function() {
-                    removeBookmarkByText(b.text);
-                    item.remove();
-                    // Update count in heading.
-                    savedHead.textContent = 'Saved responses (' + getBookmarks().length + ')';
-                });
-                item.appendChild(removeBtn);
-                savedSection.appendChild(item);
-            });
-        }
-        content.appendChild(savedSection);
+        // v5.1.5: "Saved responses" section removed from the settings panel.
+        // The same bookmarks are surfaced in the Notes tab where learners
+        // can read, edit, and organise them, so duplicating them here was
+        // confusing. The bookmark store APIs (getBookmarks /
+        // removeBookmarkByText) and the star toggle on each message are
+        // unchanged — Notes continues to read the same data.
 
         // ── My Progress ──
         if (config.studySessions !== undefined || config.quizHistory !== undefined) {
