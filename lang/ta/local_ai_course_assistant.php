@@ -206,6 +206,16 @@ $string['reminder:email_body'] = 'வணக்கம் {$a->firstname},
 
 ---
 இந்த நினைவூட்டல்களை நிறுத்த, இங்கே கிளிக் செய்யுங்கள்: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = '{$a->coursename}-க்கான படிப்பு நினைவூட்டல்: {$a->message} (குழுவிலக்கு: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'இன்றைய படிப்பு கவனம்: ';
 

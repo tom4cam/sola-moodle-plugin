@@ -187,6 +187,16 @@ Ga zo door!
 
 ---
 Om u af te melden voor deze herinneringen, klik hier: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = 'Studieherinnering voor {$a->coursename}: {$a->message} (Afmelden: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Studiedoel van de dag: ';
 $string['unsubscribe:title'] = 'Afmelden voor studieherinneringen';

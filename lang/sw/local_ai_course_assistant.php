@@ -206,6 +206,16 @@ Endelea na kazi nzuri!
 
 ---
 Ili kusimamisha kupokea vikumbusho hivi, bonyeza hapa: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = 'Kikumbusho cha Masomo kwa {$a->coursename}: {$a->message} (Jitoe: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Mwelekeo wa masomo wa leo: ';
 

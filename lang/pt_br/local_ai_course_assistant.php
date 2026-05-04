@@ -206,6 +206,16 @@ Continue assim, ótimo trabalho!
 
 ---
 Para parar de receber esses lembretes, clique aqui: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = 'Lembrete de Estudo para {$a->coursename}: {$a->message} (Cancelar inscrição: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Foco de estudo de hoje: ';
 

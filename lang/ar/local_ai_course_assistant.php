@@ -187,6 +187,16 @@ $string['reminder:email_body'] = 'مرحبًا {$a->firstname}،
 
 ---
 لإلغاء الاشتراك في هذه التذكيرات، انقر هنا: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = 'تذكير دراسي لـ {$a->coursename}: {$a->message} (إلغاء الاشتراك: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'تركيز الدراسة اليوم: ';
 $string['unsubscribe:title'] = 'إلغاء الاشتراك في التذكيرات الدراسية';

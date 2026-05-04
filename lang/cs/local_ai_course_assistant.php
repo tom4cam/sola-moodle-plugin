@@ -187,6 +187,16 @@ Jen tak dál!
 
 ---
 Pro odhlášení z těchto připomínek klikněte zde: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = 'Připomínka ke studiu pro {$a->coursename}: {$a->message} (Odhlásit se: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Studijní cíl dne: ';
 $string['unsubscribe:title'] = 'Odhlášení z připomínek ke studiu';

@@ -187,6 +187,16 @@ Böyle devam edin!
 
 ---
 Bu hatırlatmaları almayı durdurmak için buraya tıklayın: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = '{$a->coursename} için çalışma hatırlatması: {$a->message} (Abonelikten çık: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Bugünün çalışma hedefi: ';
 $string['unsubscribe:title'] = 'Çalışma hatırlatmalarından çık';

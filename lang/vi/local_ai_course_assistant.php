@@ -206,6 +206,16 @@ Cố lên nhé!
 
 ---
 Để ngừng nhận những nhắc nhở này, nhấn vào đây: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = 'Nhắc nhở học tập cho {$a->coursename}: {$a->message} (Hủy đăng ký: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Nội dung học tập hôm nay: ';
 

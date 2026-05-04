@@ -206,6 +206,16 @@ Ci gaba da aikin da kyau!
 
 ---
 Don daina karɓar waɗannan tunatarwa, danna nan: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = 'Tunatarwa ta Karatu don {$a->coursename}: {$a->message} (Fita: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Maƙasudin karatu na yau: ';
 

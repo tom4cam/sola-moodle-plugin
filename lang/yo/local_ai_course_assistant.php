@@ -206,6 +206,16 @@ Tẹ̀síwájú ìgbẹ́kẹ̀lé rere!
 
 ---
 Láti dáwọ́ àwọn ìránlọ́wọ́ wọ̀nyí dúró, tẹ ibí: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = 'Ìránlọ́wọ́ Ìkẹ́kọ̀ọ́ fún {$a->coursename}: {$a->message} (Jáde: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Àfojúsí ìkẹ́kọ̀ọ́ lónìí: ';
 

@@ -206,6 +206,16 @@ Terus semangat!
 
 ---
 Untuk berhenti menerima pengingat ini, klik di sini: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = 'Pengingat Belajar untuk {$a->coursename}: {$a->message} (Berhenti berlangganan: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Fokus belajar hari ini: ';
 

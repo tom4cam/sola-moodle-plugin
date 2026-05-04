@@ -215,17 +215,23 @@ class reminder_manager {
 
         $subject = get_string('reminder:email_subject', 'local_ai_course_assistant', $course->fullname);
 
+        // v5.0.0 patch 11: previously a missing or zero-hours plan rendered
+        // the body as 'Your study plan suggests (not set) hours per week ...'
+        // which leaked the hardcoded placeholder into the learner's inbox.
+        // Pick the variant template based on whether we actually have hours
+        // to report — translators localise both, no placeholder leakage.
         $plan = study_planner::get_plan($reminder->userid, $reminder->courseid);
-        $hoursperweek = $plan ? $plan->hours_per_week : '(not set)';
+        $hashours = $plan && (float) $plan->hours_per_week > 0;
 
         $bodydata = (object) [
             'firstname' => $user->firstname,
             'coursename' => $course->fullname,
             'message' => $message,
-            'hours_per_week' => $hoursperweek,
+            'hours_per_week' => $hashours ? $plan->hours_per_week : '',
             'unsubscribe_url' => $unsubscribeurl->out(false),
         ];
-        $body = get_string('reminder:email_body', 'local_ai_course_assistant', $bodydata);
+        $stringkey = $hashours ? 'reminder:email_body' : 'reminder:email_body_no_hours';
+        $body = get_string($stringkey, 'local_ai_course_assistant', $bodydata);
 
         $noreplyuser = \core_user::get_noreply_user();
 

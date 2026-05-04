@@ -187,6 +187,16 @@ Continuă tot așa!
 
 ---
 Pentru a nu mai primi aceste memento-uri, faceți clic aici: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = 'Memento de studiu pentru {$a->coursename}: {$a->message} (Dezabonare: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Obiectivul de studiu al zilei: ';
 $string['unsubscribe:title'] = 'Dezabonare de la memento-urile de studiu';

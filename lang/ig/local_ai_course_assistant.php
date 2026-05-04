@@ -197,6 +197,16 @@ Nọgide na-arụ ọrụ ọma!
 
 ---
 Iji kwụsị ịnatara ihe ncheta ndị a, pịa ebe a: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = 'Ihe Ncheta Mmụta maka {$a->coursename}: {$a->message} (Pụọ: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Isiokwu mmụta taa: ';
 // Unsubscribe page.

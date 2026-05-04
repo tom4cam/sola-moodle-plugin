@@ -194,6 +194,16 @@ Hojii gaariin itti fufii!
 
 ---
 Yaadachiisuuwwan kana argachuu dhaabuuf, asitti cuqaasi: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = 'Yaadachiisuu Barumsa {$a->coursename}: {$a->message} (Bahuu: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Xiyyeeffannaa barumsa har\'aa: ';
 // Unsubscribe page.

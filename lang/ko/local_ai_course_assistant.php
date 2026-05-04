@@ -187,6 +187,16 @@ $string['reminder:email_body'] = '{$a->firstname}님, 안녕하세요.
 
 ---
 이 알림을 중지하려면 여기를 클릭하세요: {$a->unsubscribe_url}';
+$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+
+This is your study reminder for "{$a->coursename}".
+
+{$a->message}
+
+Keep up the great work!
+
+---
+To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['reminder:whatsapp_body'] = '{$a->coursename} 학습 알림: {$a->message} (구독 취소: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = '오늘의 학습 목표: ';
 $string['unsubscribe:title'] = '학습 알림 구독 취소';
