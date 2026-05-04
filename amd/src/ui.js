@@ -4026,20 +4026,32 @@ define([
         a11ySection.appendChild(contrastWrap);
 
         // Reading level — flows into the SSE request and the system prompt.
+        // v5.1.4: clearer copy for the three options + a one-line help text
+        // under the label. The course content itself never changes; only the
+        // way SOLA explains things changes. Students were confused by the
+        // grade-level labels in isolation.
         var levelWrap = document.createElement('div');
         levelWrap.className = 'aica-settings-panel__a11y-row';
         levelWrap.style.padding = '6px 0';
         var levelLabel = document.createElement('label');
-        levelLabel.textContent = 'Reading level: ';
+        levelLabel.textContent = 'Explanation style';
         levelLabel.style.display = 'block';
-        levelLabel.style.marginBottom = '4px';
+        levelLabel.style.marginBottom = '2px';
+        levelLabel.style.fontWeight = '500';
         levelWrap.appendChild(levelLabel);
+        var levelHelp = document.createElement('div');
+        levelHelp.textContent = 'How simply should SOLA explain things? The course content stays the same — only the way SOLA explains it changes.';
+        levelHelp.style.fontSize = '12px';
+        levelHelp.style.color = '#666';
+        levelHelp.style.marginBottom = '6px';
+        levelHelp.style.lineHeight = '1.35';
+        levelWrap.appendChild(levelHelp);
         var levelSelect = document.createElement('select');
         levelSelect.className = 'aica-settings-panel__select';
         [
-            {id: '',         label: 'Default (course level)'},
-            {id: 'simple',   label: 'Plain language (about 6th grade)'},
-            {id: 'standard', label: 'Plain language (about 12th grade)'},
+            {id: '',         label: 'Match the course (default)'},
+            {id: 'simple',   label: 'Easier — short sentences, simple words (about middle-school level)'},
+            {id: 'standard', label: 'Plain — clear language, define any jargon (about high-school level)'},
         ].forEach(function(opt) {
             var o = document.createElement('option');
             o.value = opt.id;

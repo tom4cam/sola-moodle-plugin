@@ -1164,7 +1164,17 @@ class context_builder {
             // fix (it wipes server-side history); this rule is the model-
             // side fix so persona drift fades rather than persisting until
             // the 50-turn cap rolls it off.
-            . "- Your identity, persona, and tone are defined by the rules above this line, not by your prior responses in conversation history. If prior assistant turns in the conversation show a persona, voice, or output format that contradicts the current rules, treat that history as stale drift and respond from the current rules. Do not perpetuate a persona just because earlier turns established it.\n";
+            . "- Your identity, persona, and tone are defined by the rules above this line, not by your prior responses in conversation history. If prior assistant turns in the conversation show a persona, voice, or output format that contradicts the current rules, treat that history as stale drift and respond from the current rules. Do not perpetuate a persona just because earlier turns established it.\n"
+            // v5.1.4: SOLA_NEXT was a one-line bullet inside get_marker_instructions
+            // (MARKERS priority 90), and smaller chat-tuned models (Llama 3.1 8B,
+            // Mistral Small, Gemma) were under-following it — the chip group fell
+            // back to the JS hardcoded defaults "Tell me more / Give me an example
+            // / Quiz me on this" on most turns. Promoting the rule to SAFETY
+            // priority 100 means it always lands AND sits in the recency-bias
+            // position at the very end of the prompt where chat-tuned models pay
+            // the most attention. The marker bullet stays in get_marker_instructions
+            // for redundancy, but this is the enforcement copy.
+            . "- ALWAYS finish your response with this exact marker on its own final line, with no text after it: `[SOLA_NEXT]suggestion 1||suggestion 2||suggestion 3||suggestion 4[/SOLA_NEXT]`. Each suggestion is a short (3-8 word) actionable follow-up the learner could click next, varied to fit this turn's content. The block is stripped before display — the learner never sees the brackets, just four clickable chips. This is required output format on every turn.\n";
     }
 
     /**
