@@ -167,7 +167,14 @@ class get_realtime_token extends external_api {
             'token'    => new external_value(PARAM_RAW, 'Ephemeral session token (or raw API key for providers without ephemeral support)'),
             'voice'    => new external_value(PARAM_ALPHANUMEXT, 'Voice identifier'),
             'provider' => new external_value(PARAM_ALPHANUMEXT, 'Provider id (openai|xai)'),
-            'endpoint' => new external_value(PARAM_URL, 'WebSocket endpoint URL'),
+            // v5.1.3: was PARAM_URL, which Moodle\'s webservice layer rejects
+            // for wss:// schemes — both providers return wss:// endpoints,
+            // and the xAI proxy form additionally carries a JWT in its query
+            // string. PARAM_URL validation failure surfaced as the generic
+            // "Invalid response value detected" error to the learner the
+            // moment voice mode was opened. Server-generated value, not
+            // user input, so PARAM_RAW is the right type here.
+            'endpoint' => new external_value(PARAM_RAW, 'WebSocket endpoint URL (wss://)'),
         ]);
     }
 }
