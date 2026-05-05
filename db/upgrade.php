@@ -885,8 +885,8 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
             $table->add_field('current_streak_days', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_field('longest_streak_days', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-            $table->add_field('last_active_date', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, '');
-            $table->add_field('last_milestone_kind', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, '');
+            $table->add_field('last_active_date', XMLDB_TYPE_CHAR, '10', null, null, null, null);
+            $table->add_field('last_milestone_kind', XMLDB_TYPE_CHAR, '20', null, null, null, null);
             $table->add_field('last_milestone_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
@@ -919,10 +919,10 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
             $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
             $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
-            $table->add_field('session_id', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, '');
-            $table->add_field('topic_hint', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, '');
+            $table->add_field('session_id', XMLDB_TYPE_CHAR, '64', null, null, null, null);
+            $table->add_field('topic_hint', XMLDB_TYPE_CHAR, '255', null, null, null, null);
             $table->add_field('stage1_score', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-            $table->add_field('stage2_label', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, '');
+            $table->add_field('stage2_label', XMLDB_TYPE_CHAR, '20', null, null, null, null);
             $table->add_field('followup_sent_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
@@ -940,8 +940,8 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
             $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_field('channel', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL);
-            $table->add_field('trigger_reason', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, '');
-            $table->add_field('message_id', XMLDB_TYPE_CHAR, '80', null, XMLDB_NOTNULL, null, '');
+            $table->add_field('trigger_reason', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+            $table->add_field('message_id', XMLDB_TYPE_CHAR, '80', null, null, null, null);
             $table->add_field('timesent', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
             $table->add_key('userid_fk_out', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);

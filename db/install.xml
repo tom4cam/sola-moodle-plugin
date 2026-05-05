@@ -207,8 +207,8 @@
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="current_streak_days" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="longest_streak_days" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="last_active_date" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="" SEQUENCE="false" COMMENT="YYYY-MM-DD in Moodle server tz"/>
-        <FIELD NAME="last_milestone_kind" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="" SEQUENCE="false" COMMENT="streak7 | streak30 | completion"/>
+        <FIELD NAME="last_active_date" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="YYYY-MM-DD in Moodle server tz"/>
+        <FIELD NAME="last_milestone_kind" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="streak7 | streak30 | completion"/>
         <FIELD NAME="last_milestone_at" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -241,10 +241,10 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="session_id" TYPE="char" LENGTH="64" NOTNULL="true" DEFAULT="" SEQUENCE="false"/>
-        <FIELD NAME="topic_hint" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="" SEQUENCE="false" COMMENT="Course module name or topic, derived from page context"/>
+        <FIELD NAME="session_id" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="topic_hint" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Course module name or topic, derived from page context"/>
         <FIELD NAME="stage1_score" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="stage2_label" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="" SEQUENCE="false" COMMENT="confused | frustrated | fine | unprocessed"/>
+        <FIELD NAME="stage2_label" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="confused | frustrated | fine | unprocessed"/>
         <FIELD NAME="followup_sent_at" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
@@ -264,8 +264,8 @@
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="channel" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="milestone_streak7 | milestone_streak30 | milestone_completion | struggle_followup"/>
-        <FIELD NAME="trigger_reason" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="" SEQUENCE="false" COMMENT="Plain-English reason shown in learner audit log"/>
-        <FIELD NAME="message_id" TYPE="char" LENGTH="80" NOTNULL="true" DEFAULT="" SEQUENCE="false"/>
+        <FIELD NAME="trigger_reason" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Plain-English reason shown in learner audit log"/>
+        <FIELD NAME="message_id" TYPE="char" LENGTH="80" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timesent" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
