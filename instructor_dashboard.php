@@ -34,7 +34,19 @@ use local_ai_course_assistant\security;
 
 require_login();
 
-$courseid = required_param('courseid', PARAM_INT);
+// v5.1.7: was required_param, which threw and rendered a hard 404 when an
+// admin opened the page bare. Now optional_param + a friendly "pick a
+// course" landing if missing. Direct links with ?courseid=N are unchanged.
+$courseid = optional_param('courseid', 0, PARAM_INT);
+if ($courseid <= 0) {
+    \local_ai_course_assistant\page_helpers::render_course_picker_landing(
+        '/local/ai_course_assistant/instructor_dashboard.php',
+        get_string('coursepicker:title', 'local_ai_course_assistant',
+            get_string('instructor_dashboard:short', 'local_ai_course_assistant')),
+        'local/ai_course_assistant:viewanalytics'
+    );
+    exit;
+}
 $range    = optional_param('range', 30, PARAM_INT);   // 7, 30, 90, 0=all
 $gapdays  = optional_param('gapdays', 7, PARAM_INT);
 $action   = optional_param('action', '', PARAM_ALPHA);

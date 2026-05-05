@@ -31,7 +31,20 @@ require_once(__DIR__ . '/../../config.php');
 
 require_login();
 
-$courseid = required_param('courseid', PARAM_INT);
+// v5.1.7: was required_param + hard 404 when accessed bare. Sandbox is
+// learner-facing and almost always opened from inside a course context,
+// but a direct hit on the URL should give a friendly "pick a course"
+// landing rather than a 404. Direct links with ?courseid=N unchanged.
+$courseid = optional_param('courseid', 0, PARAM_INT);
+if ($courseid <= 0) {
+    \local_ai_course_assistant\page_helpers::render_course_picker_landing(
+        '/local/ai_course_assistant/sandbox.php',
+        get_string('coursepicker:title', 'local_ai_course_assistant',
+            get_string('sandbox:title', 'local_ai_course_assistant')),
+        'local/ai_course_assistant:use'
+    );
+    exit;
+}
 $course = get_course($courseid);
 $context = context_course::instance($courseid);
 require_capability('local/ai_course_assistant:use', $context);

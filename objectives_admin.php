@@ -30,7 +30,19 @@ require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\objective_manager;
 
-$courseid = required_param('courseid', PARAM_INT);
+// v5.1.7: was required_param + 404. Now optional_param with a friendly
+// course picker landing when accessed bare. Direct links unchanged.
+$courseid = optional_param('courseid', 0, PARAM_INT);
+if ($courseid <= 0) {
+    require_login();
+    \local_ai_course_assistant\page_helpers::render_course_picker_landing(
+        '/local/ai_course_assistant/objectives_admin.php',
+        get_string('coursepicker:title', 'local_ai_course_assistant',
+            get_string('objectives:title', 'local_ai_course_assistant')),
+        'local/ai_course_assistant:manage'
+    );
+    exit;
+}
 $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
 $context = context_course::instance($courseid);
 
